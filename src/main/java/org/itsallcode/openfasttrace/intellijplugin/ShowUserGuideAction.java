@@ -1,4 +1,4 @@
-package org.itsallcode.intellij.oftplugin;
+package org.itsallcode.openfasttrace.intellijplugin;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnAction;
