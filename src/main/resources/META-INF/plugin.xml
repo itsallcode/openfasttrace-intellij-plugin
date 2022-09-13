@@ -26,7 +26,7 @@
     <actions>
         <action
                 id="Oft.ShowUserGuide.HelpMenu"
-                class="org.itsallcode.intellij.oftplugin.ShowUserGuideAction"
+                class="org.itsallcode.openfasttrace.intellijplugin.ShowUserGuideAction"
                 text="OpenFastTrace User Guide"
                 description="Open the OpenFastTrace user Guide in the built-in browser."
         >

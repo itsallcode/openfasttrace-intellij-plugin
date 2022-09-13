@@ -1,6 +1,8 @@
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.8.0"
+    id("jacoco")
+    id("org.jetbrains.intellij") version "1.9.0"
+    id("org.sonarqube") version "3.4.0.2513"
 }
 
 group = "org.itsallcode"
@@ -41,3 +43,18 @@ tasks {
         token.set(System.getenv("PUBLISH_TOKEN"))
     }
 }
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+    }
+}
+
+tasks.sonarqube {
+    dependsOn(tasks.jacocoTestReport)
+}
+
