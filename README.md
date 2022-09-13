@@ -31,14 +31,12 @@ Editor support for writing and maintaining OpenFastTrace documents
 
 ### Information for Users
 
-<!-- * [User Guide](doc/user_guide/user_guide.md) -->
 * [Changelog](doc/changes/changelog.md)
 
 ### Information for Contributors
 
 Requirement, design documents and coverage tags are written in [OpenFastTrace](https://github.com/itsallcode/openfasttrace) format.
 
-<!-- * [Developer Guide](doc/developer_guide/developer_guide.md) -->
 * [Getting Started With IntelliJ Plugin Development](doc/developer_guide/getting_started_intellij_plugin_development.md)
 
 ### Runtime Dependencies
