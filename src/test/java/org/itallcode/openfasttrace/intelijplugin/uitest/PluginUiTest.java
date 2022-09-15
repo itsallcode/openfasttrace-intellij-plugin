@@ -43,7 +43,7 @@ class PluginUiTest {
     }
 
     private static void assumeNotRunningInCiBUild() {
-        assumeFalse("TRUE".equals(System.getenv("CI")));
+        assumeFalse(Boolean.parseBoolean(System.getenv("CI")));
     }
 
     @SuppressWarnings("java:S2925")
