@@ -2,8 +2,10 @@ package org.itallcode.openfasttrace.intelijplugin.uitest;
 
 import com.intellij.remoterobot.RemoteRobot;
 import com.intellij.remoterobot.fixtures.ComponentFixture;
+
 import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import com.intellij.remoterobot.fixtures.JMenuBarFixture;
 import org.itallcode.openfasttrace.intelijplugin.uitest.pages.IdeFrameFixture;
@@ -24,6 +26,7 @@ class PluginUiTest {
 
     @Test
     void testOftMenuEntryExists() {
+        assumeNotRunningInCiBUild();
         final RemoteRobot robot = new RemoteRobot(ROBOT_BASE_URL);
         final WelcomeFrameFixture welcomeFrame = robot.find(WelcomeFrameFixture.class, WITH_PATIENCE);
         welcomeFrame.createNewProjectLink().click();
@@ -37,6 +40,10 @@ class PluginUiTest {
         menuBar.select("Help");
         assertDoesNotThrow(() -> robot.find(ComponentFixture.class,
                 byXpath("//div[@class='ActionMenu']//div[@text='OpenFastTrace User Guide']")));
+    }
+
+    private static void assumeNotRunningInCiBUild() {
+        assumeFalse("TRUE".equals(System.getenv("CI")));
     }
 
     @SuppressWarnings("java:S2925")
