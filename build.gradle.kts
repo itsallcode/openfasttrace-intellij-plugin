@@ -1,3 +1,5 @@
+val remoteRobotVersion = "0.11.16"
+
 plugins {
     id("java")
     id("jacoco")
@@ -10,6 +12,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven { url = uri("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies") }
 }
 
 // Configure Gradle IntelliJ Plugin
@@ -17,8 +20,18 @@ repositories {
 intellij {
     version.set("2021.3.3")
     type.set("IC") // Target IDE Platform
-
     plugins.set(listOf(/* Plugin Dependencies */))
+}
+
+dependencies {
+    testImplementation("com.intellij.remoterobot:remote-robot:" + remoteRobotVersion)
+    testImplementation("com.intellij.remoterobot:remote-fixtures:" + remoteRobotVersion)
+    testImplementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+
+    val junitVersion = "5.9.0"
+    testImplementation("org.junit.jupiter:junit-jupiter-api:" + junitVersion)
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:" + junitVersion)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.0")
 }
 
 tasks {
@@ -42,19 +55,41 @@ tasks {
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
     }
-}
 
-tasks.test {
-    finalizedBy(tasks.jacocoTestReport)
-}
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-    reports {
-        xml.required.set(true)
+    downloadRobotServerPlugin {
+        version.set(remoteRobotVersion)
+    }
+
+    test {
+        systemProperty("robot-server.port", "8082")
+        useJUnitPlatform()
+        finalizedBy(jacocoTestReport)
+    }
+
+    runIdeForUiTests {
+        //    In case your Idea is launched on remote machine you can enable public port and enable encryption of JS calls
+        //    systemProperty "robot-server.host.public", "true"
+        //    systemProperty "robot.encryption.enabled", "true"
+        //    systemProperty "robot.encryption.password", "my super secret"
+        systemProperty("robot-server.port", "8082")
+        systemProperty("ide.mac.message.dialogs.as.sheets", "false")
+        systemProperty("jb.privacy.policy.text", "<!--999.999-->")
+        systemProperty("jb.consents.confirmation.enabled", "false")
+        systemProperty("ide.mac.file.chooser.native", "false")
+        systemProperty("jbScreenMenuBar.enabled", "false")
+        systemProperty("apple.laf.useScreenMenuBar", "false")
+        systemProperty("idea.trust.all.projects", "true")
+        systemProperty("ide.show.tips.on.startup.default.value", "false")
+    }
+
+    jacocoTestReport {
+        dependsOn(test)
+        reports {
+            xml.required.set(true)
+        }
     }
 }
 
 tasks.sonarqube {
-    dependsOn(tasks.jacocoTestReport)
+     dependsOn(tasks.jacocoTestReport)
 }
-
