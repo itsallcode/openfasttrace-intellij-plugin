@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 
-@DefaultXpath(by = "MyDialog type", xpath = "//*[contains(@title.key, 'title.new.project')]")
+@DefaultXpath(by = "NewProjectDialog type", xpath = "//*[contains(@title.key, 'title.new.project')]")
 @FixtureName(name = "New Project Dialog")
 public class NewProjectDialogFixture extends CommonContainerFixture {
     public NewProjectDialogFixture(@NotNull RemoteRobot remoteRobot, @NotNull RemoteComponent remoteComponent) {
