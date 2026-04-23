@@ -1,4 +1,4 @@
-# OpenFastTrace IntelliJ Plugin 0.1.0, released 2022-09-??
+# OpenFastTrace IntelliJ Plugin 0.1.0, released 2026-04-??
 
 Code name: Initial Release
 
@@ -6,8 +6,6 @@ Code name: Initial Release
 
 In this release we added support for the following features:
 
-* Open the OFT user guide
-
 ## Features
 
-* #1: Open OFT user guide
+* #1: Specification 
