@@ -87,6 +87,17 @@ intellijPlatform {
     }
 }
 
+intellijPlatformTesting {
+    runIde {
+        create("manualTestIde") {
+            sandboxDirectory.set(layout.buildDirectory.dir("manual-test-ide-sandbox"))
+            task {
+                description = "Launches a throwaway IntelliJ instance with the plugin installed for manual testing."
+            }
+        }
+    }
+}
+
 tasks {
     withType<JavaCompile>().configureEach {
         options.release = 21

@@ -29,9 +29,10 @@ public final class OftSyntaxCore {
             "^\\[\\s*[A-Za-z]+(?:~~\\d+|~" + NAME_PART + "~\\d+)?\\s*->\\s*" + SPECIFICATION_ITEM_BODY + "\\s*]$"
     );
     private static final Pattern COVERAGE_TAG_PATTERN = Pattern.compile(
-            "\\[\\s*(?<sourceArtifact>[A-Za-z]+)"
-                    + "(?:~~(?<sourceRevision>\\d+)|~(?<sourceName>" + NAME_PART + ")~(?<sourceNamedRevision>\\d+))?"
-                    + "\\s*->\\s*" + NAMED_SPECIFICATION_ITEM_BODY + "\\s*]"
+            "\\[\\s*(?<sourceId>(?<sourceArtifact>[A-Za-z]+)"
+                    + "(?:~~(?<sourceRevision>\\d+)|~(?<sourceName>" + NAME_PART + ")~(?<sourceNamedRevision>\\d+))?)"
+                    + "\\s*->\\s*(?<targetId>(?<targetArtifactType>[A-Za-z]+)"
+                    + "~(?<targetName>" + NAME_PART + ")~(?<targetRevision>\\d+))\\s*]"
     );
 
     private OftSyntaxCore() {
@@ -99,9 +100,14 @@ public final class OftSyntaxCore {
                     matcher.group("sourceArtifact"),
                     matcher.group("sourceName"),
                     sourceRevision != null ? sourceRevision : sourceNamedRevision,
-                    specificationItemFrom(matcher)
+                    targetSpecificationItemFrom(matcher)
             );
-            matches.add(new OftCoverageTagMatch(tag, new OftTextSpan(matcher.start(), matcher.end())));
+            matches.add(new OftCoverageTagMatch(
+                    tag,
+                    new OftTextSpan(matcher.start(), matcher.end()),
+                    new OftTextSpan(matcher.start("sourceId"), matcher.end("sourceId")),
+                    new OftTextSpan(matcher.start("targetId"), matcher.end("targetId"))
+            ));
         }
         return List.copyOf(matches);
     }
@@ -123,6 +129,14 @@ public final class OftSyntaxCore {
                 matcher.group("artifactType"),
                 matcher.group("name"),
                 Integer.parseInt(matcher.group("revision"))
+        );
+    }
+
+    private static OftSpecificationItem targetSpecificationItemFrom(Matcher matcher) {
+        return new OftSpecificationItem(
+                matcher.group("targetArtifactType"),
+                matcher.group("targetName"),
+                Integer.parseInt(matcher.group("targetRevision"))
         );
     }
 

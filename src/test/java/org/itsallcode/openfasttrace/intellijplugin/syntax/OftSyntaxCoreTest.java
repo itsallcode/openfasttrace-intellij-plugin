@@ -62,4 +62,17 @@ class OftSyntaxCoreTest {
 
         assertThat(OftSyntaxCore.findCoverageTags(text), hasSize(2));
     }
+
+    @Test
+    void extractsCoverageTagSourceAndTargetSpansAndEffectiveSource() {
+        final String text = "// [impl->" + "req~openfasttrace_navigation_target~1]";
+        final OftCoverageTagMatch match = OftSyntaxCore.findCoverageTags(text).get(0);
+
+        assertThat(text.substring(match.sourceSpan().startOffset(), match.sourceSpan().endOffset()), is("impl"));
+        assertThat(
+                text.substring(match.targetSpan().startOffset(), match.targetSpan().endOffset()),
+                is("req~openfasttrace_navigation_target~1")
+        );
+        assertThat(match.tag().effectiveSource().id(), is("impl~openfasttrace_navigation_target~1"));
+    }
 }

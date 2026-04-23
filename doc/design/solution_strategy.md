@@ -16,7 +16,7 @@ Compatibility across the selected IDEs is verified continuously with plugin comp
 
 Where the IntelliJ Platform already provides a fitting concept, the plugin uses that concept instead of introducing parallel infrastructure.
 
-Specification items are exposed through the IDE symbol and navigation facilities so users interact with OpenFastTrace data through established workflows such as 'Go to Symbol' and editor navigation.
+Specification items are exposed through the IDE symbol and navigation facilities so users interact with OpenFastTrace data through established workflows such as 'Go to Symbol', Search Everywhere, and Go To on specification references and coverage tags.
 
 Parsing and syntax-aware editor behavior use the IntelliJ parsing, PSI, lexer, and highlighting infrastructure. The plugin builds only the OpenFastTrace-specific parts that are missing and reuses the existing editor, indexing, and navigation services for the rest.
 

@@ -32,7 +32,7 @@ public final class OftSpecificationIndex extends FileBasedIndexExtension<String,
         }
         final Map<String, List<OftIndexedSpecification>> entries = new LinkedHashMap<>();
         for (OftSpecificationItemMatch match : OftSyntaxCore.findDefinitionSpecificationItems(inputData.getContentAsText())) {
-            entries.computeIfAbsent(match.item().name(), ignored -> new ArrayList<>())
+            entries.computeIfAbsent(match.item().id(), ignored -> new ArrayList<>())
                     .add(new OftIndexedSpecification(
                             match.item().artifactType(),
                             match.item().name(),
@@ -76,7 +76,7 @@ public final class OftSpecificationIndex extends FileBasedIndexExtension<String,
 
     @Override
     public int getVersion() {
-        return 2;
+        return 3;
     }
 
     private static final class OftIndexedSpecificationExternalizer implements DataExternalizer<List<OftIndexedSpecification>> {

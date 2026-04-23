@@ -53,14 +53,16 @@ Needs: impl, itest
 ### Specification Item Navigation Runtime
 `dsn~specification-item-navigation-runtime~1`
 
-**Given** supported specification documents exist in the opened project
-**When** project indexing runs and a user invokes Go to Symbol or Search Everywhere for a specification item name
-**Then** the specification item index provides project-local lookup data for matching items and the navigation component opens the selected specification item at its stored file location and offset
+**Given** supported specification documents and supported files with OFT coverage tags exist in the opened project
+**When** project indexing runs and a user invokes Go to Symbol, Search Everywhere, or Go To on an OFT reference or either side of a coverage tag
+**Then** the specification item index provides project-local lookup data for matching items and the navigation component resolves the effective specification item ID under the caret, including shortened left sides of coverage tags by copying missing name and revision parts from the covered ID on the right side, and opens the selected specification item at its stored file location and offset
 
 Covers:
 - `scn~show-specification-item-in-go-to-symbol~1`
 - `scn~open-specification-item-from-go-to-symbol~1`
 - `scn~open-specification-item-from-search-everywhere~1`
+- `scn~open-specification-item-from-coverage-tag-left-side~1`
+- `scn~open-specification-item-from-coverage-tag-right-side~1`
 
 Needs: impl, itest
 

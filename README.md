@@ -38,6 +38,7 @@ Editor support for writing and maintaining OpenFastTrace documents
 Requirement, design documents and coverage tags are written in [OpenFastTrace](https://github.com/itsallcode/openfasttrace) format.
 
 * [Getting Started With IntelliJ Plugin Development](doc/developer_guide/getting_started_intellij_plugin_development.md)
+* Launch a temporary IDE with the plugin installed for manual testing: `./gradlew manualTestIde`
 
 ### Runtime Dependencies
 
@@ -46,4 +47,3 @@ You need an IntelliJ platform based IDE like the [IntelliJ IDEA](https://www.jet
 ## License
 
 This project is licensed under the [Apache 2.0 license](LICENSE) which follows the license chose from the [IntelliJ community edition](https://github.com/JetBrains/intellij-community/blob/master/LICENSE.txt) since that is the platform the plugin integrates into.
-

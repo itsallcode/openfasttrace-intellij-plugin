@@ -80,7 +80,7 @@ Needs: req
 ### Go to Specification Item
 `feat~go-to-specification-item~1`
 
-The plugin lets users search specification items by name across the project. Users can select a matching item from the result list and open it in the editor.
+The plugin lets users search specification items by name across the project and navigate from OpenFastTrace references in the editor. Users can select a matching item from the result list or invoke Go To on a specification reference or coverage-tag side and open the corresponding definition in the editor.
 
 Needs: req
 
@@ -149,6 +149,26 @@ Needs: scn
 `req~open-specification-item-from-go-to-symbol~1`
 
 The plugin opens the selected OpenFastTrace specification item from the 'Go to Symbol' result list in the editor. Users can jump from the result list to the definition of the selected specification item.
+
+Covers:
+- `feat~go-to-specification-item~1`
+
+Needs: scn
+
+### Open Specification Item from Coverage Tag Left Side
+`req~open-specification-item-from-coverage-tag-left-side~1`
+
+The plugin opens the covering OpenFastTrace specification item when a user invokes Go To on the left side of an OFT coverage tag in a supported file. If the left side omits the name and revision, the plugin resolves the effective ID by copying the missing parts from the covered ID on the right side of the arrow.
+
+Covers:
+- `feat~go-to-specification-item~1`
+
+Needs: scn
+
+### Open Specification Item from Coverage Tag Right Side
+`req~open-specification-item-from-coverage-tag-right-side~1`
+
+The plugin opens the covered OpenFastTrace specification item when a user invokes Go To on the right side of an OFT coverage tag in a supported file.
 
 Covers:
 - `feat~go-to-specification-item~1`
@@ -295,7 +315,7 @@ Needs: dsn
 
 ### Go to Specification Item
 
-The following scenarios describe the happy path for navigating to specification items by symbol name.
+The following scenarios describe the happy path for navigating to specification items by symbol name and from coverage tags.
 
 ### Show Specification Item in Go to Symbol
 `scn~show-specification-item-in-go-to-symbol~1`
@@ -331,6 +351,30 @@ Needs: dsn
 Covers:
 - `req~go-to-symbol-for-specification-items~1`
 - `req~open-specification-item-from-go-to-symbol~1`
+
+Needs: dsn
+
+### Open Specification Item from Coverage Tag Left Side
+`scn~open-specification-item-from-coverage-tag-left-side~1`
+
+**Given** a project contains the specification items `impl~openfasttrace_navigation_target~1` and `req~openfasttrace_navigation_target~1`, and a supported source file contains the OFT coverage tag `[impl->req~openfasttrace_navigation_target~1]`
+**When** a user invokes Go To on `impl` on the left side of the coverage tag
+**Then** the editor opens `impl~openfasttrace_navigation_target~1` at its definition by copying the missing name and revision from the covered ID on the right side
+
+Covers:
+- `req~open-specification-item-from-coverage-tag-left-side~1`
+
+Needs: dsn
+
+### Open Specification Item from Coverage Tag Right Side
+`scn~open-specification-item-from-coverage-tag-right-side~1`
+
+**Given** a project contains the specification item `req~openfasttrace_navigation_target~1`, and a supported source file contains the OFT coverage tag `[impl->req~openfasttrace_navigation_target~1]`
+**When** a user invokes Go To on `req~openfasttrace_navigation_target~1` on the right side of the coverage tag
+**Then** the editor opens `req~openfasttrace_navigation_target~1` at its definition
+
+Covers:
+- `req~open-specification-item-from-coverage-tag-right-side~1`
 
 Needs: dsn
 

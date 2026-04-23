@@ -54,7 +54,7 @@ SpecIndex --> "1..n" ProjectSpecs : indexes
 ### OFT Syntax Core
 `dsn~oft-syntax-core~1`
 
-The plugin contains a shared OpenFastTrace syntax core that recognizes valid, invalid, and incomplete specification items and coverage tags. This component provides the common parsing and recognition logic that editor support and project indexing reuse.
+The plugin contains a shared OpenFastTrace syntax core that recognizes valid, invalid, and incomplete specification items and coverage tags. This component provides the common parsing and recognition logic that editor support, project indexing, and navigation reuse, including extracting both sides of coverage tags so navigation can resolve shortened left-side IDs.
 
 Covers:
 - `scn~highlight-markdown-specification-item~1`
@@ -69,6 +69,8 @@ Covers:
 - `scn~show-specification-item-in-go-to-symbol~1`
 - `scn~open-specification-item-from-go-to-symbol~1`
 - `scn~open-specification-item-from-search-everywhere~1`
+- `scn~open-specification-item-from-coverage-tag-left-side~1`
+- `scn~open-specification-item-from-coverage-tag-right-side~1`
 
 Needs: impl
 
@@ -111,24 +113,28 @@ Needs: impl
 ### Specification Item Index
 `dsn~specification-item-index~1`
 
-The plugin builds a project-local index of OpenFastTrace specification items from supported specification documents. This component provides the project-wide lookup data needed by symbol-based navigation.
+The plugin builds a project-local index of OpenFastTrace specification items from supported specification documents. This component provides the project-wide lookup data needed by symbol-based navigation and editor-driven Go To resolution.
 
 Covers:
 - `scn~show-specification-item-in-go-to-symbol~1`
 - `scn~open-specification-item-from-go-to-symbol~1`
 - `scn~open-specification-item-from-search-everywhere~1`
+- `scn~open-specification-item-from-coverage-tag-left-side~1`
+- `scn~open-specification-item-from-coverage-tag-right-side~1`
 
 Needs: impl
 
 ### Specification Item Navigation
 `dsn~specification-item-navigation~1`
 
-The plugin exposes indexed OpenFastTrace specification items through the IntelliJ navigation facilities so users can find and open specification items through established IDE workflows such as Go to Symbol and Search Everywhere.
+The plugin exposes indexed OpenFastTrace specification items through the IntelliJ navigation facilities so users can find and open specification items through established IDE workflows such as Go to Symbol, Search Everywhere, and Go To on specification references and either side of coverage tags. For shortened left sides of coverage tags, the navigation component resolves the effective ID by inheriting missing name and revision parts from the covered ID on the right side.
 
 Covers:
 - `scn~show-specification-item-in-go-to-symbol~1`
 - `scn~open-specification-item-from-go-to-symbol~1`
 - `scn~open-specification-item-from-search-everywhere~1`
+- `scn~open-specification-item-from-coverage-tag-left-side~1`
+- `scn~open-specification-item-from-coverage-tag-right-side~1`
 
 Needs: impl
 
