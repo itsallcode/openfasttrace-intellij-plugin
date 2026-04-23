@@ -31,6 +31,8 @@ Static code analysis runs in SonarQube Cloud and acts as a build breaker. A fail
 
 Dependency security scanning runs with OSS Index and acts as a build breaker. The build stays free of known vulnerable dependencies.
 
+OpenFastTrace tracing runs as a build breaker for the specification artifacts in scope. The trace stays clean for the requirement and design artifact types used by the project.
+
 ## Testability And Coverage
 
 Automated tests use JUnit 5 together with Hamcrest matchers.
