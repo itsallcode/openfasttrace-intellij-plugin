@@ -14,6 +14,8 @@ The implementation prefers speaking names over explanatory comments. Comments ar
 
 Methods stay short and keep cyclomatic complexity low. When behavior grows beyond a small, readable unit, the design is refactored into smaller collaborating types or methods.
 
+All objects that can be, are immutable. The implementation prefers static object allocation over dynamic allocation where possible.
+
 ## Dependency Policy
 
 The plugin uses the minimum set of dependencies required for:
