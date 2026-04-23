@@ -33,9 +33,13 @@ Dependency security scanning runs with OSS Index and acts as a build breaker. Th
 
 OpenFastTrace tracing runs as a build breaker for the specification artifacts in scope. The trace stays clean for the requirement and design artifact types used by the project.
 
+The Gradle build applies the latest OpenFastTrace Gradle plugin version approved for the project and executes `traceRequirements` locally and in CI through the standard `check` lifecycle.
+
 ## Testability And Coverage
 
 Automated tests use JUnit 5 together with Hamcrest matchers.
+
+IntelliJ Platform light fixture tests may keep a JUnit 4 compatibility dependency when JetBrains test base classes still require the legacy `TestCase` API.
 
 Path coverage across the code base stays at or above 80%. Coverage below that threshold fails the build unless a documented exception is accepted in advance.
 

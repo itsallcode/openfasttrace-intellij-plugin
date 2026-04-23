@@ -1,35 +1,22 @@
-<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>org.itsallcode.openfasttrace-intellij-plugin</id>
-    <name>OpenFastTrace</name>
-
-    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="support@yourcompany.com" url="https://blog.itsallcode.org/">Itsallcode.org</vendor>
-
-    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
-         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
-         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
-    <description><![CDATA[
-    Toolbox that makes authoring <a href="https://github.com/itsallcode/openfasttrace">OpenFastTrace</a> requirement
-    documents more comfortable.
-  ]]></description>
-
-    <!-- Product and plugin compatibility requirements.
-         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
 
-    <!-- Extension points defined by the plugin.
-         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
-    <extensions defaultExtensionNs="com.intellij">
+    <description><![CDATA[
+        Authoring support for OpenFastTrace specification documents and coverage tags.
+    ]]></description>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <fileBasedIndex implementation="org.itsallcode.openfasttrace.intellijplugin.indexing.OftSpecificationIndex"/>
+        <gotoSymbolContributor implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftChooseByNameContributor"/>
+        <highlightingPassFactory implementation="org.itsallcode.openfasttrace.intellijplugin.highlighting.OftHighlightingPassRegistrar"/>
     </extensions>
+
     <actions>
         <action
-                id="Oft.ShowUserGuide.HelpMenu"
-                class="org.itsallcode.openfasttrace.intellijplugin.ShowUserGuideAction"
+                id="Oft.OpenUserGuide.HelpMenu"
+                class="org.itsallcode.openfasttrace.intellijplugin.help.OpenFastTraceUserGuideAction"
                 text="OpenFastTrace User Guide"
-                description="Open the OpenFastTrace user Guide in the built-in browser."
-        >
+                description="Open the OpenFastTrace user guide in the integrated browser tab.">
             <add-to-group group-id="HelpMenu" anchor="last"/>
         </action>
     </actions>

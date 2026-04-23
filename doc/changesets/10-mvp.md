@@ -34,42 +34,42 @@ Out of scope:
 
 ### Build Setup
 
-- [ ] Create the Gradle-based IntelliJ Platform plugin build using the IntelliJ Platform Gradle Plugin
-- [ ] Configure plugin metadata, target platform baseline, and compatibility range for current and later IDE versions
-- [ ] Add the minimum approved dependencies for the MVP implementation and test setup
+- [x] Create the Gradle-based IntelliJ Platform plugin build using the IntelliJ Platform Gradle Plugin
+- [x] Configure plugin metadata, target platform baseline, and compatibility range for current and later IDE versions
+- [x] Add the minimum approved dependencies for the MVP implementation and test setup
 
 ### OFT Syntax Core
 
-- [ ] Implement shared recognition for valid, invalid, and incomplete OpenFastTrace specification items
-- [ ] Implement shared recognition for valid, invalid, and incomplete OpenFastTrace coverage tags
-- [ ] Keep the syntax core independent from editor-specific extension-point code
+- [x] Implement shared recognition for valid, invalid, and incomplete OpenFastTrace specification items
+- [x] Implement shared recognition for valid, invalid, and incomplete OpenFastTrace coverage tags
+- [x] Keep the syntax core independent from editor-specific extension-point code
 
 ### Editor Support
 
-- [ ] Implement Markdown specification highlighting for `.md` and `.markdown`
-- [ ] Implement RST specification highlighting for `.rst`
-- [ ] Implement coverage-tag highlighting for supported tag-importer file types
-- [ ] Ensure incomplete OpenFastTrace fragments do not block editing
+- [x] Implement Markdown specification highlighting for `.md` and `.markdown`
+- [x] Implement RST specification highlighting for `.rst`
+- [x] Implement coverage-tag highlighting for supported tag-importer file types
+- [x] Ensure incomplete OpenFastTrace fragments do not block editing
 
 ### Navigation
 
-- [ ] Implement project-local extraction and indexing of OpenFastTrace specification items
-- [ ] Implement Go to Symbol contribution for specification items
-- [ ] Implement opening the selected specification item at its definition from Go to Symbol and Search Everywhere
+- [x] Implement project-local extraction and indexing of OpenFastTrace specification items
+- [x] Implement Go to Symbol contribution for specification items
+- [x] Implement opening the selected specification item at its definition from Go to Symbol and Search Everywhere
 
 ### Help Integration
 
-- [ ] Register the OpenFastTrace user guide action in the global Help menu
-- [ ] Open the configured OpenFastTrace user guide URL in the integrated IDE web view
+- [x] Register the OpenFastTrace user guide action in the global Help menu
+- [x] Open the configured OpenFastTrace user guide URL in the integrated IDE web view
 
 ### Verification
 
-- [ ] Add automated plugin tests for Markdown highlighting scenarios
-- [ ] Add automated plugin tests for RST highlighting scenarios
-- [ ] Add automated plugin tests for coverage-tag highlighting scenarios
-- [ ] Add automated plugin tests for specification-item indexing and navigation scenarios
-- [ ] Add automated plugin tests for the user-guide action behavior
-- [ ] Keep automated test coverage at or above the required threshold
+- [x] Add automated plugin tests for Markdown highlighting scenarios
+- [x] Add automated plugin tests for RST highlighting scenarios
+- [x] Add automated plugin tests for coverage-tag highlighting scenarios
+- [x] Add automated plugin tests for specification-item indexing and navigation scenarios
+- [x] Add automated plugin tests for the user-guide action behavior
+- [x] Keep automated test coverage at or above the required threshold
 - [ ] Keep the OpenFastTrace trace clean for the requirement and design artifact types in scope
 - [ ] Keep SonarQube Cloud quality-gate checks green
 - [ ] Keep OSS Index audit results clean
