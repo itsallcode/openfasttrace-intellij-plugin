@@ -17,9 +17,10 @@ import java.util.List;
 // [impl->dsn~specification-item-navigation~1]
 public final class OftChooseByNameContributor implements ChooseByNameContributor, DumbAware {
     @Override
+    // [impl->dsn~show-specification-item-in-go-to-symbol~1]
     public String @NonNull [] getNames(final Project project, final boolean includeNonProjectItems) {
         final List<String> names = new ArrayList<>();
-        FileBasedIndex.getInstance().processAllKeys(OftSpecificationIndex.NAME, key -> {
+        FileBasedIndex.getInstance().processAllKeys(OftSpecificationIndex.SPECIFICATION_ID, key -> {
             names.add(key);
             return true;
         }, project);
@@ -28,6 +29,8 @@ public final class OftChooseByNameContributor implements ChooseByNameContributor
     }
 
     @Override
+    // [impl->dsn~open-specification-item-from-go-to-symbol~1]
+    // [impl->dsn~open-specification-item-from-search-everywhere~1]
     public NavigationItem @NonNull [] getItemsByName(
             final String name,
             final String pattern,
@@ -37,7 +40,7 @@ public final class OftChooseByNameContributor implements ChooseByNameContributor
         final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
         final List<OftNavigationItem> items = new ArrayList<>();
         FileBasedIndex.getInstance().processValues(
-                OftSpecificationIndex.NAME,
+                OftSpecificationIndex.SPECIFICATION_ID,
                 name,
                 null,
                 (file, values) -> {

@@ -21,9 +21,6 @@ import java.util.List;
 // [impl->dsn~markdown-specification-support~1]
 // [impl->dsn~rst-specification-support~1]
 // [impl->dsn~coverage-tag-support~1]
-// [impl->dsn~markdown-highlighting-runtime~1]
-// [impl->dsn~rst-highlighting-runtime~1]
-// [impl->dsn~coverage-tag-highlighting-runtime~1]
 public final class OftHighlightingPass extends TextEditorHighlightingPass implements DumbAware {
     private final PsiFile file;
     public OftHighlightingPass(final PsiFile file) {
@@ -32,6 +29,15 @@ public final class OftHighlightingPass extends TextEditorHighlightingPass implem
     }
 
     @Override
+    // [impl->dsn~highlight-markdown-specification-item~1]
+    // [impl->dsn~ignore-invalid-markdown-specification-item~1]
+    // [impl->dsn~tolerate-incomplete-markdown-specification-item~1]
+    // [impl->dsn~highlight-rst-specification-item~1]
+    // [impl->dsn~ignore-invalid-rst-specification-item~1]
+    // [impl->dsn~tolerate-incomplete-rst-specification-item~1]
+    // [impl->dsn~highlight-coverage-tag~1]
+    // [impl->dsn~ignore-invalid-coverage-tag~1]
+    // [impl->dsn~tolerate-incomplete-coverage-tag~1]
     public void doCollectInformation(final com.intellij.openapi.progress.@NonNull ProgressIndicator progress) {
         if (file.getVirtualFile() == null) {
             return;

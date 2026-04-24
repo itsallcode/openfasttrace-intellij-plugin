@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-// [impl->dsn~specification-item-navigation-runtime~1]
 public final class OftCoverageTagReferenceContributor extends PsiReferenceContributor {
     @Override
     public void registerReferenceProviders(@NotNull final PsiReferenceRegistrar registrar) {

@@ -10,9 +10,6 @@ import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecificat
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.Icon;
-import java.util.Objects;
-
-// [impl->dsn~specification-item-navigation-runtime~1]
 public final class OftNavigationItem implements NavigationItem {
     private final Project project;
     private final VirtualFile file;
@@ -25,8 +22,9 @@ public final class OftNavigationItem implements NavigationItem {
     }
 
     @Override
+    // [impl->dsn~show-specification-item-in-go-to-symbol~1]
     public String getName() {
-        return specification.name();
+        return specification.id();
     }
 
     @Override
@@ -34,7 +32,7 @@ public final class OftNavigationItem implements NavigationItem {
         return new ItemPresentation() {
             @Override
             public @Nullable String getPresentableText() {
-                return Objects.requireNonNullElse(specification.id(), "unknown");
+                return specification.id();
             }
 
             @Override
@@ -51,6 +49,8 @@ public final class OftNavigationItem implements NavigationItem {
     }
 
     @Override
+    // [impl->dsn~open-specification-item-from-go-to-symbol~1]
+    // [impl->dsn~open-specification-item-from-search-everywhere~1]
     public void navigate(final boolean requestFocus) {
         new OpenFileDescriptor(project, file, specification.offset()).navigate(requestFocus);
     }

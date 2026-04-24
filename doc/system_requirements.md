@@ -468,7 +468,6 @@ Needs: dsn
 **Then** the IDE opens the OpenFastTrace user guide GitHub page in an integrated web view tab
 
 Covers:
-- `req~open-oft-user-guide-in-help-menu~1`
 - `req~open-oft-user-guide-in-integrated-web-view~1`
 
 Needs: dsn

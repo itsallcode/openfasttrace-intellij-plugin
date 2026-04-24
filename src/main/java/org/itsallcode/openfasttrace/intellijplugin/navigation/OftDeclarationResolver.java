@@ -7,11 +7,16 @@ import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.ResolveResult;
+import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.util.Processor;
 import com.intellij.util.indexing.FileBasedIndex;
+import org.itsallcode.openfasttrace.intellijplugin.OftSupportedFiles;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecification;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftSpecificationIndex;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftCoverageTagMatch;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.OftKeywordMatch;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItem;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItemMatch;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSyntaxCore;
@@ -33,6 +38,20 @@ final class OftDeclarationResolver {
                         .filter(match -> contains(match.span(), offset))
                         .map(OftSpecificationItemMatch::item)
                         .findFirst());
+    }
+
+    static Optional<OftSpecificationItem> findDeclaredItem(final PsiElement element) {
+        if (element == null || element.getContainingFile() == null || element.getContainingFile().getVirtualFile() == null) {
+            return Optional.empty();
+        }
+        if (!OftSupportedFiles.isSpecificationFile(element.getContainingFile().getVirtualFile())) {
+            return Optional.empty();
+        }
+        final int offset = element.getTextRange().getStartOffset();
+        return OftSyntaxCore.findDefinitionSpecificationItems(element.getContainingFile().getViewProvider().getContents()).stream()
+                .filter(match -> contains(match.span(), offset))
+                .map(OftSpecificationItemMatch::item)
+                .findFirst();
     }
 
     private static Optional<OftSpecificationItem> findCoverageTagReferenceAt(final CharSequence text, final int offset) {
@@ -72,8 +91,8 @@ final class OftDeclarationResolver {
         final List<PsiElement> targets = new ArrayList<>();
         final Set<String> seenTargets = new LinkedHashSet<>();
         FileBasedIndex.getInstance().processValues(
-                OftSpecificationIndex.NAME,
-                reference.name(),
+                OftSpecificationIndex.SPECIFICATION_ID,
+                reference.id(),
                 null,
                 (file, values) -> {
                     for (OftIndexedSpecification value : values) {
@@ -92,7 +111,126 @@ final class OftDeclarationResolver {
         return targets;
     }
 
-    private static PsiElement findPsiElementAt(final PsiManager psiManager, final VirtualFile file, final int offset) {
+    static boolean processCoverageOccurrences(
+            final Project project,
+            final OftSpecificationItem declaration,
+            final SearchScope scope,
+            final Processor<? super PsiElement> processor
+    ) {
+        final PsiManager psiManager = PsiManager.getInstance(project);
+        final Set<String> seenTargets = new LinkedHashSet<>();
+        return ProjectFileIndex.getInstance(project).iterateContent(file -> {
+            if (!isInScope(scope, file)) {
+                return true;
+            }
+            if (OftSupportedFiles.isSpecificationFile(file)) {
+                return processSpecificationCoverageOccurrences(psiManager, file, declaration, processor, seenTargets);
+            }
+            if (OftSupportedFiles.isCoverageTagFile(file)) {
+                return processCoverageTagOccurrences(psiManager, file, declaration, processor, seenTargets);
+            }
+            return true;
+        });
+    }
+
+    private static boolean processSpecificationCoverageOccurrences(
+            final PsiManager psiManager,
+            final VirtualFile file,
+            final OftSpecificationItem declaration,
+            final Processor<? super PsiElement> processor,
+            final Set<String> seenTargets
+    ) {
+        final PsiFile psiFile = psiManager.findFile(file);
+        if (psiFile == null) {
+            return true;
+        }
+        for (OftTextSpan span : findCoveredSpecificationItemSpans(psiFile.getViewProvider().getContents(), declaration)) {
+            final PsiElement target = findPsiElementAt(psiManager, file, span.startOffset());
+            if (target != null && seenTargets.add(file.getPath() + ":" + span.startOffset()) && !processor.process(target)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean processCoverageTagOccurrences(
+            final PsiManager psiManager,
+            final VirtualFile file,
+            final OftSpecificationItem declaration,
+            final Processor<? super PsiElement> processor,
+            final Set<String> seenTargets
+    ) {
+        final PsiFile psiFile = psiManager.findFile(file);
+        if (psiFile == null) {
+            return true;
+        }
+        for (OftCoverageTagMatch match : OftSyntaxCore.findCoverageTags(psiFile.getViewProvider().getContents())) {
+            if (declaration.id().equals(match.tag().effectiveSource().id())) {
+                final PsiElement target = findPsiElementAt(psiManager, file, match.sourceSpan().startOffset());
+                if (target != null && seenTargets.add(file.getPath() + ":" + match.sourceSpan().startOffset()) && !processor.process(target)) {
+                    return false;
+                }
+            }
+            if (declaration.id().equals(match.tag().target().id())) {
+                final PsiElement target = findPsiElementAt(psiManager, file, match.targetSpan().startOffset());
+                if (target != null && seenTargets.add(file.getPath() + ":" + match.targetSpan().startOffset()) && !processor.process(target)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static List<OftTextSpan> findCoveredSpecificationItemSpans(
+            final CharSequence text,
+            final OftSpecificationItem declaration
+    ) {
+        final List<OftTextSpan> spans = new ArrayList<>();
+        int lineStart = 0;
+        boolean insideCoversSection = false;
+        while (lineStart <= text.length()) {
+            final int lineEnd = findLineEnd(text, lineStart);
+            final CharSequence line = text.subSequence(lineStart, lineEnd);
+            insideCoversSection = updateSectionState(line, insideCoversSection);
+            if (insideCoversSection) {
+                for (OftSpecificationItemMatch match : OftSyntaxCore.findSpecificationItems(line)) {
+                    if (declaration.id().equals(match.item().id())) {
+                        spans.add(new OftTextSpan(lineStart + match.span().startOffset(), lineStart + match.span().endOffset()));
+                    }
+                }
+            }
+            lineStart = lineEnd + 1;
+        }
+        return List.copyOf(spans);
+    }
+
+    private static int findLineEnd(final CharSequence text, final int lineStart) {
+        int lineEnd = lineStart;
+        while (lineEnd < text.length() && text.charAt(lineEnd) != '\n') {
+            lineEnd++;
+        }
+        return lineEnd;
+    }
+
+    private static boolean updateSectionState(final CharSequence line, final boolean insideCoversSection) {
+        if (line.toString().trim().isEmpty()) {
+            return false;
+        }
+        if (!OftSyntaxCore.findDefinitionSpecificationItems(line).isEmpty()) {
+            return false;
+        }
+        final List<OftKeywordMatch> keywords = OftSyntaxCore.findKeywords(line);
+        if (!keywords.isEmpty()) {
+            return "Covers".equals(keywords.get(0).keyword());
+        }
+        return insideCoversSection;
+    }
+
+    private static boolean isInScope(final SearchScope scope, final VirtualFile file) {
+        return !(scope instanceof GlobalSearchScope globalSearchScope) || globalSearchScope.contains(file);
+    }
+
+    static PsiElement findPsiElementAt(final PsiManager psiManager, final VirtualFile file, final int offset) {
         final PsiFile psiFile = psiManager.findFile(file);
         if (psiFile == null || psiFile.getTextLength() == 0) {
             return null;

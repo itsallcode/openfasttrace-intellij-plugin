@@ -1,12 +1,13 @@
 package org.itsallcode.openfasttrace.intellijplugin.help;
 
+import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ActionUiKind;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -14,9 +15,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-// [itest->dsn~user-guide-action-runtime~1]
 public class OpenFastTraceUserGuideActionTest extends AbstractOftPlatformTestCase {
-    public void testActionOpensUserGuideInHtmlEditor() throws Exception {
+    // [itest->dsn~show-oft-user-guide-in-help-menu~1]
+    public void testGivenPluginIsLoadedWhenHelpMenuActionIsQueriedThenTheUserGuideActionIsRegistered() {
+        assertThat(ActionManager.getInstance().getAction("Oft.OpenUserGuide.HelpMenu") != null, is(true));
+    }
+
+    // [itest->dsn~open-oft-user-guide-in-integrated-web-view~1]
+    public void testGivenUserInvokesTheHelpActionWhenActionPerformsThenTheUserGuideIsOpened() throws Exception {
         final AtomicReference<ProjectCall> call = new AtomicReference<>();
         final OpenFastTraceUserGuideAction action = new OpenFastTraceUserGuideAction(
                 (project, title, url) -> call.set(new ProjectCall(project, title, url))
@@ -33,10 +39,7 @@ public class OpenFastTraceUserGuideActionTest extends AbstractOftPlatformTestCas
 
         ApplicationManager.getApplication().invokeAndWait(() -> action.actionPerformed(event));
 
-        final ProjectCall actual = call.get();
-        assertThat(actual.project(), is(getProject()));
-        assertThat(actual.title(), is(OpenFastTraceUserGuide.TITLE));
-        assertThat(actual.url(), is(OpenFastTraceUserGuide.URL));
+        assertThat(call.get(), is(new ProjectCall(getProject(), OpenFastTraceUserGuide.TITLE, OpenFastTraceUserGuide.URL)));
     }
 
     private record ProjectCall(com.intellij.openapi.project.Project project, String title, String url) {

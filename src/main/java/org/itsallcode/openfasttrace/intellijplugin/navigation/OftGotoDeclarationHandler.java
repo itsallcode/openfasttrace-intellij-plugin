@@ -6,9 +6,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.Nullable;
 
-// [impl->dsn~specification-item-navigation-runtime~1]
 public final class OftGotoDeclarationHandler implements GotoDeclarationHandler {
     @Override
+    // [impl->dsn~open-specification-item-from-coverage-definition~1]
+    // [impl->dsn~stay-on-specification-item-declaration~1]
+    // [impl->dsn~open-specification-item-from-coverage-tag-left-side~1]
+    // [impl->dsn~open-specification-item-from-coverage-tag-right-side~1]
     public PsiElement @Nullable [] getGotoDeclarationTargets(
             final PsiElement sourceElement,
             final int offset,

@@ -26,7 +26,7 @@ import java.util.Map;
 
 // [impl->dsn~specification-item-index~1]
 public final class OftSpecificationIndex extends FileBasedIndexExtension<String, List<OftIndexedSpecification>> implements DumbAware {
-    public static final ID<String, List<OftIndexedSpecification>> NAME = ID.create("openfasttrace.specification.index");
+    public static final ID<String, List<OftIndexedSpecification>> SPECIFICATION_ID = ID.create("openfasttrace.specification.index");
 
     private final DataIndexer<String, List<OftIndexedSpecification>, FileContent> indexer = inputData -> {
         if (!OftSupportedFiles.isSpecificationFileName(inputData.getFileName())) {
@@ -34,13 +34,14 @@ public final class OftSpecificationIndex extends FileBasedIndexExtension<String,
         }
         final Map<String, List<OftIndexedSpecification>> entries = new LinkedHashMap<>();
         for (OftSpecificationItemMatch match : OftSyntaxCore.findDefinitionSpecificationItems(inputData.getContentAsText())) {
-            entries.computeIfAbsent(match.item().name(), ignored -> new ArrayList<>())
-                    .add(new OftIndexedSpecification(
-                            match.item().artifactType(),
-                            match.item().name(),
-                            match.item().revision(),
-                            match.span().startOffset()
-                    ));
+            final OftIndexedSpecification specification = new OftIndexedSpecification(
+                    match.item().artifactType(),
+                    match.item().name(),
+                    match.item().revision(),
+                    match.span().startOffset()
+            );
+            entries.computeIfAbsent(specification.id(), ignored -> new ArrayList<>())
+                    .add(specification);
         }
         entries.replaceAll((ignored, values) -> List.copyOf(values));
         return entries;
@@ -48,7 +49,7 @@ public final class OftSpecificationIndex extends FileBasedIndexExtension<String,
 
     @Override
     public @NonNull ID<String, List<OftIndexedSpecification>> getName() {
-        return NAME;
+        return SPECIFICATION_ID;
     }
 
     @Override
@@ -78,7 +79,7 @@ public final class OftSpecificationIndex extends FileBasedIndexExtension<String,
 
     @Override
     public int getVersion() {
-        return 4;
+        return 5;
     }
 
     private static final class OftIndexedSpecificationExternalizer implements DataExternalizer<List<OftIndexedSpecification>> {
