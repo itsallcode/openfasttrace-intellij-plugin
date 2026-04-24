@@ -17,22 +17,29 @@ import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSyntaxCore;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+
+/**
+ * Index that keeps track of the occurrences of OFT specification item IDs in the IDE project.
+ * <p>
+ * This class implements IntelliJ's methodless DumbAware interface as a promise that it is safe to use in dumb mode
+ * (e.g., during indexer runs).
+ * </p>
+ *  *
+ * @see com.intellij.openapi.project.DumbAware
+ */
 // [impl->dsn~specification-item-index~1]
 public final class OftSpecificationIndex extends FileBasedIndexExtension<String, List<OftIndexedSpecification>> implements DumbAware {
     public static final ID<String, List<OftIndexedSpecification>> NAME = ID.create("openfasttrace.specification.index");
 
     private final DataIndexer<String, List<OftIndexedSpecification>, FileContent> indexer = inputData -> {
         if (!OftSupportedFiles.isSpecificationFileName(inputData.getFileName())) {
-            return Map.of();
+            return Collections.emptyMap();
         }
         final Map<String, List<OftIndexedSpecification>> entries = new LinkedHashMap<>();
         for (OftSpecificationItemMatch match : OftSyntaxCore.findDefinitionSpecificationItems(inputData.getContentAsText())) {
-            entries.computeIfAbsent(match.item().id(), ignored -> new ArrayList<>())
+            entries.computeIfAbsent(match.item().name(), ignored -> new ArrayList<>())
                     .add(new OftIndexedSpecification(
                             match.item().artifactType(),
                             match.item().name(),
@@ -76,12 +83,12 @@ public final class OftSpecificationIndex extends FileBasedIndexExtension<String,
 
     @Override
     public int getVersion() {
-        return 3;
+        return 4;
     }
 
     private static final class OftIndexedSpecificationExternalizer implements DataExternalizer<List<OftIndexedSpecification>> {
         @Override
-        public void save(DataOutput out, List<OftIndexedSpecification> value) throws IOException {
+        public void save(final DataOutput out, final List<OftIndexedSpecification> value) throws IOException {
             DataInputOutputUtil.writeINT(out, value.size());
             for (OftIndexedSpecification specification : value) {
                 out.writeUTF(specification.artifactType());
@@ -92,7 +99,7 @@ public final class OftSpecificationIndex extends FileBasedIndexExtension<String,
         }
 
         @Override
-        public List<OftIndexedSpecification> read(DataInput in) throws IOException {
+        public List<OftIndexedSpecification> read(final DataInput in) throws IOException {
             final int size = DataInputOutputUtil.readINT(in);
             final List<OftIndexedSpecification> values = new ArrayList<>(size);
             for (int index = 0; index < size; index++) {

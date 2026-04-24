@@ -41,23 +41,23 @@ public final class OftSupportedFiles {
     private OftSupportedFiles() {
     }
 
-    public static boolean isSpecificationFile(VirtualFile file) {
+    public static boolean isSpecificationFile(final VirtualFile file) {
         return file != null && isSpecificationFileName(file.getName());
     }
 
-    public static boolean isSpecificationFileName(String fileName) {
+    public static boolean isSpecificationFileName(final String fileName) {
         return SPECIFICATION_EXTENSIONS.contains(extensionOf(fileName));
     }
 
-    public static boolean isCoverageTagFile(VirtualFile file) {
+    public static boolean isCoverageTagFile(final VirtualFile file) {
         return file != null && isCoverageTagFileName(file.getName());
     }
 
-    public static boolean isCoverageTagFileName(String fileName) {
+    public static boolean isCoverageTagFileName(final String fileName) {
         return TAG_IMPORTER_EXTENSIONS.contains(extensionOf(fileName));
     }
 
-    private static String extensionOf(String fileName) {
+    private static String extensionOf(final String fileName) {
         final int lastDot = fileName.lastIndexOf('.');
         if (lastDot < 0 || lastDot == fileName.length() - 1) {
             return "";

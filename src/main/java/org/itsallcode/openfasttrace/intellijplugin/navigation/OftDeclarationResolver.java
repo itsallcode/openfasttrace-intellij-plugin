@@ -3,8 +3,10 @@ package org.itsallcode.openfasttrace.intellijplugin.navigation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.ResolveResult;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecification;
@@ -24,7 +26,7 @@ final class OftDeclarationResolver {
     private OftDeclarationResolver() {
     }
 
-    static Optional<OftSpecificationItem> findReferenceAt(CharSequence text, int offset) {
+    static Optional<OftSpecificationItem> findReferenceAt(final CharSequence text, final int offset) {
         return findCoverageTagReferenceAt(text, offset)
                 .or(() -> OftSyntaxCore.findSpecificationItems(text).stream()
                         .filter(match -> contains(match.span(), offset))
@@ -32,14 +34,14 @@ final class OftDeclarationResolver {
                         .findFirst());
     }
 
-    private static Optional<OftSpecificationItem> findCoverageTagReferenceAt(CharSequence text, int offset) {
+    private static Optional<OftSpecificationItem> findCoverageTagReferenceAt(final CharSequence text, final int offset) {
         return OftSyntaxCore.findCoverageTags(text).stream()
                 .filter(match -> contains(match.span(), offset))
                 .findFirst()
                 .flatMap(match -> referenceFromCoverageTag(match, offset));
     }
 
-    private static Optional<OftSpecificationItem> referenceFromCoverageTag(OftCoverageTagMatch match, int offset) {
+    private static Optional<OftSpecificationItem> referenceFromCoverageTag(final OftCoverageTagMatch match, final int offset) {
         if (contains(match.sourceSpan(), offset)) {
             return Optional.of(match.tag().effectiveSource());
         }
@@ -49,21 +51,34 @@ final class OftDeclarationResolver {
         return Optional.empty();
     }
 
-    private static boolean contains(OftTextSpan span, int offset) {
+    private static boolean contains(final OftTextSpan span, final int offset) {
         return span.startOffset() <= offset && offset < span.endOffset();
     }
 
-    static PsiElement[] resolveDeclarations(Project project, OftSpecificationItem reference) {
+    static PsiElement[] resolveDeclarations(final Project project, final OftSpecificationItem reference) {
+        return resolveDeclarationElements(project, reference).toArray(PsiElement[]::new);
+    }
+
+    static ResolveResult[] resolveDeclarationResults(final Project project, final OftSpecificationItem reference) {
+        return resolveDeclarationElements(project, reference).stream()
+                .map(PsiElementResolveResult::new)
+                .toArray(ResolveResult[]::new);
+    }
+
+    private static List<PsiElement> resolveDeclarationElements(final Project project, final OftSpecificationItem reference) {
         final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
         final PsiManager psiManager = PsiManager.getInstance(project);
         final List<PsiElement> targets = new ArrayList<>();
         final Set<String> seenTargets = new LinkedHashSet<>();
         FileBasedIndex.getInstance().processValues(
                 OftSpecificationIndex.NAME,
-                reference.id(),
+                reference.name(),
                 null,
                 (file, values) -> {
                     for (OftIndexedSpecification value : values) {
+                        if (!value.matches(reference)) {
+                            continue;
+                        }
                         final PsiElement target = findPsiElementAt(psiManager, file, value.offset());
                         if (target != null && seenTargets.add(file.getPath() + ":" + value.offset())) {
                             targets.add(target);
@@ -73,10 +88,10 @@ final class OftDeclarationResolver {
                 },
                 scope
         );
-        return targets.toArray(PsiElement[]::new);
+        return targets;
     }
 
-    private static PsiElement findPsiElementAt(PsiManager psiManager, VirtualFile file, int offset) {
+    private static PsiElement findPsiElementAt(final PsiManager psiManager, final VirtualFile file, final int offset) {
         final PsiFile psiFile = psiManager.findFile(file);
         if (psiFile == null || psiFile.getTextLength() == 0) {
             return null;

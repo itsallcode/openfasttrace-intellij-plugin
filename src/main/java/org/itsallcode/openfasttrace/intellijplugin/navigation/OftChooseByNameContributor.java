@@ -16,7 +16,7 @@ import java.util.List;
 // [impl->dsn~specification-item-navigation~1]
 public final class OftChooseByNameContributor implements ChooseByNameContributor, DumbAware {
     @Override
-    public String[] getNames(Project project, boolean includeNonProjectItems) {
+    public String[] getNames(final Project project, final boolean includeNonProjectItems) {
         final List<String> names = new ArrayList<>();
         FileBasedIndex.getInstance().processAllKeys(OftSpecificationIndex.NAME, key -> {
             names.add(key);
@@ -27,7 +27,12 @@ public final class OftChooseByNameContributor implements ChooseByNameContributor
     }
 
     @Override
-    public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
+    public NavigationItem[] getItemsByName(
+            final String name,
+            final String pattern,
+            final Project project,
+            final boolean includeNonProjectItems
+    ) {
         final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
         final List<OftNavigationItem> items = new ArrayList<>();
         FileBasedIndex.getInstance().processValues(

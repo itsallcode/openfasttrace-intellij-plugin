@@ -16,6 +16,8 @@ Methods stay short and keep cyclomatic complexity low. When behavior grows beyon
 
 All objects that can be, are immutable. The implementation prefers static object allocation over dynamic allocation where possible.
 
+As a rule, all method parameters are final. Output parameters are only allowed when they are used in external libraries.
+
 ## Dependency Policy
 
 The plugin uses the minimum set of dependencies required for:

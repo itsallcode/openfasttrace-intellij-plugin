@@ -13,12 +13,12 @@ public final class OpenFastTraceUserGuideAction extends DumbAwareAction {
         this(OpenFastTraceUserGuide::open);
     }
 
-    OpenFastTraceUserGuideAction(OpenFastTraceUserGuideOpener opener) {
+    OpenFastTraceUserGuideAction(final OpenFastTraceUserGuideOpener opener) {
         this.opener = opener;
     }
 
     @Override
-    public void actionPerformed(AnActionEvent event) {
+    public void actionPerformed(final AnActionEvent event) {
         final Project project = event.getProject();
         if (project != null) {
             opener.open(project, OpenFastTraceUserGuide.TITLE, OpenFastTraceUserGuide.URL);
@@ -26,7 +26,7 @@ public final class OpenFastTraceUserGuideAction extends DumbAwareAction {
     }
 
     @Override
-    public void update(AnActionEvent event) {
+    public void update(final AnActionEvent event) {
         event.getPresentation().setEnabled(event.getProject() != null);
     }
 }

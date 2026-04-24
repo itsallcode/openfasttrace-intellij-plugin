@@ -38,7 +38,7 @@ public final class OftSyntaxCore {
     private OftSyntaxCore() {
     }
 
-    public static OftFragmentStatus classifySpecificationItem(String text) {
+    public static OftFragmentStatus classifySpecificationItem(final String text) {
         if (SPECIFICATION_ITEM_EXACT_PATTERN.matcher(text).matches()) {
             return OftFragmentStatus.VALID;
         }
@@ -48,7 +48,7 @@ public final class OftSyntaxCore {
         return OftFragmentStatus.INVALID;
     }
 
-    public static OftFragmentStatus classifyCoverageTag(String text) {
+    public static OftFragmentStatus classifyCoverageTag(final String text) {
         if (COVERAGE_TAG_EXACT_PATTERN.matcher(text).matches()) {
             return OftFragmentStatus.VALID;
         }
@@ -68,16 +68,16 @@ public final class OftSyntaxCore {
         return OftFragmentStatus.INVALID;
     }
 
-    public static List<OftSpecificationItemMatch> findSpecificationItems(CharSequence text) {
+    public static List<OftSpecificationItemMatch> findSpecificationItems(final CharSequence text) {
         return collectSpecificationItemMatches(text, SPECIFICATION_ITEM_PATTERN, false);
     }
 
-    public static List<OftSpecificationItemMatch> findDefinitionSpecificationItems(CharSequence text) {
+    public static List<OftSpecificationItemMatch> findDefinitionSpecificationItems(final CharSequence text) {
         return collectSpecificationItemMatches(text, SPECIFICATION_ITEM_DEFINITION_PATTERN, true);
     }
 
     private static List<OftSpecificationItemMatch> collectSpecificationItemMatches(
-            CharSequence text, Pattern pattern, boolean useNamedIdGroup
+            final CharSequence text, final Pattern pattern, final boolean useNamedIdGroup
     ) {
         final List<OftSpecificationItemMatch> matches = new ArrayList<>();
         final Matcher matcher = pattern.matcher(text);
@@ -90,7 +90,7 @@ public final class OftSyntaxCore {
         return List.copyOf(matches);
     }
 
-    public static List<OftCoverageTagMatch> findCoverageTags(CharSequence text) {
+    public static List<OftCoverageTagMatch> findCoverageTags(final CharSequence text) {
         final List<OftCoverageTagMatch> matches = new ArrayList<>();
         final Matcher matcher = COVERAGE_TAG_PATTERN.matcher(text);
         while (matcher.find()) {
@@ -112,7 +112,7 @@ public final class OftSyntaxCore {
         return List.copyOf(matches);
     }
 
-    public static List<OftKeywordMatch> findKeywords(CharSequence text) {
+    public static List<OftKeywordMatch> findKeywords(final CharSequence text) {
         final List<OftKeywordMatch> matches = new ArrayList<>();
         final Matcher matcher = KEYWORD_PATTERN.matcher(text);
         while (matcher.find()) {
@@ -124,7 +124,7 @@ public final class OftSyntaxCore {
         return List.copyOf(matches);
     }
 
-    private static OftSpecificationItem specificationItemFrom(Matcher matcher) {
+    private static OftSpecificationItem specificationItemFrom(final Matcher matcher) {
         return new OftSpecificationItem(
                 matcher.group("artifactType"),
                 matcher.group("name"),
@@ -132,7 +132,7 @@ public final class OftSyntaxCore {
         );
     }
 
-    private static OftSpecificationItem targetSpecificationItemFrom(Matcher matcher) {
+    private static OftSpecificationItem targetSpecificationItemFrom(final Matcher matcher) {
         return new OftSpecificationItem(
                 matcher.group("targetArtifactType"),
                 matcher.group("targetName"),
@@ -140,11 +140,11 @@ public final class OftSyntaxCore {
         );
     }
 
-    private static Integer parseOptionalInt(String value) {
+    private static Integer parseOptionalInt(final String value) {
         return value == null ? null : Integer.parseInt(value);
     }
 
-    private static OftTextSpan specificationItemSpan(Matcher matcher, boolean useNamedIdGroup) {
+    private static OftTextSpan specificationItemSpan(final Matcher matcher, final boolean useNamedIdGroup) {
         if (useNamedIdGroup) {
             return new OftTextSpan(matcher.start("id"), matcher.end("id"));
         }

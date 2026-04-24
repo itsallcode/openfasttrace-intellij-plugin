@@ -17,7 +17,7 @@ public final class OftNavigationItem implements NavigationItem {
     private final VirtualFile file;
     private final OftIndexedSpecification specification;
 
-    OftNavigationItem(Project project, VirtualFile file, OftIndexedSpecification specification) {
+    OftNavigationItem(final Project project, final VirtualFile file, final OftIndexedSpecification specification) {
         this.project = project;
         this.file = file;
         this.specification = specification;
@@ -43,14 +43,14 @@ public final class OftNavigationItem implements NavigationItem {
             }
 
             @Override
-            public @Nullable Icon getIcon(boolean unused) {
+            public @Nullable Icon getIcon(final boolean unused) {
                 return file.getFileType().getIcon();
             }
         };
     }
 
     @Override
-    public void navigate(boolean requestFocus) {
+    public void navigate(final boolean requestFocus) {
         new OpenFileDescriptor(project, file, specification.offset()).navigate(requestFocus);
     }
 

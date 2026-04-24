@@ -8,7 +8,10 @@ import com.intellij.openapi.project.Project;
 
 public final class OftHighlightingPassRegistrar implements TextEditorHighlightingPassFactoryRegistrar, DumbAware {
     @Override
-    public void registerHighlightingPassFactory(TextEditorHighlightingPassRegistrar registrar, Project project) {
+    public void registerHighlightingPassFactory(
+            final TextEditorHighlightingPassRegistrar registrar,
+            final Project project
+    ) {
         registrar.registerTextEditorHighlightingPass(
                 new OftHighlightingPassFactory(),
                 Anchor.LAST,

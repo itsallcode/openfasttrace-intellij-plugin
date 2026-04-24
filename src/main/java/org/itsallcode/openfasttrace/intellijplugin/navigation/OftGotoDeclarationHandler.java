@@ -9,7 +9,11 @@ import org.jetbrains.annotations.Nullable;
 // [impl->dsn~specification-item-navigation-runtime~1]
 public final class OftGotoDeclarationHandler implements GotoDeclarationHandler {
     @Override
-    public PsiElement @Nullable [] getGotoDeclarationTargets(PsiElement sourceElement, int offset, Editor editor) {
+    public PsiElement @Nullable [] getGotoDeclarationTargets(
+            final PsiElement sourceElement,
+            final int offset,
+            final Editor editor
+    ) {
         final Project project = sourceElement != null ? sourceElement.getProject() : editor.getProject();
         if (project == null) {
             return null;

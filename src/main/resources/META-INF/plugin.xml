@@ -9,6 +9,12 @@
         <fileBasedIndex implementation="org.itsallcode.openfasttrace.intellijplugin.indexing.OftSpecificationIndex"/>
         <gotoSymbolContributor implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftChooseByNameContributor"/>
         <gotoDeclarationHandler implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftGotoDeclarationHandler"/>
+        <psi.referenceContributor
+                language="JAVA"
+                implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftCoverageTagReferenceContributor"/>
+        <psi.referenceContributor
+                language="TEXT"
+                implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftCoverageTagReferenceContributor"/>
         <highlightingPassFactory implementation="org.itsallcode.openfasttrace.intellijplugin.highlighting.OftHighlightingPassRegistrar"/>
     </extensions>
 

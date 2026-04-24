@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 // [tst->dsn~intellij-light-tests-keep-junit4-compatibility-dependency~1]
 public abstract class AbstractOftPlatformTestCase extends BasePlatformTestCase {
-    protected boolean hasHighlight(List<HighlightInfo> infos, String fragment, TextAttributesKey key) {
+    protected boolean hasHighlight(final List<HighlightInfo> infos, final String fragment, final TextAttributesKey key) {
         final String text = myFixture.getEditor().getDocument().getText();
         final int startOffset = text.indexOf(fragment);
         assertThat("Missing fragment in test text: " + fragment, startOffset, greaterThanOrEqualTo(0));

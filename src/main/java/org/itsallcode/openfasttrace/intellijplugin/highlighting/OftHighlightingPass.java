@@ -25,13 +25,13 @@ import java.util.List;
 // [impl->dsn~coverage-tag-highlighting-runtime~1]
 public final class OftHighlightingPass extends TextEditorHighlightingPass implements DumbAware {
     private final PsiFile file;
-    public OftHighlightingPass(PsiFile file) {
+    public OftHighlightingPass(final PsiFile file) {
         super(file.getProject(), file.getViewProvider().getDocument(), true);
         this.file = file;
     }
 
     @Override
-    public void doCollectInformation(com.intellij.openapi.progress.ProgressIndicator progress) {
+    public void doCollectInformation(final com.intellij.openapi.progress.ProgressIndicator progress) {
         if (file.getVirtualFile() == null) {
             return;
         }
@@ -65,7 +65,7 @@ public final class OftHighlightingPass extends TextEditorHighlightingPass implem
         // BackgroundUpdateHighlightersUtil applies the collected infos during the background phase.
     }
 
-    private HighlightInfo info(OftTextSpan span, TextAttributesKey key) {
+    private HighlightInfo info(final OftTextSpan span, final TextAttributesKey key) {
         return HighlightInfo.newHighlightInfo(HighlightInfoType.INFORMATION)
                 .range(span.startOffset(), span.endOffset())
                 .textAttributes(key)

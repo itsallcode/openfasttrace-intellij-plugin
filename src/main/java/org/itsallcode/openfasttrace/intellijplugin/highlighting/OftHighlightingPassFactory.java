@@ -9,7 +9,7 @@ import org.itsallcode.openfasttrace.intellijplugin.OftSupportedFiles;
 
 public final class OftHighlightingPassFactory implements TextEditorHighlightingPassFactory, DumbAware {
     @Override
-    public TextEditorHighlightingPass createHighlightingPass(PsiFile file, Editor editor) {
+    public TextEditorHighlightingPass createHighlightingPass(final PsiFile file, final Editor editor) {
         if (file.getVirtualFile() == null) {
             return null;
         }

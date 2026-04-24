@@ -4,5 +4,5 @@ import com.intellij.openapi.project.Project;
 
 @FunctionalInterface
 interface OpenFastTraceUserGuideOpener {
-    void open(Project project, String title, String url);
+    void open(final Project project, final String title, final String url);
 }

@@ -10,15 +10,20 @@ final class OpenFastTraceUserGuide {
     private OpenFastTraceUserGuide() {
     }
 
-    static void open(Project project) {
+    static void open(final Project project) {
         open(project, TITLE, URL, HTMLEditorProvider::openEditor);
     }
 
-    static void open(Project project, String title, String url) {
+    static void open(final Project project, final String title, final String url) {
         open(project, title, url, HTMLEditorProvider::openEditor);
     }
 
-    static void open(Project project, String title, String url, OpenFastTraceUserGuideHtmlEditorOpener opener) {
+    static void open(
+            final Project project,
+            final String title,
+            final String url,
+            final OpenFastTraceUserGuideHtmlEditorOpener opener
+    ) {
         opener.open(project, title, url, null);
     }
 }
