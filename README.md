@@ -62,7 +62,7 @@ To understand product intent and implementation scope, start with:
 * [Design](doc/design.md)
 * [Change Log](doc/changes/changelog.md)
 
-Example OFT files for manual testing are available in [examples/](examples/).
+Example OFT files for manual testing are available under `examples\` in this project.
 
 ## License
 This project is licensed under the [Apache 2.0 license](LICENSE).
