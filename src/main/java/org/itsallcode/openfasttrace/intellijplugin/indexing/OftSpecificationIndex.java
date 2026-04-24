@@ -18,18 +18,12 @@ import org.jspecify.annotations.NonNull;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-
-/**
- * Index that keeps track of the occurrences of OFT specification item IDs in the IDE project.
- * <p>
- * This class implements IntelliJ's methodless DumbAware interface as a promise that it is safe to use in dumb mode
- * (e.g., during indexer runs).
- * </p>
- *  *
- * @see com.intellij.openapi.project.DumbAware
- */
 // [impl->dsn~specification-item-index~1]
 public final class OftSpecificationIndex extends FileBasedIndexExtension<String, List<OftIndexedSpecification>> implements DumbAware {
     public static final ID<String, List<OftIndexedSpecification>> NAME = ID.create("openfasttrace.specification.index");

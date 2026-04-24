@@ -26,7 +26,7 @@ public final class OftNavigationItem implements NavigationItem {
 
     @Override
     public String getName() {
-        return specification.id();
+        return specification.name();
     }
 
     @Override

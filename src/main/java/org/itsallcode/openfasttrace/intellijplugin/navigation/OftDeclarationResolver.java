@@ -11,7 +11,11 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecification;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftSpecificationIndex;
-import org.itsallcode.openfasttrace.intellijplugin.syntax.*;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.OftCoverageTagMatch;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItem;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItemMatch;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSyntaxCore;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.OftTextSpan;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
