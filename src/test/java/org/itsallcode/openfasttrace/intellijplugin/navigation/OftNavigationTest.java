@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.is;
 
@@ -330,16 +331,41 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
         myFixture.configureFromExistingVirtualFile(referencingFile.getVirtualFile());
         myFixture.getEditor().getCaretModel().moveToOffset(myFixture.getFile().getText().indexOf(specificationId));
 
-        final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getEditor().getCaretModel().getOffset());
-        final List<String> targetLabels = Arrays.stream(((PsiPolyVariantReference) Objects.requireNonNull(reference)).multiResolve(false))
-                .map(result -> Objects.requireNonNull(result.getElement()))
-                .map(element -> Objects.requireNonNull(((NavigationItem) element).getPresentation()).getPresentableText())
+        final List<PsiElement> targets = resolvedTargetsAtCaret();
+        final List<String> targetLabels = targets.stream()
+                .map(element -> Objects.requireNonNull(((NavigationItem) element).getName()))
                 .toList();
+        final List<String> targetLocations = targets.stream()
+                .map(element -> Objects.requireNonNull(((NavigationItem) element).getPresentation()).getLocationString())
+                .toList();
+
+        final PsiElement markdownTarget = targets.stream()
+                .filter(element -> Objects.requireNonNull(element.getContainingFile()).getName().equals("spec.md"))
+                .findFirst()
+                .orElseThrow();
+
+        EdtTestUtil.runInEdtAndWait(() -> ((NavigationItem) markdownTarget).navigate(true));
 
         assertAll(
                 () -> assertThat(targetLabels.size(), is(2)),
-                () -> assertThat(targetLabels, everyItem(is(specificationId)))
+                () -> assertThat(targetLabels, everyItem(is(specificationId))),
+                () -> assertThat(targetLocations, containsInAnyOrder(endsWith("doc/spec.md"), endsWith("doc/spec.rst"))),
+                () -> assertThat(markdownTarget.getTextOffset(), is(0)),
+                () -> assertThat(markdownTarget.getNavigationElement().getContainingFile().getName(), is("spec.md")),
+                () -> assertThat(markdownTarget.getContainingFile().getName(), is("spec.md")),
+                () -> assertThat(markdownTarget.isValid(), is(true)),
+                () -> assertThat(Objects.requireNonNull(markdownTarget.getManager()).getProject(), is(getProject())),
+                () -> assertThat(((NavigationItem) markdownTarget).canNavigate(), is(true)),
+                () -> assertThat(((NavigationItem) markdownTarget).canNavigateToSource(), is(true)),
+                () -> assertThat(selectedEditorLocation(), is(new EditorLocation("spec.md", 0)))
         );
+    }
+
+    private List<PsiElement> resolvedTargetsAtCaret() {
+        final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getEditor().getCaretModel().getOffset());
+        return Arrays.stream(((PsiPolyVariantReference) Objects.requireNonNull(reference)).multiResolve(false))
+                .map(result -> Objects.requireNonNull(result.getElement()))
+                .toList();
     }
 
     public void testGivenQuotedCoverageDefinitionWhenGotoDeclarationHandlerResolvesThenItDefersToPlatformNavigation() {
