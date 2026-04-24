@@ -59,7 +59,7 @@ public final class OftCoverageTagReferenceContributor extends PsiReferenceContri
             return references.toArray(PsiReference[]::new);
         }
 
-        private void addReferenceIfCovered(
+        private static void addReferenceIfCovered(
                 final List<PsiReference> references,
                 final PsiElement element,
                 final TextRange elementRange,
