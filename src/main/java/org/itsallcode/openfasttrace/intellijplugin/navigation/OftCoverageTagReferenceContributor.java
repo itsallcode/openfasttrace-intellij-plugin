@@ -77,7 +77,7 @@ public final class OftCoverageTagReferenceContributor extends PsiReferenceContri
                     target
             ));
         }
-        private boolean isCoverageTagElement(final PsiElement element) {
+        private static boolean isCoverageTagElement(final PsiElement element) {
             return element.getContainingFile() != null
                     && element.getContainingFile().getVirtualFile() != null
                     && OftSupportedFiles.isCoverageTagFile(element.getContainingFile().getVirtualFile());

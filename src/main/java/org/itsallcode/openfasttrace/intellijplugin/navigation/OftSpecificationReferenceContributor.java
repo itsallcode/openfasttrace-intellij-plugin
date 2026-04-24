@@ -47,7 +47,7 @@ public final class OftSpecificationReferenceContributor extends PsiReferenceCont
             return references.toArray(PsiReference[]::new);
         }
 
-        private void addReferenceIfCovered(
+        private static void addReferenceIfCovered(
                 final List<PsiReference> references,
                 final PsiElement element,
                 final TextRange elementRange,
@@ -66,7 +66,7 @@ public final class OftSpecificationReferenceContributor extends PsiReferenceCont
             ));
         }
 
-        private boolean isSpecificationElement(final PsiElement element) {
+        private static boolean isSpecificationElement(final PsiElement element) {
             return element.getContainingFile() != null
                     && element.getContainingFile().getVirtualFile() != null
                     && OftSupportedFiles.isSpecificationFile(element.getContainingFile().getVirtualFile());

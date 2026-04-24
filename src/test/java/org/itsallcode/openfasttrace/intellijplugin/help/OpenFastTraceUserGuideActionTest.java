@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 public class OpenFastTraceUserGuideActionTest extends AbstractOftPlatformTestCase {
     // [itest->dsn~show-oft-user-guide-in-help-menu~1]
@@ -40,6 +41,58 @@ public class OpenFastTraceUserGuideActionTest extends AbstractOftPlatformTestCas
         ApplicationManager.getApplication().invokeAndWait(() -> action.actionPerformed(event));
 
         assertThat(call.get(), is(new ProjectCall(getProject(), OpenFastTraceUserGuide.TITLE, OpenFastTraceUserGuide.URL)));
+    }
+
+    public void testGivenNoProjectWhenActionPerformsThenTheUserGuideIsNotOpened() {
+        final AtomicReference<ProjectCall> call = new AtomicReference<>();
+        final OpenFastTraceUserGuideAction action = new OpenFastTraceUserGuideAction(
+                (project, title, url) -> call.set(new ProjectCall(project, title, url))
+        );
+        final AnActionEvent event = AnActionEvent.createEvent(
+                SimpleDataContext.builder().build(),
+                new Presentation(),
+                ActionPlaces.UNKNOWN,
+                ActionUiKind.NONE,
+                null
+        );
+
+        ApplicationManager.getApplication().invokeAndWait(() -> action.actionPerformed(event));
+
+        assertThat(call.get(), is(nullValue()));
+    }
+
+    public void testGivenProjectWhenActionUpdatesThenPresentationIsEnabled() {
+        final OpenFastTraceUserGuideAction action = new OpenFastTraceUserGuideAction();
+        final Presentation presentation = new Presentation();
+        final AnActionEvent event = AnActionEvent.createEvent(
+                SimpleDataContext.builder()
+                        .add(CommonDataKeys.PROJECT, getProject())
+                        .build(),
+                presentation,
+                ActionPlaces.UNKNOWN,
+                ActionUiKind.NONE,
+                null
+        );
+
+        action.update(event);
+
+        assertThat(presentation.isEnabled(), is(true));
+    }
+
+    public void testGivenNoProjectWhenActionUpdatesThenPresentationIsDisabled() {
+        final OpenFastTraceUserGuideAction action = new OpenFastTraceUserGuideAction();
+        final Presentation presentation = new Presentation();
+        final AnActionEvent event = AnActionEvent.createEvent(
+                SimpleDataContext.builder().build(),
+                presentation,
+                ActionPlaces.UNKNOWN,
+                ActionUiKind.NONE,
+                null
+        );
+
+        action.update(event);
+
+        assertThat(presentation.isEnabled(), is(false));
     }
 
     private record ProjectCall(com.intellij.openapi.project.Project project, String title, String url) {
