@@ -6,6 +6,8 @@ import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecification;
 import org.junit.jupiter.api.Assertions;
 
+import java.lang.reflect.Proxy;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
@@ -95,6 +97,36 @@ public class OftNavigationInfrastructureTest extends AbstractOftPlatformTestCase
                 () -> assertThat(item.canNavigateToSource(), is(true)),
                 () -> assertThat(item.getFile(), is(myFixture.getFile().getVirtualFile())),
                 () -> assertThat(item.getSpecification(), is(specification))
+        );
+    }
+
+    public void testGivenNavigationItemWithoutProjectBasePathWhenQueryingPresentationThenItUsesThePresentableUrl() {
+        myFixture.configureByText("spec.md", """
+                req~openfasttrace_navigation_target~1
+                Needs: dsn
+                """);
+        final var projectWithoutBasePath = (com.intellij.openapi.project.Project) Proxy.newProxyInstance(
+                com.intellij.openapi.project.Project.class.getClassLoader(),
+                new Class<?>[]{com.intellij.openapi.project.Project.class},
+                (proxy, method, args) -> {
+                    if ("getBasePath".equals(method.getName())) {
+                        return null;
+                    }
+                    throw new UnsupportedOperationException(method.getName());
+                }
+        );
+        final OftNavigationItem item = new OftNavigationItem(
+                projectWithoutBasePath,
+                myFixture.getFile().getVirtualFile(),
+                new OftIndexedSpecification("req", "openfasttrace_navigation_target", 1, 0)
+        );
+
+        Assertions.assertAll(
+                () -> assertThat(
+                        item.getPresentation().getLocationString(),
+                        is(myFixture.getFile().getVirtualFile().getPresentableUrl())
+                ),
+                () -> assertThat(item.getPresentation().getIcon(false), notNullValue())
         );
     }
 

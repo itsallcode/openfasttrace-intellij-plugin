@@ -2,6 +2,8 @@ package org.itsallcode.openfasttrace.intellijplugin.highlighting;
 
 import com.intellij.codeHighlighting.TextEditorHighlightingPass;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileTypes.PlainTextFileType;
+import com.intellij.psi.PsiFileFactory;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 
 import java.util.concurrent.ExecutionException;
@@ -23,6 +25,20 @@ public class OftHighlightingPassFactoryTest extends AbstractOftPlatformTestCase 
 
         final TextEditorHighlightingPass pass =
                 new OftHighlightingPassFactory().createHighlightingPass(myFixture.getFile(), myFixture.getEditor());
+
+        assertThat(pass, nullValue());
+    }
+
+    public void testGivenInMemoryFileWithoutVirtualFileWhenCreatingPassThenFactoryReturnsNull() {
+        myFixture.configureByText("spec.md", "req~login~1");
+        final var inMemoryFile = PsiFileFactory.getInstance(getProject()).createFileFromText(
+                "InMemory.txt",
+                PlainTextFileType.INSTANCE,
+                "not an oft file"
+        );
+
+        final TextEditorHighlightingPass pass =
+                new OftHighlightingPassFactory().createHighlightingPass(inMemoryFile, myFixture.getEditor());
 
         assertThat(pass, nullValue());
     }

@@ -48,6 +48,13 @@ class OftDeclarationResolverTest {
     }
 
     @Test
+    void givenCoverageTagArrowWhenFindingReferenceAtOffsetThenItReturnsEmpty() {
+        final String text = "// [impl" + "->req~openfasttrace_navigation_target~1]";
+
+        assertThat(OftDeclarationResolver.findReferenceAt(text, text.indexOf("->")).isEmpty(), is(true));
+    }
+
+    @Test
     void givenOffsetOutsideAnyReferenceWhenFindingReferenceThenItReturnsEmpty() {
         final String text = """
                 Covers:
@@ -55,6 +62,11 @@ class OftDeclarationResolverTest {
                 """;
 
         assertThat(OftDeclarationResolver.findReferenceAt(text, 0).isEmpty(), is(true));
+    }
+
+    @Test
+    void givenNullElementWhenFindingDeclaredItemThenItReturnsEmpty() {
+        assertThat(OftDeclarationResolver.findDeclaredItem(null).isEmpty(), is(true));
     }
 
     @Test
