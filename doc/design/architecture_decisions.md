@@ -50,3 +50,42 @@ This decision does not change the general dependency policy of the project. Addi
 Needs: bld
 
 Tags: Build, Gradle
+
+## Test Framework Decisions
+
+### Which JUnit Baseline Does the Plugin Use?
+
+The project needs a test setup that follows the preferred JUnit 5 direction from the quality requirements while still working with the IntelliJ Platform light test infrastructure used for MVP verification.
+
+This decision is architecture-relevant because it impacts:
+
+* consistency of the project test stack
+* compatibility with JetBrains-provided test base classes
+* long-term maintainability of the automated test setup
+
+We considered the following alternatives:
+
+1. Using only JUnit 5 artifacts in the test classpath.
+
+   This is the preferred direction for ordinary project tests, but the IntelliJ Platform `BasePlatformTestCase` hierarchy still depends on the legacy JUnit `TestCase` API. Using only JUnit 5 breaks compilation of the light platform test base used by the plugin tests.
+
+1. Using JUnit 5 as the test platform and adding JUnit 4 only as a compatibility dependency for IntelliJ light platform tests.
+
+   This keeps the primary test runner and authored tests on JUnit 5 while limiting the legacy dependency to the narrow compatibility gap imposed by the JetBrains test framework.
+
+#### IntelliJ Light Tests Keep a Narrow JUnit 4 Compatibility Dependency
+`dsn~intellij-light-tests-keep-junit4-compatibility-dependency~1`
+
+The plugin uses JUnit 5 as the primary automated test platform and keeps JUnit 4 only as a compatibility dependency required by IntelliJ Platform light test base classes such as `BasePlatformTestCase`.
+
+Rationale:
+
+This keeps the authored test suite aligned with the preferred JUnit 5 direction while avoiding custom wrappers or heavier test infrastructure just to work around a dependency inherited from the JetBrains test framework.
+
+Comment:
+
+The JUnit 4 dependency is not a license to write new project tests against JUnit 4 APIs by default. It exists only because the IntelliJ light test infrastructure still exposes that compatibility requirement.
+
+Needs: tst
+
+Tags: Test, JUnit, IntelliJ Platform
