@@ -16,7 +16,7 @@ Compatibility across the selected IDEs is verified continuously with plugin comp
 
 Where the IntelliJ Platform already provides a fitting concept, the plugin uses that concept instead of introducing parallel infrastructure.
 
-Specification items are exposed through the IDE symbol and navigation facilities so users interact with OpenFastTrace data through established workflows such as 'Go to Symbol', Search Everywhere, and Go To on specification references and coverage tags.
+Specification item declarations are exposed through the IDE symbol and navigation facilities so users interact with OpenFastTrace data through established workflows such as `Go to Symbol`, the Symbols tab in `Search Everywhere`, `Go To Declaration` on specification references and coverage tags, and `Go To Implementations` on declarations.
 
 Parsing and syntax-aware editor behavior use the IntelliJ parsing, PSI, lexer, and highlighting infrastructure. The plugin builds only the OpenFastTrace-specific parts that are missing and reuses the existing editor, indexing, and navigation services for the rest.
 
@@ -45,7 +45,7 @@ This mapping also clarifies what the index stores. The symbol-facing index store
 
 For IntelliJ's search and navigation facilities, the declaration index is the source of truth for `Go to Symbol` and `Search Everywhere`. JetBrains documents [Go to Symbol](https://plugins.jetbrains.com/docs/intellij/go-to-class-and-go-to-symbol.html) as a contributor that feeds the IDE with names and matching `NavigationItem` instances, typically PSI elements. The plugin contributes declaration elements, not synthetic wrappers around arbitrary text matches and not coverage occurrences. This keeps symbol search aligned with the IDE expectation that a search result names something that is actually declared somewhere in the project.
 
-Coverage locations are still first-class data, but they belong in reference resolution and usage-style navigation. They are the places where the IDE should resolve from a usage to a declaration, and they are also the natural basis for any later OFT-specific "show covering items" or "show implementations" feature.
+Coverage locations are still first-class data, but they belong in reference resolution and usage-style navigation. They are the places where the IDE should resolve from a usage to a declaration, and they are also the basis for `Go To Implementations` on a declared specification item.
 
 ## MVP Scope And Deferred OFT Integration
 
