@@ -256,7 +256,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
 
         final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getEditor().getCaretModel().getOffset());
 
-        assertThat(Objects.requireNonNull(reference).resolve().getContainingFile().getName(), is("spec.md"));
+        assertThat(Objects.requireNonNull(Objects.requireNonNull(reference).resolve()).getContainingFile().getName(), is("spec.md"));
     }
 
     public void testGivenQuotedCoverageDefinitionWhenPsiReferenceResolvesThenItOpensTheCoveredDeclaration() {
@@ -276,7 +276,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
 
         final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getEditor().getCaretModel().getOffset());
 
-        assertThat(Objects.requireNonNull(reference).resolve().getContainingFile().getName(), is("spec.md"));
+        assertThat(Objects.requireNonNull(Objects.requireNonNull(reference).resolve()).getContainingFile().getName(), is("spec.md"));
     }
 
     public void testGivenQuotedCoverageDefinitionWhenGotoDeclarationHandlerResolvesThenItDefersToPlatformNavigation() {
@@ -414,7 +414,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
             }
 
             @Override
-            public @NonNull String transformPattern(final String pattern) {
+            public @NonNull String transformPattern(final @NonNull String pattern) {
                 return pattern;
             }
 
