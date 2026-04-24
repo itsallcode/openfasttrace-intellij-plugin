@@ -4,6 +4,7 @@ import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import org.itsallcode.openfasttrace.intellijplugin.OftSupportedFiles;
 import org.jetbrains.annotations.Nullable;
 
 public final class OftGotoDeclarationHandler implements GotoDeclarationHandler {
@@ -17,6 +18,13 @@ public final class OftGotoDeclarationHandler implements GotoDeclarationHandler {
             final int offset,
             final Editor editor
     ) {
+        if (sourceElement != null
+                && sourceElement.getContainingFile() != null
+                && sourceElement.getContainingFile().getVirtualFile() != null
+                && OftSupportedFiles.isSpecificationFile(sourceElement.getContainingFile().getVirtualFile())
+                && OftDeclarationResolver.findDeclaredItem(sourceElement).isPresent()) {
+            return null;
+        }
         final Project project = sourceElement != null ? sourceElement.getProject() : editor.getProject();
         if (project == null) {
             return null;

@@ -4,9 +4,11 @@ import com.intellij.ide.util.gotoByName.ChooseByNameModel;
 import com.intellij.ide.util.gotoByName.ChooseByNameViewModel;
 import com.intellij.ide.util.gotoByName.DefaultChooseByNameItemProvider;
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2;
+import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.progress.util.ProgressIndicatorBase;
@@ -17,8 +19,10 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.testFramework.EdtTestUtil;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -95,7 +99,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
         final PsiFile contextFile = myFixture.addFileToProject("src/Main.java", "class Main {}");
         myFixture.configureFromExistingVirtualFile(contextFile.getVirtualFile());
 
-        final NavigationItem item = searchSymbolItems(specificationId).get(0);
+        final NavigationItem item = searchSymbolItems(specificationId).getFirst();
 
         EdtTestUtil.runInEdtAndWait(() -> item.navigate(true));
 
@@ -103,12 +107,12 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
     }
 
     // [itest->dsn~open-specification-item-from-coverage-definition~1]
-    public void testGivenCoverageDefinitionWhenGoToDeclarationInvokesOnCoveredItemThenEditorOpensTheDeclarationAnchor() throws Exception {
+    public void testGivenCoverageDefinitionWhenGoToDeclarationInvokesOnCoveredItemThenEditorOpensTheDeclarationAnchor() {
         assertCoverageDefinitionNavigation("plain", "<caret>req~openfasttrace_navigation_target~1");
     }
 
     // [itest->dsn~stay-on-specification-item-declaration~1]
-    public void testGivenDeclarationAnchorWhenGoToDeclarationInvokesThenEditorStaysOnThatDeclaration() throws Exception {
+    public void testGivenDeclarationAnchorWhenGoToDeclarationInvokesThenEditorStaysOnThatDeclaration() {
         final PsiFile declarationFile = myFixture.addFileToProject("doc/spec.md", """
                 <caret>req~openfasttrace_navigation_target~1
                 Needs: dsn
@@ -148,7 +152,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
     }
 
     // [itest->dsn~open-specification-item-from-coverage-tag-left-side~1]
-    public void testGivenCoverageTagLeftSideWhenGoToDeclarationInvokesThenEditorOpensTheCoveringDeclaration() throws Exception {
+    public void testGivenCoverageTagLeftSideWhenGoToDeclarationInvokesThenEditorOpensTheCoveringDeclaration() {
         myFixture.addFileToProject("doc/impl.md", """
                 impl~openfasttrace_navigation_target~1
                 Covers:
@@ -171,7 +175,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
     }
 
     // [itest->dsn~open-specification-item-from-coverage-tag-right-side~1]
-    public void testGivenCoverageTagRightSideWhenGoToDeclarationInvokesThenEditorOpensTheCoveredDeclaration() throws Exception {
+    public void testGivenCoverageTagRightSideWhenGoToDeclarationInvokesThenEditorOpensTheCoveredDeclaration() {
         myFixture.addFileToProject("doc/spec.md", """
                 req~openfasttrace_navigation_target~1
                 Needs: dsn
@@ -205,7 +209,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
         final int offset = editor.getCaretModel().getOffset();
         final PsiElement[] targets = new OftGotoDeclarationHandler().getGotoDeclarationTargets(null, offset, editor);
 
-        assertThat(targets[0].getContainingFile().getName(), is("impl.md"));
+        assertThat(Objects.requireNonNull(targets)[0].getContainingFile().getName(), is("impl.md"));
     }
 
     public void testGivenCoverageTagLeftSideWhenPsiReferenceResolvesThenItOpensTheCoveringDeclaration() {
@@ -227,7 +231,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
 
         final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getEditor().getCaretModel().getOffset());
 
-        assertThat(reference.resolve().getContainingFile().getName(), is("impl.md"));
+        assertThat(Objects.requireNonNull(Objects.requireNonNull(reference).resolve()).getContainingFile().getName(), is("impl.md"));
     }
 
     public void testGivenCoverageTagRightSideWhenPsiReferenceResolvesThenItOpensTheCoveredDeclaration() {
@@ -249,7 +253,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
 
         final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getEditor().getCaretModel().getOffset());
 
-        assertThat(reference.resolve().getContainingFile().getName(), is("spec.md"));
+        assertThat(Objects.requireNonNull(reference).resolve().getContainingFile().getName(), is("spec.md"));
     }
 
     public void testGivenQuotedCoverageDefinitionWhenPsiReferenceResolvesThenItOpensTheCoveredDeclaration() {
@@ -269,10 +273,10 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
 
         final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getEditor().getCaretModel().getOffset());
 
-        assertThat(reference.resolve().getContainingFile().getName(), is("spec.md"));
+        assertThat(Objects.requireNonNull(reference).resolve().getContainingFile().getName(), is("spec.md"));
     }
 
-    public void testGivenQuotedCoverageDefinitionWhenGotoDeclarationHandlerResolvesThenItOpensTheCoveredDeclaration() {
+    public void testGivenQuotedCoverageDefinitionWhenGotoDeclarationHandlerResolvesThenItDefersToPlatformNavigation() {
         myFixture.addFileToProject("doc/spec.md", """
                 req~openfasttrace_navigation_target~1
                 Needs: dsn
@@ -289,9 +293,36 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
 
         final Editor editor = myFixture.getEditor();
         final int offset = editor.getCaretModel().getOffset();
-        final PsiElement[] targets = new OftGotoDeclarationHandler().getGotoDeclarationTargets(null, offset, editor);
+        final PsiElement sourceElement = myFixture.getFile().findElementAt(offset);
+        final PsiElement[] targets = new OftGotoDeclarationHandler().getGotoDeclarationTargets(sourceElement, offset, editor);
 
-        assertThat(targets[0].getContainingFile().getName(), is("spec.md"));
+        assertThat(targets == null, is(true));
+    }
+
+    public void testGivenQuotedCoverageDefinitionWhenRegisteredGotoDeclarationHandlersAreQueriedThenNoHandlerResolvesTheSpecTarget() {
+        myFixture.addFileToProject("doc/spec.md", """
+                req~openfasttrace_navigation_target~1
+                Needs: dsn
+                """);
+        final PsiFile referencingFile = myFixture.addFileToProject("doc/design.md", """
+                dsn~openfasttrace_navigation_design~1
+                Covers:
+                - `req~openfasttrace_navigation_target~1`
+                """);
+        myFixture.configureFromExistingVirtualFile(referencingFile.getVirtualFile());
+        myFixture.getEditor().getCaretModel().moveToOffset(
+                myFixture.getFile().getText().indexOf("req~openfasttrace_navigation_target~1")
+        );
+
+        final PsiElement sourceElement = myFixture.getFile().findElementAt(myFixture.getEditor().getCaretModel().getOffset());
+        final int offset = myFixture.getEditor().getCaretModel().getOffset();
+        final List<String> handlerResults = ExtensionPointName.<GotoDeclarationHandler>create("com.intellij.gotoDeclarationHandler")
+                .getExtensionList().stream()
+                .map(handler -> describeHandlerResult(handler, sourceElement, offset, myFixture.getEditor()))
+                .filter(result -> !result.endsWith(":[]"))
+                .toList();
+
+        assertThat(handlerResults, is(List.of()));
     }
 
     private List<String> searchSymbolMatches(final String pattern) {
@@ -300,8 +331,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
                 .toList();
     }
 
-    private void assertCoverageDefinitionNavigation(final String fileSuffix, final String coveredItemReferenceWithCaret)
-            throws Exception {
+    private void assertCoverageDefinitionNavigation(final String fileSuffix, final String coveredItemReferenceWithCaret) {
         final PsiFile declarationFile = myFixture.addFileToProject("doc/spec-" + fileSuffix + ".md", """
                 req~openfasttrace_navigation_target~1
                 Needs: dsn
@@ -320,6 +350,19 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
         EdtTestUtil.runInEdtAndWait(() -> myFixture.performEditorAction(IdeActions.ACTION_GOTO_DECLARATION));
 
         assertThat(selectedEditorLocation(), is(new EditorLocation(declarationFile.getName(), 0)));
+    }
+
+    private String describeHandlerResult(
+            final GotoDeclarationHandler handler,
+            final PsiElement sourceElement,
+            final int offset,
+            final Editor editor
+    ) {
+        final PsiElement[] targets = handler.getGotoDeclarationTargets(sourceElement, offset, editor);
+        final List<String> fileNames = targets == null
+                ? List.of()
+                : Arrays.stream(targets).map(target -> target.getContainingFile().getName()).toList();
+        return handler.getClass().getName() + ":" + fileNames;
     }
 
     private List<NavigationItem> searchSymbolItems(final String pattern) {
@@ -351,7 +394,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
             }
 
             @Override
-            public ChooseByNameModel getModel() {
+            public @NonNull ChooseByNameModel getModel() {
                 return model;
             }
 
@@ -361,7 +404,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
             }
 
             @Override
-            public String transformPattern(final String pattern) {
+            public @NonNull String transformPattern(final String pattern) {
                 return pattern;
             }
 
@@ -380,7 +423,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
     private EditorLocation selectedEditorLocation() {
         final Editor selectedEditor = FileEditorManager.getInstance(getProject()).getSelectedTextEditor();
         return new EditorLocation(
-                Objects.requireNonNull(FileDocumentManager.getInstance().getFile(selectedEditor.getDocument())).getName(),
+                Objects.requireNonNull(FileDocumentManager.getInstance().getFile(Objects.requireNonNull(selectedEditor).getDocument())).getName(),
                 selectedEditor.getCaretModel().getOffset()
         );
     }
@@ -388,7 +431,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
     private List<String> implementationTargetFilesAtCaret() {
         final int offset = myFixture.getEditor().getCaretModel().getOffset();
         final PsiElement declarationElement = myFixture.getFile().findElementAt(offset);
-        return DefinitionsScopedSearch.search(declarationElement).findAll().stream()
+        return DefinitionsScopedSearch.search(Objects.requireNonNull(declarationElement)).findAll().stream()
                 .map(target -> target.getContainingFile().getName())
                 .toList();
     }
