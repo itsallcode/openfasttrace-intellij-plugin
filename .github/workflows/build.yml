@@ -36,8 +36,29 @@ jobs:
           cache-provider: basic
           add-job-summary: on-failure
 
+      - name: Cache SonarQube packages
+        if: ${{ env.SONAR_TOKEN != null }}
+        uses: actions/cache@v5
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
       - name: Build and verify plugin
         run: ./gradlew --stacktrace --warning-mode=all check buildPlugin
+
+      - name: OSSIndex audit
+        run: ./gradlew --stacktrace --warning-mode=all ossIndexAudit --info
+        env:
+          OSSINDEX_USERNAME: ${{ secrets.OSSINDEX_USERNAME }}
+          OSSINDEX_TOKEN: ${{ secrets.OSSINDEX_TOKEN }}
+
+      - name: Sonar analysis
+        if: ${{ env.SONAR_TOKEN != null }}
+        run: ./gradlew --stacktrace --warning-mode=all sonar -Dsonar.token=$SONAR_TOKEN
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Upload plugin archive
         if: ${{ success() }}

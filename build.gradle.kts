@@ -10,6 +10,8 @@ plugins {
     id("jacoco")
     id("org.itsallcode.openfasttrace") version "3.1.1"
     id("org.jetbrains.intellij.platform") version "2.14.0"
+    id("org.sonarqube") version "7.0.1.6134"
+    id("org.sonatype.gradle.plugins.scan") version "3.1.5"
 }
 
 group = providers.gradleProperty("group").get()
@@ -23,6 +25,29 @@ java {
 
 jacoco {
     toolVersion = "0.8.13"
+}
+
+sonar {
+    properties {
+        property("sonar.organization", "itsallcode")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
+}
+
+val ossIndexUsername = providers.gradleProperty("ossIndexUsername")
+    .orElse(providers.environmentVariable("OSSINDEX_USERNAME"))
+    .orNull
+val ossIndexToken = providers.gradleProperty("ossIndexToken")
+    .orElse(providers.environmentVariable("OSSINDEX_TOKEN"))
+    .orNull
+
+ossIndexAudit {
+    ossIndexUsername?.let { username = it }
+    ossIndexToken?.let { password = it }
+    isUseCache = true
+    isPrintBanner = false
+    isColorEnabled = false
+    isFailOnDetection = true
 }
 
 requirementTracing {
