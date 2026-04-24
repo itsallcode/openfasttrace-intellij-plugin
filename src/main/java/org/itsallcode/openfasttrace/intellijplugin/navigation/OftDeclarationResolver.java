@@ -101,7 +101,7 @@ final class OftDeclarationResolver {
                         }
                         final PsiElement target = findPsiElementAt(psiManager, file, value.offset());
                         if (target != null && seenTargets.add(file.getPath() + ":" + value.offset())) {
-                            targets.add(target);
+                            targets.add(new OftDeclarationNavigationElement(target, value));
                         }
                     }
                     return true;
@@ -229,7 +229,7 @@ final class OftDeclarationResolver {
         }
         final List<OftKeywordMatch> keywords = OftSyntaxCore.findKeywords(line);
         if (!keywords.isEmpty()) {
-            return "Covers".equals(keywords.get(0).keyword());
+            return "Covers".equals(keywords.getFirst().keyword());
         }
         return insideCoversSection;
     }
