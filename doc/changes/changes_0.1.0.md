@@ -1,4 +1,4 @@
-# OpenFastTrace IntelliJ Plugin 0.1.0, released 2026-04-??
+# OpenFastTrace IntelliJ Plugin 0.1.0, released 2026-04-24
 
 Code name: Initial Release
 
