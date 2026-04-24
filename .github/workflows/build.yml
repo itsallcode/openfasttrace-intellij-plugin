@@ -36,6 +36,9 @@ jobs:
           cache-provider: basic
           add-job-summary: on-failure
 
+      - name: Trace requirements
+        run: ./gradlew --warning-mode=all traceRequirements
+
       - name: Cache SonarQube packages
         if: ${{ env.SONAR_TOKEN != null }}
         uses: actions/cache@v5
@@ -45,7 +48,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Build and verify plugin
-        run: ./gradlew --stacktrace --warning-mode=all check buildPlugin
+        run: ./gradlew --stacktrace --warning-mode=all check buildPlugin -x traceRequirements
 
       - name: OSSIndex audit
         run: ./gradlew --stacktrace --warning-mode=all ossIndexAudit --info

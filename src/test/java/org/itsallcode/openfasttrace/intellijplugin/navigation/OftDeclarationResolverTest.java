@@ -21,7 +21,7 @@ class OftDeclarationResolverTest {
             final int offset,
             final String expectedReferenceId
     ) {
-        final String text = "// [impl->req~openfasttrace_navigation_target~1]";
+        final String text = "// [impl" + "->req~openfasttrace_navigation_target~1]";
 
         assertThat(
                 OftDeclarationResolver.findReferenceAt(text, offset)

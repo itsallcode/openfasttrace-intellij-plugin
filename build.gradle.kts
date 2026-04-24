@@ -1,5 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.api.tasks.bundling.Zip
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
@@ -133,6 +134,10 @@ tasks {
     withType<JavaCompile>().configureEach {
         options.release = 21
         options.encoding = "UTF-8"
+    }
+
+    named<Zip>("buildPlugin") {
+        archiveBaseName.set(providers.gradleProperty("pluginName"))
     }
 
     test {

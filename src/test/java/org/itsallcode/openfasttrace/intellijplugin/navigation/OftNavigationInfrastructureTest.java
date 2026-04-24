@@ -123,11 +123,12 @@ public class OftNavigationInfrastructureTest extends AbstractOftPlatformTestCase
                 req~openfasttrace_navigation_target~1
                 Needs: dsn
                 """);
+        final String coverageTag = "[impl" + "->req~openfasttrace_navigation_target~1]";
         final var coverageReferenceFile = myFixture.addFileToProject("src/Main.java", """
-                // [impl->req~openfasttrace_navigation_target~1]
+                // %s
                 class Main {
                 }
-                """);
+                """.formatted(coverageTag));
         myFixture.configureFromExistingVirtualFile(coverageReferenceFile.getVirtualFile());
         myFixture.getEditor().getCaretModel().moveToOffset(
                 myFixture.getFile().getText().indexOf("req~openfasttrace_navigation_target~1")
