@@ -11,10 +11,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecification;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftSpecificationIndex;
-import org.itsallcode.openfasttrace.intellijplugin.syntax.OftCoverageTagMatch;
-import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItem;
-import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSyntaxCore;
-import org.itsallcode.openfasttrace.intellijplugin.syntax.OftTextSpan;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.*;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -30,7 +27,7 @@ final class OftDeclarationResolver {
         return findCoverageTagReferenceAt(text, offset)
                 .or(() -> OftSyntaxCore.findSpecificationItems(text).stream()
                         .filter(match -> contains(match.span(), offset))
-                        .map(match -> match.item())
+                        .map(OftSpecificationItemMatch::item)
                         .findFirst());
     }
 

@@ -20,6 +20,7 @@ import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -96,7 +97,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
 
         final Editor selectedEditor = FileEditorManager.getInstance(getProject()).getSelectedTextEditor();
         assertThat(selectedEditor, is(notNullValue()));
-        assertThat(FileDocumentManager.getInstance().getFile(selectedEditor.getDocument()).getName(), is("spec.md"));
+        assertThat(Objects.requireNonNull(FileDocumentManager.getInstance().getFile(selectedEditor.getDocument())).getName(), is("spec.md"));
         assertThat(selectedEditor.getCaretModel().getOffset(), is(0));
     }
 

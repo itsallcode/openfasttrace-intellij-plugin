@@ -8,6 +8,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecification;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftSpecificationIndex;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -16,7 +17,7 @@ import java.util.List;
 // [impl->dsn~specification-item-navigation~1]
 public final class OftChooseByNameContributor implements ChooseByNameContributor, DumbAware {
     @Override
-    public String[] getNames(final Project project, final boolean includeNonProjectItems) {
+    public String @NonNull [] getNames(final Project project, final boolean includeNonProjectItems) {
         final List<String> names = new ArrayList<>();
         FileBasedIndex.getInstance().processAllKeys(OftSpecificationIndex.NAME, key -> {
             names.add(key);
@@ -27,7 +28,7 @@ public final class OftChooseByNameContributor implements ChooseByNameContributor
     }
 
     @Override
-    public NavigationItem[] getItemsByName(
+    public NavigationItem @NonNull [] getItemsByName(
             final String name,
             final String pattern,
             final Project project,

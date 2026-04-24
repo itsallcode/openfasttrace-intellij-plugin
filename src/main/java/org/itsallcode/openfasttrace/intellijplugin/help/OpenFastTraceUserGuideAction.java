@@ -9,10 +9,6 @@ import com.intellij.openapi.project.Project;
 public final class OpenFastTraceUserGuideAction extends DumbAwareAction {
     private final OpenFastTraceUserGuideOpener opener;
 
-    public OpenFastTraceUserGuideAction() {
-        this(OpenFastTraceUserGuide::open);
-    }
-
     OpenFastTraceUserGuideAction(final OpenFastTraceUserGuideOpener opener) {
         this.opener = opener;
     }

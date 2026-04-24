@@ -8,15 +8,27 @@ Terms such as `plugin`, `OpenFastTrace`, and `OFT` use the definitions from [Sys
 
 ## Code Quality
 
-Production code and test code follow clean-code principles as defined in the Clean Code book.
+1. Production code and test code follow clean-code principles as defined in the Clean Code book.
+2. The implementation prefers speaking names over explanatory comments. Comments are only acceptable when intent cannot be expressed clearly in code.
+3. Abbreviations are only used where they are guaranteed common (meaning everyone knows them) otherwise all symbol names are written out.
+3. Methods avoid side effects where possible.
+4. Methods stay short and keep cyclomatic complexity low. When behavior grows beyond a small, readable unit, the design is refactored into smaller collaborating types or methods.
+5. When the cyclomatic complexity is too high, use extract method refactoring.
+6. APIs (not implementation) are documented with JavaDoc: interfaces, abstract classes, methods, parameters, return values, side effects (if any), purpose
+7. All objects that can be, are immutable.
+8. The implementation prefers static object allocation over dynamic allocation where possible.
+9. All method parameters are final. Output parameters are only allowed when they are used in external libraries.
 
-The implementation prefers speaking names over explanatory comments. Comments are only acceptable when intent cannot be expressed clearly in code.
+### Test Code Guideline
 
-Methods stay short and keep cyclomatic complexity low. When behavior grows beyond a small, readable unit, the design is refactored into smaller collaborating types or methods.
-
-All objects that can be, are immutable. The implementation prefers static object allocation over dynamic allocation where possible.
-
-As a rule, all method parameters are final. Output parameters are only allowed when they are used in external libraries.
+1. Test method names follow the given-when-then naming principle.
+2. Method parameters are final.
+3. The project uses Hamcrest matchers.
+4. If possible each test method has only a single assert.
+5. If multiple asserts are necessary and the latter asserts are not a follow-up symptom of the previous ones, the asserts must be wrapped in `assertAll`.
+6. When exceptions are asserted, then both type and message are validated.
+7. Where possible similar tests are bundled into parameterized tests (e.g., when multiple variants of input are tested against the same implementation method).
+8. Parameter validation is tested with multiple valid and invalid inputs. Testing valid and invalid input is done in separate test methods.
 
 ## Dependency Policy
 

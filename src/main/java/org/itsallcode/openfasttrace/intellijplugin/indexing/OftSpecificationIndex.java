@@ -13,6 +13,7 @@ import com.intellij.util.io.KeyDescriptor;
 import org.itsallcode.openfasttrace.intellijplugin.OftSupportedFiles;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItemMatch;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSyntaxCore;
+import org.jspecify.annotations.NonNull;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -52,27 +53,27 @@ public final class OftSpecificationIndex extends FileBasedIndexExtension<String,
     };
 
     @Override
-    public ID<String, List<OftIndexedSpecification>> getName() {
+    public @NonNull ID<String, List<OftIndexedSpecification>> getName() {
         return NAME;
     }
 
     @Override
-    public DataIndexer<String, List<OftIndexedSpecification>, FileContent> getIndexer() {
+    public @NonNull DataIndexer<String, List<OftIndexedSpecification>, FileContent> getIndexer() {
         return indexer;
     }
 
     @Override
-    public KeyDescriptor<String> getKeyDescriptor() {
+    public @NonNull KeyDescriptor<String> getKeyDescriptor() {
         return EnumeratorStringDescriptor.INSTANCE;
     }
 
     @Override
-    public DataExternalizer<List<OftIndexedSpecification>> getValueExternalizer() {
+    public @NonNull DataExternalizer<List<OftIndexedSpecification>> getValueExternalizer() {
         return new OftIndexedSpecificationExternalizer();
     }
 
     @Override
-    public FileBasedIndex.InputFilter getInputFilter() {
+    public FileBasedIndex.@NonNull InputFilter getInputFilter() {
         return OftSupportedFiles::isSpecificationFile;
     }
 
@@ -88,7 +89,7 @@ public final class OftSpecificationIndex extends FileBasedIndexExtension<String,
 
     private static final class OftIndexedSpecificationExternalizer implements DataExternalizer<List<OftIndexedSpecification>> {
         @Override
-        public void save(final DataOutput out, final List<OftIndexedSpecification> value) throws IOException {
+        public void save(final @NonNull DataOutput out, final List<OftIndexedSpecification> value) throws IOException {
             DataInputOutputUtil.writeINT(out, value.size());
             for (OftIndexedSpecification specification : value) {
                 out.writeUTF(specification.artifactType());
@@ -99,7 +100,7 @@ public final class OftSpecificationIndex extends FileBasedIndexExtension<String,
         }
 
         @Override
-        public List<OftIndexedSpecification> read(final DataInput in) throws IOException {
+        public List<OftIndexedSpecification> read(final @NonNull DataInput in) throws IOException {
             final int size = DataInputOutputUtil.readINT(in);
             final List<OftIndexedSpecification> values = new ArrayList<>(size);
             for (int index = 0; index < size; index++) {

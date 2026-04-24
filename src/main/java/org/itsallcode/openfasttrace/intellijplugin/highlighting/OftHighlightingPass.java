@@ -13,6 +13,7 @@ import org.itsallcode.openfasttrace.intellijplugin.syntax.OftKeywordMatch;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItemMatch;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSyntaxCore;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftTextSpan;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public final class OftHighlightingPass extends TextEditorHighlightingPass implem
     }
 
     @Override
-    public void doCollectInformation(final com.intellij.openapi.progress.ProgressIndicator progress) {
+    public void doCollectInformation(final com.intellij.openapi.progress.@NonNull ProgressIndicator progress) {
         if (file.getVirtualFile() == null) {
             return;
         }

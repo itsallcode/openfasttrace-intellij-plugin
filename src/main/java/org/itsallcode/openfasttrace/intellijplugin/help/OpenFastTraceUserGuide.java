@@ -10,10 +10,6 @@ final class OpenFastTraceUserGuide {
     private OpenFastTraceUserGuide() {
     }
 
-    static void open(final Project project) {
-        open(project, TITLE, URL, HTMLEditorProvider::openEditor);
-    }
-
     static void open(final Project project, final String title, final String url) {
         open(project, title, url, HTMLEditorProvider::openEditor);
     }

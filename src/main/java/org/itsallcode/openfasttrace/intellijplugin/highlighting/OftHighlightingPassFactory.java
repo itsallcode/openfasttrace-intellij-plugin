@@ -6,10 +6,11 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.psi.PsiFile;
 import org.itsallcode.openfasttrace.intellijplugin.OftSupportedFiles;
+import org.jspecify.annotations.NonNull;
 
 public final class OftHighlightingPassFactory implements TextEditorHighlightingPassFactory, DumbAware {
     @Override
-    public TextEditorHighlightingPass createHighlightingPass(final PsiFile file, final Editor editor) {
+    public TextEditorHighlightingPass createHighlightingPass(final PsiFile file, final @NonNull Editor editor) {
         if (file.getVirtualFile() == null) {
             return null;
         }

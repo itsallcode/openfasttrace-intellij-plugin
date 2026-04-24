@@ -10,6 +10,7 @@ import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecificat
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.Icon;
+import java.util.Objects;
 
 // [impl->dsn~specification-item-navigation-runtime~1]
 public final class OftNavigationItem implements NavigationItem {
@@ -33,7 +34,7 @@ public final class OftNavigationItem implements NavigationItem {
         return new ItemPresentation() {
             @Override
             public @Nullable String getPresentableText() {
-                return specification.id();
+                return Objects.requireNonNullElse(specification.id(), "unknown");
             }
 
             @Override
