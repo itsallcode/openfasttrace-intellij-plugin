@@ -1,95 +1,192 @@
-val remoteRobotVersion = "0.11.16"
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.api.tasks.bundling.Zip
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
+// [[plugin-build-uses-intellij-platform-gradle-plugin:1]]
 plugins {
     id("java")
     id("jacoco")
-    id("org.jetbrains.intellij") version "1.9.0"
-    id("org.sonarqube") version "3.4.0.2513"
+    id("com.diffplug.spotless") version "8.4.0"
+    id("org.itsallcode.openfasttrace") version "3.1.1"
+    id("org.jetbrains.intellij.platform") version "2.14.0"
+    id("org.sonarqube") version "7.2.3.7755"
+    id("org.sonatype.gradle.plugins.scan") version "3.1.5"
 }
 
-group = "org.itsallcode"
-version = "1.0-SNAPSHOT"
+group = providers.gradleProperty("group").get()
+version = providers.gradleProperty("version").get()
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.13"
+}
+
+sonar {
+    properties {
+        property("sonar.organization", "itsallcode")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath
+        )
+    }
+}
+
+val ossIndexUsername = providers.gradleProperty("ossIndexUsername")
+    .orElse(providers.environmentVariable("OSSINDEX_USERNAME"))
+    .orNull
+val ossIndexToken = providers.gradleProperty("ossIndexToken")
+    .orElse(providers.environmentVariable("OSSINDEX_TOKEN"))
+    .orNull
+
+ossIndexAudit {
+    ossIndexUsername?.let { username = it }
+    ossIndexToken?.let { password = it }
+    isUseCache = true
+    isPrintBanner = false
+    isColorEnabled = false
+    isFailOnDetection = true
+}
+
+requirementTracing {
+    failBuild = true
+    inputDirectories = files("doc", "src/main/java", "src/test/java")
+    tags {
+        tag {
+            paths = files("build.gradle.kts")
+            coveredItemArtifactType = "dsn"
+            tagArtifactType = "bld"
+            coveredItemNamePrefix = ""
+        }
+    }
+}
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies") }
-}
-
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    version.set("2021.3.3")
-    type.set("IC") // Target IDE Platform
-    plugins.set(listOf(/* Plugin Dependencies */))
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
-    testImplementation("com.intellij.remoterobot:remote-robot:" + remoteRobotVersion)
-    testImplementation("com.intellij.remoterobot:remote-fixtures:" + remoteRobotVersion)
-    testImplementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+    intellijPlatform {
+        intellijIdea(providers.gradleProperty("platformVersion"))
+        bundledPlugin("com.intellij.java")
+        testFramework(TestFrameworkType.Platform)
+        pluginVerifier()
+        zipSigner()
+    }
 
-    val junitVersion = "5.9.0"
-    testImplementation("org.junit.jupiter:junit-jupiter-api:" + junitVersion)
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:" + junitVersion)
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.0")
+    testImplementation(platform("org.junit:junit-bom:${providers.gradleProperty("junitBomVersion").get()}"))
+    testImplementation("junit:junit:${providers.gradleProperty("junit4Version").get()}")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.hamcrest:hamcrest:${providers.gradleProperty("hamcrestVersion").get()}")
+    testImplementation("org.opentest4j:opentest4j:${providers.gradleProperty("opentest4jVersion").get()}")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+}
+
+intellijPlatform {
+    buildSearchableOptions = false
+
+    pluginConfiguration {
+        id = providers.gradleProperty("pluginId")
+        name = providers.gradleProperty("pluginName")
+        version = providers.gradleProperty("version")
+
+        vendor {
+            name = providers.gradleProperty("pluginVendor")
+            email = providers.gradleProperty("pluginVendorEmail")
+            url = providers.gradleProperty("pluginVendorUrl")
+        }
+
+        ideaVersion {
+            sinceBuild = providers.gradleProperty("platformSinceBuild")
+        }
+    }
+
+    pluginVerification {
+        ides {
+            recommended()
+        }
+    }
+}
+
+intellijPlatformTesting {
+    runIde {
+        create("manualTestIde") {
+            sandboxDirectory.set(layout.buildDirectory.dir("manual-test-ide-sandbox"))
+            task {
+                description = "Launches a throwaway IntelliJ instance with the plugin installed for manual testing."
+            }
+        }
+    }
 }
 
 tasks {
-    // Set the JVM compatibility versions
-    withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+    withType<JavaCompile>().configureEach {
+        options.release = 21
+        options.encoding = "UTF-8"
     }
 
-    patchPluginXml {
-        sinceBuild.set("213")
-        untilBuild.set("223.*")
-    }
-
-    signPlugin {
-        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-        privateKey.set(System.getenv("PRIVATE_KEY"))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-    }
-
-    publishPlugin {
-        token.set(System.getenv("PUBLISH_TOKEN"))
-    }
-
-    downloadRobotServerPlugin {
-        version.set(remoteRobotVersion)
+    named<Zip>("buildPlugin") {
+        archiveBaseName.set(providers.gradleProperty("pluginName"))
     }
 
     test {
-        systemProperty("robot-server.port", "8082")
         useJUnitPlatform()
-        finalizedBy(jacocoTestReport)
-    }
-
-    runIdeForUiTests {
-        //    In case your Idea is launched on remote machine you can enable public port and enable encryption of JS calls
-        //    systemProperty "robot-server.host.public", "true"
-        //    systemProperty "robot.encryption.enabled", "true"
-        //    systemProperty "robot.encryption.password", "my super secret"
-        systemProperty("robot-server.port", "8082")
-        systemProperty("ide.mac.message.dialogs.as.sheets", "false")
-        systemProperty("jb.privacy.policy.text", "<!--999.999-->")
-        systemProperty("jb.consents.confirmation.enabled", "false")
-        systemProperty("ide.mac.file.chooser.native", "false")
-        systemProperty("jbScreenMenuBar.enabled", "false")
-        systemProperty("apple.laf.useScreenMenuBar", "false")
-        systemProperty("idea.trust.all.projects", "true")
-        systemProperty("ide.show.tips.on.startup.default.value", "false")
+        extensions.configure<JacocoTaskExtension> {
+            isIncludeNoLocationClasses = true
+            excludes = listOf("jdk.internal.*")
+        }
+        testLogging {
+            events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED)
+            exceptionFormat = TestExceptionFormat.FULL
+        }
     }
 
     jacocoTestReport {
         dependsOn(test)
         reports {
-            xml.required.set(true)
+            xml.required = true
+            html.required = true
         }
     }
-}
 
-tasks.sonarqube {
-     dependsOn(tasks.jacocoTestReport)
+    jacocoTestCoverageVerification {
+        dependsOn(test)
+        violationRules {
+            rule {
+                limit {
+                    minimum = "0.80".toBigDecimal()
+                }
+            }
+        }
+    }
+
+    named("sonar") {
+        dependsOn(jacocoTestReport)
+    }
+
+    named("verifyPluginProjectConfiguration") {
+        dependsOn("spotlessCheck")
+    }
+
+    named("verifyPluginStructure") {
+        dependsOn("spotlessCheck")
+    }
+
+    check {
+        dependsOn(
+            traceRequirements,
+            jacocoTestCoverageVerification,
+        )
+    }
 }

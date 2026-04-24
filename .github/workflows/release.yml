@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Fail if not running on main branch
+        if: ${{ github.ref != 'refs/heads/main' }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            core.setFailed('Not running on main branch, github.ref is ${{ github.ref }}. Please start this workflow only on main')
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          add-job-summary: on-failure
+
+      - name: Trace requirements
+        run: ./gradlew --warning-mode=all traceRequirements
+
+      - name: Build plugin distribution
+        run: ./gradlew --stacktrace --warning-mode=all clean check buildPlugin -x traceRequirements
+
+      - name: Create GitHub release
+        run: ./.github/workflows/github_release.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
