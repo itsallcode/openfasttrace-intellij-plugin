@@ -134,11 +134,11 @@ The following requirements refine the 'Go to Specification' Item feature into us
 ### Go to Symbol for Specification Items
 `req~go-to-symbol-for-specification-items~1`
 
-The plugin contributes OpenFastTrace specification items to Go to Symbol.
+The plugin contributes OpenFastTrace specification item declarations to `Go to Symbol`.
 
 Rationale:
 
-Users can search specification items by name and see matching items in the result list.
+Users can search specification items by full ID and see matching declarations in the result list.
 
 Covers:
 - `feat~go-to-specification-item~1`
@@ -148,7 +148,37 @@ Needs: scn
 ### Open Specification Item from Go to Symbol
 `req~open-specification-item-from-go-to-symbol~1`
 
-The plugin opens the selected OpenFastTrace specification item from the 'Go to Symbol' result list in the editor. Users can jump from the result list to the definition of the selected specification item.
+The plugin opens the selected OpenFastTrace specification item from the `Go to Symbol` result list in the editor at the declaration of that item. Users can jump from the result list to the defining item ID of the selected specification item.
+
+Covers:
+- `feat~go-to-specification-item~1`
+
+Needs: scn
+
+### Open Specification Item from Coverage Definition
+`req~open-specification-item-from-coverage-definition~1`
+
+The plugin opens the covered OpenFastTrace specification item when a user invokes `Go To Declaration` on an OFT item ID under `Covers:` in a supported specification document.
+
+Covers:
+- `feat~go-to-specification-item~1`
+
+Needs: scn
+
+### Stay on Specification Item Declaration on Go To Declaration
+`req~stay-on-specification-item-declaration-on-go-to-declaration~1`
+
+The plugin keeps the user on the current OpenFastTrace specification item declaration when a user invokes `Go To Declaration` on the declared item ID itself. Users can distinguish the declaration from coverage-providing occurrences of the same item.
+
+Covers:
+- `feat~go-to-specification-item~1`
+
+Needs: scn
+
+### Show Covering Occurrences from Specification Item Declaration
+`req~show-covering-occurrences-from-specification-item-declaration~1`
+
+The plugin shows the coverage-providing occurrences of an OpenFastTrace specification item when a user invokes `Go To Implementations` on the declared item ID. The result includes supported `Covers:` entries in specification documents and OFT coverage tags in source files.
 
 Covers:
 - `feat~go-to-specification-item~1`
@@ -158,7 +188,7 @@ Needs: scn
 ### Open Specification Item from Coverage Tag Left Side
 `req~open-specification-item-from-coverage-tag-left-side~1`
 
-The plugin opens the covering OpenFastTrace specification item when a user invokes Go To on the left side of an OFT coverage tag in a supported file. If the left side omits the name and revision, the plugin resolves the effective ID by copying the missing parts from the covered ID on the right side of the arrow.
+The plugin resolves the covering OpenFastTrace specification item when a user invokes `Go To Declaration` on the left side of an OFT coverage tag in a supported file and opens that item's declaration in the specification document. If the left side omits the name and revision, the plugin resolves the effective ID by copying the missing parts from the covered ID on the right side of the arrow.
 
 Covers:
 - `feat~go-to-specification-item~1`
@@ -210,7 +240,7 @@ The following scenarios describe the happy path for syntax highlighting.
 
 **Given** a user opens a Markdown document that contains a valid OFT specification item
 **When** the document is shown in the editor
-**Then** the OFT specification item ID and OFT keywords are highlighted differently from surrounding Markdown text
+**Then** the OFT specification item ID and OFT keywords are highlighted differently from surrounding Markdown text.
 
 Covers:
 - `req~markdown-syntax-highlighting~1`
@@ -222,7 +252,7 @@ Needs: dsn
 
 **Given** a user opens a Markdown document that contains text resembling an OFT specification item with an invalid revision such as `feat~foobar~I`
 **When** the document is shown in the editor
-**Then** the invalid text is not highlighted as a valid OFT specification item
+**Then** the invalid text is not highlighted as a valid OFT specification item.
 
 Covers:
 - `req~markdown-syntax-highlighting~1`
@@ -234,7 +264,7 @@ Needs: dsn
 
 **Given** a user edits a Markdown document that contains an incomplete OFT specification item such as `feat~foobar~`
 **When** the document is shown in the editor
-**Then** the document remains visible and editable while the incomplete text is present
+**Then** the document remains visible and editable while the incomplete text is present.
 
 Covers:
 - `req~markdown-syntax-highlighting~1`
@@ -246,7 +276,7 @@ Needs: dsn
 
 **Given** a user opens an RST document that contains a valid OFT specification item
 **When** the document is shown in the editor
-**Then** the OFT specification item ID and OFT keywords are highlighted differently from surrounding RST text
+**Then** the OFT specification item ID and OFT keywords are highlighted differently from surrounding RST text.
 
 Covers:
 - `req~rst-syntax-highlighting~1`
@@ -258,7 +288,7 @@ Needs: dsn
 
 **Given** a user opens an RST document that contains text resembling an OFT specification item with an invalid revision such as `feat~foobar~I`
 **When** the document is shown in the editor
-**Then** the invalid text is not highlighted as a valid OFT specification item
+**Then** the invalid text is not highlighted as a valid OFT specification item.
 
 Covers:
 - `req~rst-syntax-highlighting~1`
@@ -270,7 +300,7 @@ Needs: dsn
 
 **Given** a user edits an RST document that contains an incomplete OFT specification item such as `feat~foobar~`
 **When** the document is shown in the editor
-**Then** the document remains visible and editable while the incomplete text is present
+**Then** the document remains visible and editable while the incomplete text is present.
 
 Covers:
 - `req~rst-syntax-highlighting~1`
@@ -282,7 +312,7 @@ Needs: dsn
 
 **Given** a user opens a supported source file that contains an OFT coverage tag inside a comment
 **When** the document is shown in the editor
-**Then** the OFT coverage tag is highlighted differently from surrounding comment text
+**Then** the OFT coverage tag is highlighted differently from surrounding comment text.
 
 Covers:
 - `req~coverage-tag-syntax-highlighting~1`
@@ -294,7 +324,7 @@ Needs: dsn
 
 **Given** a user opens a supported source file that contains text resembling an OFT coverage tag with an invalid revision such as `[impl->feat~foobar~I]`
 **When** the document is shown in the editor
-**Then** the invalid text is not highlighted as a valid OFT coverage tag
+**Then** the invalid text is not highlighted as a valid OFT coverage tag.
 
 Covers:
 - `req~coverage-tag-syntax-highlighting~1`
@@ -306,7 +336,7 @@ Needs: dsn
 
 **Given** a user edits a supported source file that contains an incomplete OFT coverage tag such as `[impl->feat~foobar~`
 **When** the document is shown in the editor
-**Then** the document remains visible and editable while the incomplete text is present
+**Then** the document remains visible and editable while the incomplete text is present.
 
 Covers:
 - `req~coverage-tag-syntax-highlighting~1`
@@ -315,14 +345,14 @@ Needs: dsn
 
 ### Go to Specification Item
 
-The following scenarios describe the happy path for navigating to specification items by symbol name and from coverage tags.
+The following scenarios describe the happy path for searching declarations and navigating between declarations and coverage occurrences.
 
 ### Show Specification Item in Go to Symbol
 `scn~show-specification-item-in-go-to-symbol~1`
 
-**Given** a project contains an OpenFastTrace specification item with the name `foobar`
-**When** a user invokes Go to Symbol and searches for `foobar`
-**Then** the matching specification item appears in the result list
+**Given** a project contains the OpenFastTrace specification item `req~foobar~1`
+**When** a user invokes `Go to Symbol` and searches for `req~foobar~1`
+**Then** the result list contains the declaration of `req~foobar~1` and does not list coverage occurrences under `Covers:` or in source-code coverage tags.
 
 Covers:
 - `req~go-to-symbol-for-specification-items~1`
@@ -332,9 +362,9 @@ Needs: dsn
 ### Open Specification Item from Go to Symbol
 `scn~open-specification-item-from-go-to-symbol~1`
 
-**Given** a project contains an OpenFastTrace specification item with the name `foobar`
-**When** a user invokes Go to Symbol, searches for `foobar`, and selects the matching specification item from the result list
-**Then** the editor opens the selected specification item at its definition
+**Given** a project contains the OpenFastTrace specification item `req~foobar~1`
+**When** a user invokes `Go to Symbol`, searches for `req~foobar~1`, and selects the matching specification item from the result list
+**Then** the editor opens the selected specification item at the declaration of `req~foobar~1`
 
 Covers:
 - `req~open-specification-item-from-go-to-symbol~1`
@@ -344,9 +374,9 @@ Needs: dsn
 ### Open Specification Item from Search Everywhere
 `scn~open-specification-item-from-search-everywhere~1`
 
-**Given** a project contains an OpenFastTrace specification item with the name `foobar`
-**When** a user invokes Search Everywhere, searches for `foobar`, and selects the matching specification item from the result list
-**Then** the editor opens the selected specification item at its definition
+**Given** a project contains the OpenFastTrace specification item `req~foobar~1`
+**When** a user invokes Search Everywhere, switches to the Symbols tab, searches for `req~foobar~1`, and selects the matching specification item from the result list
+**Then** the editor opens the selected specification item at the declaration of `req~foobar~1`
 
 Covers:
 - `req~go-to-symbol-for-specification-items~1`
@@ -354,12 +384,36 @@ Covers:
 
 Needs: dsn
 
+### Open Specification Item from Coverage Definition
+`scn~open-specification-item-from-coverage-definition~1`
+
+**Given** a project contains the specification items `impl~openfasttrace_navigation_design~1` and `req~openfasttrace_navigation_target~1`, and `impl~openfasttrace_navigation_design~1` contains `Covers:` with the entry `req~openfasttrace_navigation_target~1`
+**When** a user invokes `Go To Declaration` on `req~openfasttrace_navigation_target~1` under `Covers:`
+**Then** the editor opens `req~openfasttrace_navigation_target~1` at its declaration.
+
+Covers:
+- `req~open-specification-item-from-coverage-definition~1`
+
+Needs: dsn
+
+### Stay on Specification Item Declaration on Go To Declaration
+`scn~stay-on-specification-item-declaration-on-go-to-declaration~1`
+
+**Given** a project contains the specification item `req~openfasttrace_navigation_target~1`
+**When** a user places the caret on the declared item ID `req~openfasttrace_navigation_target~1` in its own header and invokes `Go To Declaration`
+**Then** the editor keeps the caret on that declaration and does not navigate to a coverage occurrence.
+
+Covers:
+- `req~stay-on-specification-item-declaration-on-go-to-declaration~1`
+
+Needs: dsn
+
 ### Open Specification Item from Coverage Tag Left Side
 `scn~open-specification-item-from-coverage-tag-left-side~1`
 
 **Given** a project contains the specification items `impl~openfasttrace_navigation_target~1` and `req~openfasttrace_navigation_target~1`, and a supported source file contains the OFT coverage tag `[impl->req~openfasttrace_navigation_target~1]`
-**When** a user invokes Go To on `impl` on the left side of the coverage tag
-**Then** the editor opens `impl~openfasttrace_navigation_target~1` at its definition by copying the missing name and revision from the covered ID on the right side
+**When** a user invokes `Go To Declaration` on `impl` on the left side of the coverage tag
+**Then** the editor opens `impl~openfasttrace_navigation_target~1` at its definition by copying the missing name and revision from the covered ID on the right side.
 
 Covers:
 - `req~open-specification-item-from-coverage-tag-left-side~1`
@@ -370,11 +424,23 @@ Needs: dsn
 `scn~open-specification-item-from-coverage-tag-right-side~1`
 
 **Given** a project contains the specification item `req~openfasttrace_navigation_target~1`, and a supported source file contains the OFT coverage tag `[impl->req~openfasttrace_navigation_target~1]`
-**When** a user invokes Go To on `req~openfasttrace_navigation_target~1` on the right side of the coverage tag
-**Then** the editor opens `req~openfasttrace_navigation_target~1` at its definition
+**When** a user invokes `Go To Declaration` on `req~openfasttrace_navigation_target~1` on the right side of the coverage tag
+**Then** the editor opens `req~openfasttrace_navigation_target~1` at its definition.
 
 Covers:
 - `req~open-specification-item-from-coverage-tag-right-side~1`
+
+Needs: dsn
+
+### Show Covering Occurrences from Specification Item Declaration
+`scn~show-covering-occurrences-from-specification-item-declaration~1`
+
+**Given** a project contains the declared specification item `req~openfasttrace_navigation_target~1`, a `Covers:` entry that references `req~openfasttrace_navigation_target~1`, and a supported source file with an OFT coverage tag that references `req~openfasttrace_navigation_target~1`
+**When** a user places the caret on the declared item ID `req~openfasttrace_navigation_target~1` in its own header and invokes `Go To Implementations`
+**Then** the IDE shows the coverage-providing occurrences of `req~openfasttrace_navigation_target~1`, including the `Covers:` entry and the supported source-code coverage tag, instead of reopening the declaration
+
+Covers:
+- `req~show-covering-occurrences-from-specification-item-declaration~1`
 
 Needs: dsn
 
