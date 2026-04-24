@@ -11,7 +11,12 @@
         <gotoDeclarationHandler implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftGotoDeclarationHandler"/>
         <definitionsScopedSearch implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftDefinitionsScopedSearch"/>
         <psi.referenceContributor
+                implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationReferenceContributor"/>
+        <psi.referenceContributor
                 language="JAVA"
+                implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftCoverageTagReferenceContributor"/>
+        <psi.referenceContributor
+                language="Markdown"
                 implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftCoverageTagReferenceContributor"/>
         <psi.referenceContributor
                 language="TEXT"

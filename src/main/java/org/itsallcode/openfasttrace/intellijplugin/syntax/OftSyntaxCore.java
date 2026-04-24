@@ -18,6 +18,9 @@ public final class OftSyntaxCore {
     private static final Pattern SPECIFICATION_ITEM_DEFINITION_PATTERN = Pattern.compile(
             "(?m)^\\s*(?<id>" + NAMED_SPECIFICATION_ITEM_BODY + ")\\s*$"
     );
+    private static final Pattern MARKDOWN_CODE_SPAN_SPECIFICATION_ITEM_DEFINITION_PATTERN = Pattern.compile(
+            "(?m)^\\s*`(?<id>" + NAMED_SPECIFICATION_ITEM_BODY + ")`\\s*$"
+    );
     private static final Pattern SPECIFICATION_ITEM_EXACT_PATTERN = Pattern.compile("^" + SPECIFICATION_ITEM_BODY + "$");
     private static final Pattern INCOMPLETE_SPECIFICATION_ITEM_PATTERN = Pattern.compile(
             "^[A-Za-z]+(?:~" + NAME_PART + ")?~?$"
@@ -72,8 +75,12 @@ public final class OftSyntaxCore {
         return collectSpecificationItemMatches(text, SPECIFICATION_ITEM_PATTERN, false);
     }
 
+    // [impl->dsn~show-markdown-declaration-variants-in-go-to-symbol~1]
     public static List<OftSpecificationItemMatch> findDefinitionSpecificationItems(final CharSequence text) {
-        return collectSpecificationItemMatches(text, SPECIFICATION_ITEM_DEFINITION_PATTERN, true);
+        final List<OftSpecificationItemMatch> matches = new ArrayList<>();
+        matches.addAll(collectSpecificationItemMatches(text, SPECIFICATION_ITEM_DEFINITION_PATTERN, true));
+        matches.addAll(collectSpecificationItemMatches(text, MARKDOWN_CODE_SPAN_SPECIFICATION_ITEM_DEFINITION_PATTERN, true));
+        return List.copyOf(matches);
     }
 
     private static List<OftSpecificationItemMatch> collectSpecificationItemMatches(

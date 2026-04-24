@@ -185,7 +185,14 @@ final class OftDeclarationResolver {
             final CharSequence text,
             final OftSpecificationItem declaration
     ) {
-        final List<OftTextSpan> spans = new ArrayList<>();
+        return findCoveredSpecificationItems(text).stream()
+                .filter(match -> declaration.id().equals(match.item().id()))
+                .map(OftSpecificationItemMatch::span)
+                .toList();
+    }
+
+    static List<OftSpecificationItemMatch> findCoveredSpecificationItems(final CharSequence text) {
+        final List<OftSpecificationItemMatch> matches = new ArrayList<>();
         int lineStart = 0;
         boolean insideCoversSection = false;
         while (lineStart <= text.length()) {
@@ -194,14 +201,15 @@ final class OftDeclarationResolver {
             insideCoversSection = updateSectionState(line, insideCoversSection);
             if (insideCoversSection) {
                 for (OftSpecificationItemMatch match : OftSyntaxCore.findSpecificationItems(line)) {
-                    if (declaration.id().equals(match.item().id())) {
-                        spans.add(new OftTextSpan(lineStart + match.span().startOffset(), lineStart + match.span().endOffset()));
-                    }
+                    matches.add(new OftSpecificationItemMatch(
+                            match.item(),
+                            new OftTextSpan(lineStart + match.span().startOffset(), lineStart + match.span().endOffset())
+                    ));
                 }
             }
             lineStart = lineEnd + 1;
         }
-        return List.copyOf(spans);
+        return List.copyOf(matches);
     }
 
     private static int findLineEnd(final CharSequence text, final int lineStart) {

@@ -19,17 +19,18 @@ import com.intellij.testFramework.EdtTestUtil;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 
 public class OftNavigationTest extends AbstractOftPlatformTestCase {
+    private int searchContextCounter;
+
     // [itest->dsn~show-specification-item-in-go-to-symbol~1]
     public void testGivenDeclarationAndCoverageOccurrencesWhenGoToSymbolSearchesByFullIdThenOnlyTheDeclarationAppears() {
         final String specificationId = "req~openfasttrace_navigation_target~1";
@@ -44,6 +45,24 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
                 """);
 
         assertThat(searchSymbolMatches(specificationId), contains(specificationId));
+    }
+
+    // [itest->dsn~show-markdown-declaration-variants-in-go-to-symbol~1]
+    public void testGivenPlainAndBacktickMarkdownDeclarationsWhenGoToSymbolSearchesByFullIdThenBothDeclarationsAppear() {
+        final String plainSpecificationId = "req~plain_markdown~1";
+        final String quotedSpecificationId = "req~quoted_markdown~1";
+        myFixture.addFileToProject("doc/spec.md", """
+                req~plain_markdown~1
+                Needs: dsn
+
+                `req~quoted_markdown~1`
+                Needs: dsn
+                """);
+
+        assertAll(
+                () -> assertThat(searchSymbolMatches(plainSpecificationId), contains(plainSpecificationId)),
+                () -> assertThat(searchSymbolMatches(quotedSpecificationId), contains(quotedSpecificationId))
+        );
     }
 
     // [itest->dsn~open-specification-item-from-go-to-symbol~1]
@@ -85,20 +104,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
 
     // [itest->dsn~open-specification-item-from-coverage-definition~1]
     public void testGivenCoverageDefinitionWhenGoToDeclarationInvokesOnCoveredItemThenEditorOpensTheDeclarationAnchor() throws Exception {
-        myFixture.addFileToProject("doc/spec.md", """
-                req~openfasttrace_navigation_target~1
-                Needs: dsn
-                """);
-        final PsiFile referencingFile = myFixture.addFileToProject("doc/design.md", """
-                dsn~openfasttrace_navigation_design~1
-                Covers:
-                - <caret>req~openfasttrace_navigation_target~1
-                """);
-        myFixture.configureFromExistingVirtualFile(referencingFile.getVirtualFile());
-
-        EdtTestUtil.runInEdtAndWait(() -> myFixture.performEditorAction(IdeActions.ACTION_GOTO_DECLARATION));
-
-        assertThat(selectedEditorLocation(), is(new EditorLocation("spec.md", 0)));
+        assertCoverageDefinitionNavigation("plain", "<caret>req~openfasttrace_navigation_target~1");
     }
 
     // [itest->dsn~stay-on-specification-item-declaration~1]
@@ -246,14 +252,79 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
         assertThat(reference.resolve().getContainingFile().getName(), is("spec.md"));
     }
 
+    public void testGivenQuotedCoverageDefinitionWhenPsiReferenceResolvesThenItOpensTheCoveredDeclaration() {
+        myFixture.addFileToProject("doc/spec.md", """
+                req~openfasttrace_navigation_target~1
+                Needs: dsn
+                """);
+        final PsiFile referencingFile = myFixture.addFileToProject("doc/design.md", """
+                dsn~openfasttrace_navigation_design~1
+                Covers:
+                - `req~openfasttrace_navigation_target~1`
+                """);
+        myFixture.configureFromExistingVirtualFile(referencingFile.getVirtualFile());
+        myFixture.getEditor().getCaretModel().moveToOffset(
+                myFixture.getFile().getText().indexOf("req~openfasttrace_navigation_target~1")
+        );
+
+        final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getEditor().getCaretModel().getOffset());
+
+        assertThat(reference.resolve().getContainingFile().getName(), is("spec.md"));
+    }
+
+    public void testGivenQuotedCoverageDefinitionWhenGotoDeclarationHandlerResolvesThenItOpensTheCoveredDeclaration() {
+        myFixture.addFileToProject("doc/spec.md", """
+                req~openfasttrace_navigation_target~1
+                Needs: dsn
+                """);
+        final PsiFile referencingFile = myFixture.addFileToProject("doc/design.md", """
+                dsn~openfasttrace_navigation_design~1
+                Covers:
+                - `req~openfasttrace_navigation_target~1`
+                """);
+        myFixture.configureFromExistingVirtualFile(referencingFile.getVirtualFile());
+        myFixture.getEditor().getCaretModel().moveToOffset(
+                myFixture.getFile().getText().indexOf("req~openfasttrace_navigation_target~1")
+        );
+
+        final Editor editor = myFixture.getEditor();
+        final int offset = editor.getCaretModel().getOffset();
+        final PsiElement[] targets = new OftGotoDeclarationHandler().getGotoDeclarationTargets(null, offset, editor);
+
+        assertThat(targets[0].getContainingFile().getName(), is("spec.md"));
+    }
+
     private List<String> searchSymbolMatches(final String pattern) {
         return searchSymbolItems(pattern).stream()
                 .map(item -> ((OftNavigationItem) item).getSpecification().id())
                 .toList();
     }
 
+    private void assertCoverageDefinitionNavigation(final String fileSuffix, final String coveredItemReferenceWithCaret)
+            throws Exception {
+        final PsiFile declarationFile = myFixture.addFileToProject("doc/spec-" + fileSuffix + ".md", """
+                req~openfasttrace_navigation_target~1
+                Needs: dsn
+                """);
+        final PsiFile referencingFile = myFixture.addFileToProject("doc/design-" + fileSuffix + ".md", """
+                dsn~openfasttrace_navigation_design_%s~1
+                Covers:
+                - %s
+                """.formatted(fileSuffix, coveredItemReferenceWithCaret.replace("<caret>", "")));
+        myFixture.configureFromExistingVirtualFile(referencingFile.getVirtualFile());
+        myFixture.getEditor().getCaretModel().moveToOffset(
+                myFixture.getFile().getText().indexOf(coveredItemReferenceWithCaret.replace("<caret>", ""))
+                        + coveredItemReferenceWithCaret.indexOf("<caret>")
+        );
+
+        EdtTestUtil.runInEdtAndWait(() -> myFixture.performEditorAction(IdeActions.ACTION_GOTO_DECLARATION));
+
+        assertThat(selectedEditorLocation(), is(new EditorLocation(declarationFile.getName(), 0)));
+    }
+
     private List<NavigationItem> searchSymbolItems(final String pattern) {
-        final PsiFile contextFile = myFixture.addFileToProject("src/SearchContext.java", "class SearchContext {}");
+        final String fileName = "src/SearchContext" + searchContextCounter++ + ".java";
+        final PsiFile contextFile = myFixture.addFileToProject(fileName, "class SearchContext {}");
         myFixture.configureFromExistingVirtualFile(contextFile.getVirtualFile());
 
         final OftChooseByNameContributor contributor = new OftChooseByNameContributor();

@@ -79,7 +79,7 @@ public final class OftSpecificationIndex extends FileBasedIndexExtension<String,
 
     @Override
     public int getVersion() {
-        return 5;
+        return 6;
     }
 
     private static final class OftIndexedSpecificationExternalizer implements DataExternalizer<List<OftIndexedSpecification>> {

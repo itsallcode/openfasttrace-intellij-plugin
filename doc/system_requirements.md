@@ -145,6 +145,20 @@ Covers:
 
 Needs: scn
 
+### Recognize Markdown Specification Item Declaration Variants
+`req~recognize-markdown-specification-item-declaration-variants~1`
+
+The plugin recognizes an OpenFastTrace specification item declaration in a Markdown document both when the full OFT item ID appears as the plain declaration line and when the full OFT item ID is enclosed in single backticks on that declaration line.
+
+Rationale:
+
+Users can choose either Markdown style without losing declaration-based search and navigation.
+
+Covers:
+- `feat~go-to-specification-item~1`
+
+Needs: scn
+
 ### Open Specification Item from Go to Symbol
 `req~open-specification-item-from-go-to-symbol~1`
 
@@ -356,6 +370,18 @@ The following scenarios describe the happy path for searching declarations and n
 
 Covers:
 - `req~go-to-symbol-for-specification-items~1`
+
+Needs: dsn
+
+### Show Markdown Declaration Variants in Go to Symbol
+`scn~show-markdown-declaration-variants-in-go-to-symbol~1`
+
+**Given** a project contains the Markdown specification item declarations `req~plain_markdown~1` and `` `req~quoted_markdown~1` ``
+**When** a user invokes `Go to Symbol` and searches for `req~plain_markdown~1` or `req~quoted_markdown~1`
+**Then** the result list contains the declaration of the searched item for both declaration styles.
+
+Covers:
+- `req~recognize-markdown-specification-item-declaration-variants~1`
 
 Needs: dsn
 

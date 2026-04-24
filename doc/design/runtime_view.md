@@ -128,6 +128,18 @@ Covers:
 
 Needs: impl, itest
 
+### Show Markdown Declaration Variants in Go to Symbol
+`dsn~show-markdown-declaration-variants-in-go-to-symbol~1`
+
+**Given** a Markdown specification document declares one OFT item as a plain declaration line and another OFT item as a declaration line whose full OFT item ID is enclosed in single backticks
+**When** project indexing extracts declaration elements for `Go to Symbol`
+**Then** the specification item index recognizes both Markdown forms as declaration anchors keyed by the same canonical full OFT item IDs and the IDE can return both declarations as symbol results.
+
+Covers:
+- `scn~show-markdown-declaration-variants-in-go-to-symbol~1`
+
+Needs: impl, itest
+
 ### Open Specification Item from Go to Symbol
 `dsn~open-specification-item-from-go-to-symbol~1`
 

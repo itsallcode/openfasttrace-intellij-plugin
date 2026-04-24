@@ -3,6 +3,7 @@ package org.itsallcode.openfasttrace.intellijplugin.syntax;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
@@ -43,6 +44,16 @@ class OftSyntaxCoreTest {
     }
 
     @Test
+    void extractsSpecificationItemsFromMarkdownCodeSpans() {
+        final String text = """
+                Covers:
+                - `req~hello.world~1`
+                """;
+
+        assertThat(OftSyntaxCore.findSpecificationItems(text), hasSize(1));
+    }
+
+    @Test
     void extractsOnlyStandaloneDefinitionItemsForIndexing() {
         final String text = """
                 req~hello.world~1
@@ -51,6 +62,24 @@ class OftSyntaxCoreTest {
                 """;
 
         assertThat(OftSyntaxCore.findDefinitionSpecificationItems(text), hasSize(1));
+    }
+
+    @Test
+    void extractsMarkdownDeclarationVariantsForIndexing() {
+        final String text = """
+                req~plain_markdown~1
+                Needs: dsn
+
+                `req~quoted_markdown~1`
+                Needs: dsn
+                """;
+
+        assertThat(
+                OftSyntaxCore.findDefinitionSpecificationItems(text).stream()
+                        .map(match -> match.item().id())
+                        .toList(),
+                contains("req~plain_markdown~1", "req~quoted_markdown~1")
+        );
     }
 
     @Test
