@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -108,7 +109,9 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
 
     // [itest->dsn~open-specification-item-from-coverage-definition~1]
     public void testGivenCoverageDefinitionWhenGoToDeclarationInvokesOnCoveredItemThenEditorOpensTheDeclarationAnchor() {
-        assertCoverageDefinitionNavigation("plain", "<caret>req~openfasttrace_navigation_target~1");
+        specificationFileSuffixes().forEach(fileSuffix ->
+                assertCoverageDefinitionNavigation(fileSuffix, "plain")
+        );
     }
 
     // [itest->dsn~stay-on-specification-item-declaration~1]
@@ -331,20 +334,27 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
                 .toList();
     }
 
-    private void assertCoverageDefinitionNavigation(final String fileSuffix, final String coveredItemReferenceWithCaret) {
-        final PsiFile declarationFile = myFixture.addFileToProject("doc/spec-" + fileSuffix + ".md", """
-                req~openfasttrace_navigation_target~1
+    private static List<String> specificationFileSuffixes() {
+        return Stream.of("md", "rst").toList();
+    }
+
+    private void assertCoverageDefinitionNavigation(
+            final String fileExtension,
+            final String scenarioSuffix
+    ) {
+        final String targetId = "req~openfasttrace_navigation_target_%s_%s~1".formatted(scenarioSuffix, fileExtension);
+        final PsiFile declarationFile = myFixture.addFileToProject("doc/spec-" + scenarioSuffix + "." + fileExtension, """
+                %s
                 Needs: dsn
-                """);
-        final PsiFile referencingFile = myFixture.addFileToProject("doc/design-" + fileSuffix + ".md", """
+                """.formatted(targetId));
+        final PsiFile referencingFile = myFixture.addFileToProject("doc/design-" + scenarioSuffix + "." + fileExtension, """
                 dsn~openfasttrace_navigation_design_%s~1
                 Covers:
                 - %s
-                """.formatted(fileSuffix, coveredItemReferenceWithCaret.replace("<caret>", "")));
+                """.formatted(scenarioSuffix, targetId));
         myFixture.configureFromExistingVirtualFile(referencingFile.getVirtualFile());
         myFixture.getEditor().getCaretModel().moveToOffset(
-                myFixture.getFile().getText().indexOf(coveredItemReferenceWithCaret.replace("<caret>", ""))
-                        + coveredItemReferenceWithCaret.indexOf("<caret>")
+                myFixture.getFile().getText().indexOf(targetId)
         );
 
         EdtTestUtil.runInEdtAndWait(() -> myFixture.performEditorAction(IdeActions.ACTION_GOTO_DECLARATION));
