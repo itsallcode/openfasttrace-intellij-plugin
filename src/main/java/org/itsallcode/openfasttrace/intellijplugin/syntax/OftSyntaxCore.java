@@ -8,33 +8,37 @@ import java.util.regex.Pattern;
 // [impl->dsn~oft-syntax-core~1]
 public final class OftSyntaxCore {
     private static final String GROUP_KEYWORD = "keyword";
+    private static final int UNICODE_PATTERN_FLAGS = Pattern.UNICODE_CHARACTER_CLASS;
+    private static final String ARTIFACT_TYPE = "\\p{L}++";
     private static final String NAME_PART = "\\p{L}[\\p{L}\\p{N}]*+(?:[._-][\\p{L}\\p{N}]++)*+";
-    private static final String SPECIFICATION_ITEM_BODY = "[A-Za-z]+~" + NAME_PART + "~\\d+";
+    private static final String SPECIFICATION_ITEM_BODY = ARTIFACT_TYPE + "~" + NAME_PART + "~\\d+";
     private static final String NAMED_SPECIFICATION_ITEM_BODY =
-            "(?<artifactType>[A-Za-z]+)~(?<name>" + NAME_PART + ")~(?<revision>\\d+)";
-    private static final Pattern SPECIFICATION_ITEM_PATTERN = Pattern.compile(
+            "(?<artifactType>" + ARTIFACT_TYPE + ")~(?<name>" + NAME_PART + ")~(?<revision>\\d+)";
+    private static final Pattern SPECIFICATION_ITEM_PATTERN = compilePattern(
             "(?<![\\p{L}\\p{N}~._-])" + NAMED_SPECIFICATION_ITEM_BODY + "(?![\\p{L}\\p{N}~._-])"
     );
-    private static final Pattern SPECIFICATION_ITEM_DEFINITION_PATTERN = Pattern.compile(
+    private static final Pattern SPECIFICATION_ITEM_DEFINITION_PATTERN = compilePattern(
             "(?m)^\\s*(?<id>" + NAMED_SPECIFICATION_ITEM_BODY + ")\\s*$"
     );
-    private static final Pattern MARKDOWN_CODE_SPAN_SPECIFICATION_ITEM_DEFINITION_PATTERN = Pattern.compile(
+    private static final Pattern MARKDOWN_CODE_SPAN_SPECIFICATION_ITEM_DEFINITION_PATTERN = compilePattern(
             "(?m)^\\s*`(?<id>" + NAMED_SPECIFICATION_ITEM_BODY + ")`\\s*$"
     );
-    private static final Pattern SPECIFICATION_ITEM_EXACT_PATTERN = Pattern.compile("^" + SPECIFICATION_ITEM_BODY + "$");
-    private static final Pattern INCOMPLETE_SPECIFICATION_ITEM_PATTERN = Pattern.compile(
-            "^[A-Za-z]+(?:~" + NAME_PART + ")?~?$"
+    private static final Pattern SPECIFICATION_ITEM_EXACT_PATTERN =
+            compilePattern("^" + SPECIFICATION_ITEM_BODY + "$");
+    private static final Pattern INCOMPLETE_SPECIFICATION_ITEM_PATTERN = compilePattern(
+            "^" + ARTIFACT_TYPE + "(?:~" + NAME_PART + ")?~?$"
     );
-    private static final Pattern KEYWORD_PATTERN = Pattern.compile(
+    private static final Pattern KEYWORD_PATTERN = compilePattern(
             "(?m)^\\s*(?<" + GROUP_KEYWORD + ">Needs|Covers|Depends|Status|Description|Rationale|Comment|Tags):"
     );
-    private static final Pattern COVERAGE_TAG_EXACT_PATTERN = Pattern.compile(
-            "^\\[\\s*[A-Za-z]+(?:~~\\d+|~" + NAME_PART + "~\\d+)?\\s*->\\s*" + SPECIFICATION_ITEM_BODY + "\\s*]$"
+    private static final Pattern COVERAGE_TAG_EXACT_PATTERN = compilePattern(
+            "^\\[\\s*" + ARTIFACT_TYPE + "(?:~~\\d+|~" + NAME_PART + "~\\d+)?\\s*->\\s*"
+                    + SPECIFICATION_ITEM_BODY + "\\s*]$"
     );
-    private static final Pattern COVERAGE_TAG_PATTERN = Pattern.compile(
-            "\\[\\s*(?<sourceId>(?<sourceArtifact>[A-Za-z]+)"
+    private static final Pattern COVERAGE_TAG_PATTERN = compilePattern(
+            "\\[\\s*(?<sourceId>(?<sourceArtifact>" + ARTIFACT_TYPE + ")"
                     + "(?:~~(?<sourceRevision>\\d+)|~(?<sourceName>" + NAME_PART + ")~(?<sourceNamedRevision>\\d+))?)"
-                    + "\\s*->\\s*(?<targetId>(?<targetArtifactType>[A-Za-z]+)"
+                    + "\\s*->\\s*(?<targetId>(?<targetArtifactType>" + ARTIFACT_TYPE + ")"
                     + "~(?<targetName>" + NAME_PART + ")~(?<targetRevision>\\d+))\\s*]"
     );
 
@@ -79,7 +83,11 @@ public final class OftSyntaxCore {
     public static List<OftSpecificationItemMatch> findDefinitionSpecificationItems(final CharSequence text) {
         final List<OftSpecificationItemMatch> matches = new ArrayList<>();
         matches.addAll(collectSpecificationItemMatches(text, SPECIFICATION_ITEM_DEFINITION_PATTERN, true));
-        matches.addAll(collectSpecificationItemMatches(text, MARKDOWN_CODE_SPAN_SPECIFICATION_ITEM_DEFINITION_PATTERN, true));
+        matches.addAll(collectSpecificationItemMatches(
+                text,
+                MARKDOWN_CODE_SPAN_SPECIFICATION_ITEM_DEFINITION_PATTERN,
+                true
+        ));
         return List.copyOf(matches);
     }
 
@@ -149,6 +157,10 @@ public final class OftSyntaxCore {
 
     private static Integer parseOptionalInt(final String value) {
         return value == null ? null : Integer.parseInt(value);
+    }
+
+    private static Pattern compilePattern(final String regex) {
+        return Pattern.compile(regex, UNICODE_PATTERN_FLAGS);
     }
 
     private static OftTextSpan specificationItemSpan(final Matcher matcher, final boolean useNamedIdGroup) {

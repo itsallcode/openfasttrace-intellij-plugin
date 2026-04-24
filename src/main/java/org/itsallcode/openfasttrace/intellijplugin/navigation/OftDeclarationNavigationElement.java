@@ -1,6 +1,5 @@
 package org.itsallcode.openfasttrace.intellijplugin.navigation;
 
-import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
@@ -14,9 +13,14 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import javax.swing.Icon;
+import java.io.Serial;
+import java.util.Objects;
 
-final class OftDeclarationNavigationElement extends FakePsiElement implements NavigationItem {
-    private final PsiElement delegate;
+final class OftDeclarationNavigationElement extends FakePsiElement {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private final transient PsiElement delegate;
     private final OftIndexedSpecification specification;
 
     OftDeclarationNavigationElement(final PsiElement delegate, final OftIndexedSpecification specification) {
@@ -26,17 +30,17 @@ final class OftDeclarationNavigationElement extends FakePsiElement implements Na
 
     @Override
     public PsiElement getParent() {
-        return delegate.getParent();
+        return delegate == null ? null : delegate.getParent();
     }
 
     @Override
     public PsiFile getContainingFile() {
-        return delegate.getContainingFile();
+        return delegate == null ? null : delegate.getContainingFile();
     }
 
     @Override
     public @NonNull PsiElement getNavigationElement() {
-        return delegate;
+        return requireDelegate();
     }
 
     @Override
@@ -75,12 +79,12 @@ final class OftDeclarationNavigationElement extends FakePsiElement implements Na
 
     @Override
     public boolean isValid() {
-        return delegate.isValid();
+        return delegate != null && delegate.isValid();
     }
 
     @Override
     public PsiManager getManager() {
-        return delegate.getManager();
+        return requireDelegate().getManager();
     }
 
     @Override
@@ -102,5 +106,9 @@ final class OftDeclarationNavigationElement extends FakePsiElement implements Na
     @Override
     public boolean canNavigateToSource() {
         return canNavigate();
+    }
+
+    private @NonNull PsiElement requireDelegate() {
+        return Objects.requireNonNull(delegate, "navigation delegate is unavailable");
     }
 }

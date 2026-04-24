@@ -8,6 +8,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecification;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import javax.swing.Icon;
 public final class OftNavigationItem implements NavigationItem {
@@ -31,14 +32,16 @@ public final class OftNavigationItem implements NavigationItem {
     public ItemPresentation getPresentation() {
         return new ItemPresentation() {
             @Override
-            public @Nullable String getPresentableText() {
+            public @NonNull String getPresentableText() {
                 return specification.id();
             }
 
             @Override
             public @Nullable String getLocationString() {
                 final String basePath = project.getBasePath();
-                return basePath == null ? file.getPresentableUrl() : FileUtil.getRelativePath(basePath, file.getPath(), '/');
+                return basePath == null
+                        ? file.getPresentableUrl()
+                        : FileUtil.getRelativePath(basePath, file.getPath(), '/');
             }
 
             @Override

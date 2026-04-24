@@ -51,7 +51,8 @@ public final class OftHighlightingPass extends TextEditorHighlightingPass implem
             for (OftKeywordMatch match : OftSyntaxCore.findKeywords(text)) {
                 collected.add(info(match.span(), OftHighlighterKeys.KEYWORD));
             }
-        } else if (OftSupportedFiles.isCoverageTagFile(file.getVirtualFile())) {
+        }
+        if (OftSupportedFiles.isCoverageTagFile(file.getVirtualFile())) {
             for (OftCoverageTagMatch match : OftSyntaxCore.findCoverageTags(text)) {
                 collected.add(info(match.span(), OftHighlighterKeys.COVERAGE_TAG));
             }
@@ -72,7 +73,7 @@ public final class OftHighlightingPass extends TextEditorHighlightingPass implem
         // BackgroundUpdateHighlightersUtil applies the collected infos during the background phase.
     }
 
-    private HighlightInfo info(final OftTextSpan span, final TextAttributesKey key) {
+    private static HighlightInfo info(final OftTextSpan span, final TextAttributesKey key) {
         return HighlightInfo.newHighlightInfo(HighlightInfoType.INFORMATION)
                 .range(span.startOffset(), span.endOffset())
                 .textAttributes(key)

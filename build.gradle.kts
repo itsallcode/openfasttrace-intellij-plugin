@@ -8,9 +8,10 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 plugins {
     id("java")
     id("jacoco")
+    id("com.diffplug.spotless") version "8.4.0"
     id("org.itsallcode.openfasttrace") version "3.1.1"
     id("org.jetbrains.intellij.platform") version "2.14.0"
-    id("org.sonarqube") version "7.0.1.6134"
+    id("org.sonarqube") version "7.2.3.7755"
     id("org.sonatype.gradle.plugins.scan") version "3.1.5"
 }
 
@@ -31,6 +32,10 @@ sonar {
     properties {
         property("sonar.organization", "itsallcode")
         property("sonar.host.url", "https://sonarcloud.io")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath
+        )
     }
 }
 
@@ -161,12 +166,22 @@ tasks {
         }
     }
 
+    named("sonar") {
+        dependsOn(jacocoTestReport)
+    }
+
+    named("verifyPluginProjectConfiguration") {
+        dependsOn("spotlessCheck")
+    }
+
+    named("verifyPluginStructure") {
+        dependsOn("spotlessCheck")
+    }
+
     check {
         dependsOn(
             traceRequirements,
             jacocoTestCoverageVerification,
-            verifyPluginProjectConfiguration,
-            verifyPluginStructure,
         )
     }
 }

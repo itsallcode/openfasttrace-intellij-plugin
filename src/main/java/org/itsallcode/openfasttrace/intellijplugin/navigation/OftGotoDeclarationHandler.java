@@ -18,11 +18,7 @@ public final class OftGotoDeclarationHandler implements GotoDeclarationHandler {
             final int offset,
             final Editor editor
     ) {
-        if (sourceElement != null
-                && sourceElement.getContainingFile() != null
-                && sourceElement.getContainingFile().getVirtualFile() != null
-                && OftSupportedFiles.isSpecificationFile(sourceElement.getContainingFile().getVirtualFile())
-                && OftDeclarationResolver.findDeclaredItem(sourceElement).isPresent()) {
+        if (isDeclaredSpecificationElement(sourceElement)) {
             return null;
         }
         final Project project = sourceElement != null ? sourceElement.getProject() : editor.getProject();
@@ -34,5 +30,15 @@ public final class OftGotoDeclarationHandler implements GotoDeclarationHandler {
                 .map(reference -> OftDeclarationResolver.resolveDeclarations(project, reference))
                 .filter(targets -> targets.length > 0)
                 .orElse(null);
+    }
+
+    private static boolean isDeclaredSpecificationElement(final @Nullable PsiElement sourceElement) {
+        if (sourceElement == null || sourceElement.getContainingFile() == null) {
+            return false;
+        }
+        final var virtualFile = sourceElement.getContainingFile().getVirtualFile();
+        return virtualFile != null
+                && OftSupportedFiles.isSpecificationFile(virtualFile)
+                && OftDeclarationResolver.findDeclaredItem(sourceElement).isPresent();
     }
 }

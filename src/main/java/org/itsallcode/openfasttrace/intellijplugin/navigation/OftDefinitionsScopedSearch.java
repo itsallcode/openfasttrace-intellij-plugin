@@ -17,18 +17,23 @@ public final class OftDefinitionsScopedSearch
             final DefinitionsScopedSearch.@NonNull SearchParameters queryParameters,
             final @NonNull Processor<? super PsiElement> consumer
     ) {
-        return ReadAction.computeBlocking(() -> {
-            if (!queryParameters.isQueryValid()) {
-                return true;
-            }
-            return OftDeclarationResolver.findDeclaredItem(queryParameters.getElement())
-                    .map(declaration -> OftDeclarationResolver.processCoverageOccurrences(
-                            queryParameters.getProject(),
-                            declaration,
-                            queryParameters.getScope(),
-                            consumer
-                    ))
-                    .orElse(true);
-        });
+        return ReadAction.computeBlocking(() -> executeSearch(queryParameters, consumer));
+    }
+
+    private static boolean executeSearch(
+            final DefinitionsScopedSearch.@NonNull SearchParameters queryParameters,
+            final @NonNull Processor<? super PsiElement> consumer
+    ) {
+        if (!queryParameters.isQueryValid()) {
+            return true;
+        }
+        return OftDeclarationResolver.findDeclaredItem(queryParameters.getElement())
+                .map(declaration -> OftDeclarationResolver.processCoverageOccurrences(
+                        queryParameters.getProject(),
+                        declaration,
+                        queryParameters.getScope(),
+                        consumer
+                ))
+                .orElse(true);
     }
 }

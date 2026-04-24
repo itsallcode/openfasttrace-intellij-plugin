@@ -25,27 +25,13 @@ import java.util.List;
 import java.util.Map;
 
 // [impl->dsn~specification-item-index~1]
-public final class OftSpecificationIndex extends FileBasedIndexExtension<String, List<OftIndexedSpecification>> implements DumbAware {
-    public static final ID<String, List<OftIndexedSpecification>> SPECIFICATION_ID = ID.create("openfasttrace.specification.index");
+public final class OftSpecificationIndex extends FileBasedIndexExtension<String, List<OftIndexedSpecification>>
+        implements DumbAware {
+    public static final ID<String, List<OftIndexedSpecification>> SPECIFICATION_ID =
+            ID.create("openfasttrace.specification.index");
 
-    private final DataIndexer<String, List<OftIndexedSpecification>, FileContent> indexer = inputData -> {
-        if (!OftSupportedFiles.isSpecificationFileName(inputData.getFileName())) {
-            return Collections.emptyMap();
-        }
-        final Map<String, List<OftIndexedSpecification>> entries = new LinkedHashMap<>();
-        for (OftSpecificationItemMatch match : OftSyntaxCore.findDefinitionSpecificationItems(inputData.getContentAsText())) {
-            final OftIndexedSpecification specification = new OftIndexedSpecification(
-                    match.item().artifactType(),
-                    match.item().name(),
-                    match.item().revision(),
-                    match.span().startOffset()
-            );
-            entries.computeIfAbsent(specification.id(), ignored -> new ArrayList<>())
-                    .add(specification);
-        }
-        entries.replaceAll((ignored, values) -> List.copyOf(values));
-        return entries;
-    };
+    private final DataIndexer<String, List<OftIndexedSpecification>, FileContent> indexer =
+            OftSpecificationIndex::indexSpecifications;
 
     @Override
     public @NonNull ID<String, List<OftIndexedSpecification>> getName() {
@@ -82,7 +68,32 @@ public final class OftSpecificationIndex extends FileBasedIndexExtension<String,
         return 6;
     }
 
-    private static final class OftIndexedSpecificationExternalizer implements DataExternalizer<List<OftIndexedSpecification>> {
+    private static Map<String, List<OftIndexedSpecification>> indexSpecifications(final FileContent inputData) {
+        if (!OftSupportedFiles.isSpecificationFileName(inputData.getFileName())) {
+            return Collections.emptyMap();
+        }
+        final Map<String, List<OftIndexedSpecification>> entries = new LinkedHashMap<>();
+        for (OftSpecificationItemMatch match :
+                OftSyntaxCore.findDefinitionSpecificationItems(inputData.getContentAsText())) {
+            final OftIndexedSpecification specification = toIndexedSpecification(match);
+            entries.computeIfAbsent(specification.id(), ignored -> new ArrayList<>()).add(specification);
+        }
+        entries.replaceAll((ignored, values) -> List.copyOf(values));
+        return entries;
+    }
+
+    private static OftIndexedSpecification toIndexedSpecification(final OftSpecificationItemMatch match) {
+        return new OftIndexedSpecification(
+                match.item().artifactType(),
+                match.item().name(),
+                match.item().revision(),
+                match.span().startOffset()
+        );
+    }
+
+    private static final class OftIndexedSpecificationExternalizer
+            implements DataExternalizer<List<OftIndexedSpecification>> {
+
         @Override
         public void save(final @NonNull DataOutput out, final List<OftIndexedSpecification> value) throws IOException {
             DataInputOutputUtil.writeINT(out, value.size());

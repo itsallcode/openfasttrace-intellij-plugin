@@ -55,7 +55,7 @@ jobs:
 
       - name: Sonar analysis
         if: ${{ env.SONAR_TOKEN != null }}
-        run: ./gradlew --stacktrace --warning-mode=all sonar -Dsonar.token=$SONAR_TOKEN
+        run: ./gradlew --stacktrace --warning-mode=all jacocoTestReport sonar -Dsonar.token=$SONAR_TOKEN
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -75,6 +75,7 @@ jobs:
           name: test-and-coverage-reports
           path: |
             build/reports/tests/test/
+            build/reports/jacoco/test/jacocoTestReport.xml
             build/reports/jacoco/test/html/
             build/test-results/test/
           if-no-files-found: warn

@@ -19,48 +19,57 @@ import java.util.List;
 public final class OftSpecificationReferenceContributor extends PsiReferenceContributor {
     @Override
     public void registerReferenceProviders(@NotNull final PsiReferenceRegistrar registrar) {
-        registrar.registerReferenceProvider(PlatformPatterns.psiElement(), new PsiReferenceProvider() {
-            @Override
-            // [impl->dsn~open-specification-item-from-coverage-definition~1]
-            public PsiReference @NotNull [] getReferencesByElement(
-                    @NotNull final PsiElement element,
-                    @NotNull final ProcessingContext context
-            ) {
-                if (element.getContainingFile() == null
-                        || element.getContainingFile().getVirtualFile() == null
-                        || !OftSupportedFiles.isSpecificationFile(element.getContainingFile().getVirtualFile())) {
-                    return PsiReference.EMPTY_ARRAY;
-                }
-                final TextRange elementRange = element.getTextRange();
-                if (elementRange == null || elementRange.isEmpty()) {
-                    return PsiReference.EMPTY_ARRAY;
-                }
-                final CharSequence fileText = element.getContainingFile().getViewProvider().getContents();
-                final List<PsiReference> references = new ArrayList<>();
-                for (OftSpecificationItemMatch match : OftDeclarationResolver.findCoveredSpecificationItems(fileText)) {
-                    addReferenceIfCovered(references, element, elementRange, match);
-                }
-                return references.toArray(PsiReference[]::new);
-            }
-        });
+        registrar.registerReferenceProvider(
+                PlatformPatterns.psiElement(),
+                new SpecificationReferenceProvider()
+        );
     }
 
-    private static void addReferenceIfCovered(
-            final List<PsiReference> references,
-            final PsiElement element,
-            final TextRange elementRange,
-            final OftSpecificationItemMatch match
-    ) {
-        final OftTextSpan referenceSpan = match.span();
-        final int start = Math.max(elementRange.getStartOffset(), referenceSpan.startOffset());
-        final int end = Math.min(elementRange.getEndOffset(), referenceSpan.endOffset());
-        if (start >= end) {
-            return;
+    private static final class SpecificationReferenceProvider extends PsiReferenceProvider {
+        @Override
+        // [impl->dsn~open-specification-item-from-coverage-definition~1]
+        public PsiReference @NotNull [] getReferencesByElement(
+                @NotNull final PsiElement element,
+                @NotNull final ProcessingContext context
+        ) {
+            if (!isSpecificationElement(element)) {
+                return PsiReference.EMPTY_ARRAY;
+            }
+            final TextRange elementRange = element.getTextRange();
+            if (elementRange == null || elementRange.isEmpty()) {
+                return PsiReference.EMPTY_ARRAY;
+            }
+            final CharSequence fileText = element.getContainingFile().getViewProvider().getContents();
+            final List<PsiReference> references = new ArrayList<>();
+            for (OftSpecificationItemMatch match : OftDeclarationResolver.findCoveredSpecificationItems(fileText)) {
+                addReferenceIfCovered(references, element, elementRange, match);
+            }
+            return references.toArray(PsiReference[]::new);
         }
-        references.add(new OftCoverageTagReference(
-                element,
-                new TextRange(start - elementRange.getStartOffset(), end - elementRange.getStartOffset()),
-                match.item()
-        ));
+
+        private void addReferenceIfCovered(
+                final List<PsiReference> references,
+                final PsiElement element,
+                final TextRange elementRange,
+                final OftSpecificationItemMatch match
+        ) {
+            final OftTextSpan referenceSpan = match.span();
+            final int start = Math.max(elementRange.getStartOffset(), referenceSpan.startOffset());
+            final int end = Math.min(elementRange.getEndOffset(), referenceSpan.endOffset());
+            if (start >= end) {
+                return;
+            }
+            references.add(new OftCoverageTagReference(
+                    element,
+                    new TextRange(start - elementRange.getStartOffset(), end - elementRange.getStartOffset()),
+                    match.item()
+            ));
+        }
+
+        private boolean isSpecificationElement(final PsiElement element) {
+            return element.getContainingFile() != null
+                    && element.getContainingFile().getVirtualFile() != null
+                    && OftSupportedFiles.isSpecificationFile(element.getContainingFile().getVirtualFile());
+        }
     }
 }

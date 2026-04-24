@@ -21,48 +21,66 @@ import java.util.List;
 public final class OftCoverageTagReferenceContributor extends PsiReferenceContributor {
     @Override
     public void registerReferenceProviders(@NotNull final PsiReferenceRegistrar registrar) {
-        registrar.registerReferenceProvider(PlatformPatterns.psiElement(), new PsiReferenceProvider() {
-            @Override
-            public PsiReference @NotNull [] getReferencesByElement(
-                    @NotNull final PsiElement element,
-                    @NotNull final ProcessingContext context
-            ) {
-                if (element.getContainingFile() == null
-                        || element.getContainingFile().getVirtualFile() == null
-                        || !OftSupportedFiles.isCoverageTagFile(element.getContainingFile().getVirtualFile())) {
-                    return PsiReference.EMPTY_ARRAY;
-                }
-                final TextRange elementRange = element.getTextRange();
-                if (elementRange == null || elementRange.isEmpty()) {
-                    return PsiReference.EMPTY_ARRAY;
-                }
-                final CharSequence fileText = element.getContainingFile().getViewProvider().getContents();
-                final List<PsiReference> references = new ArrayList<>();
-                for (OftCoverageTagMatch match : OftSyntaxCore.findCoverageTags(fileText)) {
-                    addReferenceIfCovered(references, element, elementRange, match.sourceSpan(), match.tag().effectiveSource());
-                    addReferenceIfCovered(references, element, elementRange, match.targetSpan(), match.tag().target());
-                }
-                return references.toArray(PsiReference[]::new);
-            }
-        });
+        registrar.registerReferenceProvider(PlatformPatterns.psiElement(), new CoverageTagReferenceProvider());
     }
 
-    private static void addReferenceIfCovered(
-            final List<PsiReference> references,
-            final PsiElement element,
-            final TextRange elementRange,
-            final OftTextSpan referenceSpan,
-            final OftSpecificationItem target
-    ) {
-        final int start = Math.max(elementRange.getStartOffset(), referenceSpan.startOffset());
-        final int end = Math.min(elementRange.getEndOffset(), referenceSpan.endOffset());
-        if (start >= end) {
-            return;
+
+    private static final class CoverageTagReferenceProvider extends PsiReferenceProvider {
+        @Override
+        public PsiReference @NotNull [] getReferencesByElement(
+                @NotNull final PsiElement element,
+                @NotNull final ProcessingContext context
+        ) {
+            if (!isCoverageTagElement(element)) {
+                return PsiReference.EMPTY_ARRAY;
+            }
+            final TextRange elementRange = element.getTextRange();
+            if (elementRange == null || elementRange.isEmpty()) {
+                return PsiReference.EMPTY_ARRAY;
+            }
+            final CharSequence fileText = element.getContainingFile().getViewProvider().getContents();
+            final List<PsiReference> references = new ArrayList<>();
+            for (OftCoverageTagMatch match : OftSyntaxCore.findCoverageTags(fileText)) {
+                addReferenceIfCovered(
+                        references,
+                        element,
+                        elementRange,
+                        match.sourceSpan(),
+                        match.tag().effectiveSource()
+                );
+                addReferenceIfCovered(
+                        references,
+                        element,
+                        elementRange,
+                        match.targetSpan(),
+                        match.tag().target()
+                );
+            }
+            return references.toArray(PsiReference[]::new);
         }
-        references.add(new OftCoverageTagReference(
-                element,
-                new TextRange(start - elementRange.getStartOffset(), end - elementRange.getStartOffset()),
-                target
-        ));
+
+        private void addReferenceIfCovered(
+                final List<PsiReference> references,
+                final PsiElement element,
+                final TextRange elementRange,
+                final OftTextSpan referenceSpan,
+                final OftSpecificationItem target
+        ) {
+            final int start = Math.max(elementRange.getStartOffset(), referenceSpan.startOffset());
+            final int end = Math.min(elementRange.getEndOffset(), referenceSpan.endOffset());
+            if (start >= end) {
+                return;
+            }
+            references.add(new OftCoverageTagReference(
+                    element,
+                    new TextRange(start - elementRange.getStartOffset(), end - elementRange.getStartOffset()),
+                    target
+            ));
+        }
+        private boolean isCoverageTagElement(final PsiElement element) {
+            return element.getContainingFile() != null
+                    && element.getContainingFile().getVirtualFile() != null
+                    && OftSupportedFiles.isCoverageTagFile(element.getContainingFile().getVirtualFile());
+        }
     }
 }
