@@ -7,13 +7,9 @@ import org.itsallcode.openfasttrace.api.ReportSettings;
 import org.itsallcode.openfasttrace.api.core.LinkedSpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.api.core.Trace;
-import org.itsallcode.openfasttrace.api.importer.ImporterContext;
-import org.itsallcode.openfasttrace.api.importer.ImporterService;
 import org.itsallcode.openfasttrace.api.importer.ImportSettings;
 import org.itsallcode.openfasttrace.api.report.ReportConstants;
 import org.itsallcode.openfasttrace.api.report.ReportVerbosity;
-import org.itsallcode.openfasttrace.core.importer.ImporterFactoryLoader;
-import org.itsallcode.openfasttrace.core.importer.ImporterServiceImpl;
 import org.itsallcode.openfasttrace.core.Oft;
 
 import java.io.IOException;
@@ -67,18 +63,10 @@ final class OftTraceService {
     }
 
     private List<SpecificationItem> importItems(final Path inputPath) {
-        return runWithPluginClassLoader(() -> {
-            final ImportSettings settings = ImportSettings.builder()
-                    .addInputs(inputPath)
-                    .build();
-            final ImporterContext context = new ImporterContext(settings);
-            final ImporterService importerService =
-                    new ImporterServiceImpl(new ImporterFactoryLoader(context), settings);
-            context.setImporterService(importerService);
-            return importerService.createImporter()
-                    .importAny(List.of(inputPath))
-                    .getImportedItems();
-        });
+        final ImportSettings settings = ImportSettings.builder()
+                .addInputs(inputPath)
+                .build();
+        return runWithPluginClassLoader(() -> oft.importItems(settings));
     }
 
     private String buildTraceOutput(final Path inputPath, final Trace trace) {
@@ -131,6 +119,7 @@ final class OftTraceService {
     private <T> T runWithPluginClassLoader(final Callable<T> action) {
         final Thread currentThread = Thread.currentThread();
         final ClassLoader previousClassLoader = currentThread.getContextClassLoader();
+        // OFT discovers importer and reporter plugins via ServiceLoader on the thread context class loader.
         currentThread.setContextClassLoader(OftTraceService.class.getClassLoader());
         try {
             return action.call();
