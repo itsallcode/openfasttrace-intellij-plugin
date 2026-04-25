@@ -249,3 +249,101 @@ Covers:
 - `scn~open-oft-user-guide-in-integrated-web-view~1`
 
 Needs: impl, itest
+
+## Trace Project
+
+### Show Trace Project Action in Tools Menu
+`dsn~show-trace-project-action-in-tools-menu~1`
+
+**Given** the plugin is loaded into the IDE and an IntelliJ project is open
+**When** the IDE builds the global `Tools` menu
+**Then** the plugin contributes an `OpenFastTrace` action group that contains the `Trace Project` action.
+
+Covers:
+- `scn~show-trace-project-action-in-tools-menu~1`
+
+Needs: impl, itest
+
+### Disable Trace Project Action without Open Project
+`dsn~disable-trace-project-action-without-open-project~1`
+
+**Given** the plugin is loaded into the IDE and no IntelliJ project is open
+**When** the IDE updates the presentation of the `Trace Project` action
+**Then** the trace-action component disables that action instead of offering a runnable trace command.
+
+Covers:
+- `scn~disable-trace-project-action-without-open-project~1`
+
+Needs: impl, itest
+
+### Run Trace Project in Background
+`dsn~run-trace-project-in-background~1`
+
+**Given** an IntelliJ project is open and its base directory resolves to a valid local file-system path
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the trace-action component starts a background task, the trace-execution service invokes the OpenFastTrace library for that project path, and the IDE keeps the editor UI responsive while showing progress for the running trace.
+
+Covers:
+- `scn~run-trace-project-in-background~1`
+
+Needs: impl, itest
+
+### Reject Trace Project without Valid Project Path
+`dsn~reject-trace-project-without-valid-project-path~1`
+
+**Given** an IntelliJ project is open but its base directory is missing, invalid, or not usable as a local OpenFastTrace input path
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the trace-action flow stops before starting the background trace run and reports the invalid project-path condition through the IDE-visible, trace flow.
+
+Covers:
+- `scn~reject-trace-project-without-valid-project-path~1`
+
+Needs: impl, itest
+
+### Show Successful Trace Output in IDE Output Window
+`dsn~show-successful-trace-output-in-ide-output-window~1`
+
+**Given** a background OpenFastTrace trace run completes successfully for the opened IntelliJ project
+**When** the trace-execution service finishes and hands the captured text report to trace-output presentation
+**Then** the plugin opens or updates an IDE output sub-window for that trace run and shows the OpenFastTrace text output under a clear trace-specific content title.
+
+Covers:
+- `scn~show-successful-trace-output-in-ide-output-window~1`
+
+Needs: impl, itest
+
+### Show Scanned Base Directory in Trace Output Window
+`dsn~show-scanned-base-directory-in-trace-output-window~1`
+
+**Given** a user starts a project trace and the plugin has resolved the local project directory that it will pass to OpenFastTrace
+**When** the trace-execution service prepares the plain-text trace output for the IDE output sub-window
+**Then** it prefixes that output with the resolved base directory so the output window shows the actual scan root before the OpenFastTrace report body
+
+Covers:
+- `scn~show-scanned-base-directory-in-trace-output-window~1`
+
+Needs: impl, itest
+
+### Show Failing Trace Output in IDE Output Window
+`dsn~show-failing-trace-output-in-ide-output-window~1`
+
+**Given** a background OpenFastTrace trace run finishes with a failing status or throws an exception after output collection has started
+**When** the trace-execution service hands the captured output and failure state to trace-output presentation
+**Then** the plugin shows the text output together with the failure result through the same IDE output flow without requiring plugin log inspection.
+
+Covers:
+- `scn~show-failing-trace-output-in-ide-output-window~1`
+
+Needs: impl, itest
+
+### Preserve Defect Count for Unclean Trace Chain in IDE Output Window
+`dsn~preserve-defect-count-for-unclean-trace-chain-in-output-window~1`
+
+**Given** a background OpenFastTrace trace run finishes with defects for an unclean feature-to-requirement-to-design chain and the OFT plain-text report includes a summary line with total-item and defect counts
+**When** the trace-execution service renders that report and hands it to trace-output presentation
+**Then** the plugin preserves that summary line unchanged in the IDE-visible trace output so users can read the reported counts directly from the trace text
+
+Covers:
+- `scn~show-defect-count-for-unclean-trace-chain-in-output-window~1`
+
+Needs: impl, itest

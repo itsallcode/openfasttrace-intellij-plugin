@@ -9,3 +9,4 @@ This draft changelog entry starts with the README badge update for repository st
 ## Features
 
 * #13: Add the GitHub Actions and SonarCloud badges to `README.md`
+* #12: Run an OpenFastTrace trace for the opened IntelliJ project from `Tools | OpenFastTrace | Trace Project` and show the plain text result in an IDE output tab

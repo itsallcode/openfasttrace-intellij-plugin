@@ -46,6 +46,7 @@ Use an IntelliJ Platform IDE and install/build this plugin to get OFT support wh
 The plugin currently focuses on:
 * syntax highlighting for OFT items in supported files
 * navigation support (`Go To Declaration`, symbol search, and related navigation paths)
+* project-wide OFT tracing from `Tools | OpenFastTrace | Trace Project`
 * quick access to the OpenFastTrace user guide from the IDE help menu
 
 For expected behavior and scope details, see:
@@ -65,6 +66,8 @@ For manual IDE testing, launch a sandbox IDE with the plugin:
 ./gradlew manualTestIde
 ```
 
+After the sandbox IDE opens a project, run an OFT trace from `Tools | OpenFastTrace | Trace Project` or use the default shortcut `Ctrl+Alt+Shift+O`. The plugin traces the opened project directory in the background and shows the plain text result in an IDE output tab.
+
 ## Installation
 ### Runtime Dependencies
 You need a JetBrains IDE based on the IntelliJ Platform (for example, IntelliJ IDEA Community Edition) to run the plugin.
@@ -77,6 +80,12 @@ To understand product intent and implementation scope, start with:
 * [System Requirements](doc/system_requirements.md)
 * [Design](doc/design.md)
 * [Change Log](doc/changes/changelog.md)
+
+To run the automated checks for the trace action and the project trace itself:
+
+```sh
+./gradlew check verifyPlugin
+```
 
 Example OFT files for manual testing are available under `examples\` in this project.
 

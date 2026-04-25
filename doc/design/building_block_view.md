@@ -2,7 +2,7 @@
 
 This chapter describes the static decomposition of the plugin into building blocks and their responsibilities.
 
-The following diagram drafts the MVP-level components of the plugin. It shows components, not classes.
+The following diagram drafts the current product-level components of the plugin. It shows components, not classes.
 
 ```plantuml
 @startuml
@@ -11,12 +11,20 @@ skinparam componentStyle rectangle
 package "JetBrains IDE / IntelliJ Platform" {
   component "Editor and PSI\nInfrastructure" as IdeEditor
   component "Symbol Search and\nNavigation Infrastructure" as IdeNavigation
+  component "Action System" as IdeActions
+  component "Background Task and\nProgress Infrastructure" as IdeTasks
+  component "Output View and\nRun Content Infrastructure" as IdeOutput
   component "Help Menu and\nWeb View Infrastructure" as IdeHelp
 }
 
 package "Opened Project" {
+  artifact "Project Content Root" as ProjectRoot
   artifact "Markdown and RST\nSpecification Documents" as ProjectSpecs
   artifact "Source Files with\nCoverage Tags" as ProjectSources
+}
+
+package "OpenFastTrace Library" {
+  component "Trace Engine and\nText Reporter" as OftTraceLibrary
 }
 
 package "OpenFastTrace Plugin" {
@@ -26,6 +34,9 @@ package "OpenFastTrace Plugin" {
   component "Coverage Tag\nSupport" as CoverageSupport
   component "Specification Item\nIndex" as SpecIndex
   component "Specification Item\nNavigation" as NavigationSupport
+  component "Trace Action\nIntegration" as TraceActionSupport
+  component "Trace Execution\nService" as TraceExecutionSupport
+  component "Trace Output\nPresentation" as TraceOutputSupport
   component "User Guide\nIntegration" as UserGuideSupport
 }
 
@@ -34,14 +45,22 @@ RstSupport --> OftSyntax
 CoverageSupport --> OftSyntax
 SpecIndex --> OftSyntax
 NavigationSupport --> SpecIndex
+TraceActionSupport --> TraceExecutionSupport
+TraceExecutionSupport --> TraceOutputSupport
 
 MarkdownSupport --> IdeEditor
 RstSupport --> IdeEditor
 CoverageSupport --> IdeEditor
 SpecIndex --> IdeEditor
 NavigationSupport --> IdeNavigation
+TraceActionSupport --> IdeActions
+TraceExecutionSupport --> IdeTasks
+TraceOutputSupport --> IdeOutput
 UserGuideSupport --> IdeHelp
 
+TraceActionSupport --> ProjectRoot : reads path
+TraceExecutionSupport --> ProjectRoot : traces
+TraceExecutionSupport --> OftTraceLibrary
 MarkdownSupport --> ProjectSpecs : reads
 RstSupport --> ProjectSpecs : reads
 CoverageSupport --> "1..n" ProjectSources : reads
@@ -152,5 +171,42 @@ The plugin contributes an OpenFastTrace user guide action to the IDE Help menu a
 Covers:
 - `scn~show-oft-user-guide-in-help-menu~1`
 - `scn~open-oft-user-guide-in-integrated-web-view~1`
+
+Needs: impl
+
+### Trace Action Integration
+`dsn~trace-action-integration~1`
+
+The plugin provides a trace-action component that contributes an `OpenFastTrace` action group with a `Trace Project` action under the global `Tools` menu. This component is responsible for exposing the entry only in an opened project context and for handing the action invocation to project-path resolution and trace execution.
+
+Covers:
+- `scn~show-trace-project-action-in-tools-menu~1`
+- `scn~disable-trace-project-action-without-open-project~1`
+- `scn~run-trace-project-in-background~1`
+- `scn~reject-trace-project-without-valid-project-path~1`
+
+Needs: impl
+
+### Trace Execution Service
+`dsn~trace-execution-service~1`
+
+The plugin provides a trace-execution service that resolves the current project root as the default OpenFastTrace input, validates that path before starting work, invokes the OpenFastTrace library in a background task, supports cancellation through IntelliJ progress infrastructure, and captures the textual trace output together with the final success or failure status.
+
+Covers:
+- `scn~run-trace-project-in-background~1`
+- `scn~reject-trace-project-without-valid-project-path~1`
+- `scn~show-successful-trace-output-in-ide-output-window~1`
+- `scn~show-failing-trace-output-in-ide-output-window~1`
+
+Needs: impl
+
+### Trace Output Presentation
+`dsn~trace-output-presentation~1`
+
+The plugin provides a trace-output presentation component that opens an IDE output sub-window for each trace run, assigns a clear trace-specific content title, and renders both successful and failing OpenFastTrace text output through the same IDE-visible flow.
+
+Covers:
+- `scn~show-successful-trace-output-in-ide-output-window~1`
+- `scn~show-failing-trace-output-in-ide-output-window~1`
 
 Needs: impl

@@ -77,6 +77,8 @@ repositories {
 }
 
 dependencies {
+    implementation("org.itsallcode.openfasttrace:openfasttrace:${providers.gradleProperty("openfasttraceVersion").get()}")
+
     intellijPlatform {
         intellijIdea(providers.gradleProperty("platformVersion"))
         bundledPlugin("com.intellij.java")
