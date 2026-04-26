@@ -8,11 +8,14 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 class OftTraceServiceTest {
+    private static final Pattern ANSI_ESCAPE_SEQUENCE = Pattern.compile("\u001B\\[[;\\d]*m");
+
     @TempDir
     Path temporaryDirectory;
 
@@ -22,17 +25,19 @@ class OftTraceServiceTest {
         writeSuccessfulTraceProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
+        final String renderedOutput = stripAnsi(result.output());
 
         Assertions.assertAll(
                 () -> assertThat(result.isSuccessful(), is(true)),
                 () -> assertThat(
-                        result.output(),
+                        renderedOutput,
                         Matchers.startsWith(
                                 "Scanning base directory: " + temporaryDirectory.toAbsolutePath().normalize()
                         )
                 ),
-                () -> assertThat(result.output(), Matchers.containsString("ok -")),
-                () -> assertThat(result.output(), Matchers.not(Matchers.containsString("not ok")))
+                () -> assertThat(result.output(), Matchers.containsString("\u001B[")),
+                () -> assertThat(renderedOutput, Matchers.containsString("ok -")),
+                () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("not ok")))
         );
     }
 
@@ -42,17 +47,19 @@ class OftTraceServiceTest {
         writeFailingTraceProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
+        final String renderedOutput = stripAnsi(result.output());
 
         Assertions.assertAll(
                 () -> assertThat(result.isSuccessful(), is(false)),
                 () -> assertThat(
-                        result.output(),
+                        renderedOutput,
                         Matchers.startsWith(
                                 "Scanning base directory: " + temporaryDirectory.toAbsolutePath().normalize()
                         )
                 ),
-                () -> assertThat(result.output(), Matchers.containsString("not ok")),
-                () -> assertThat(result.output(), Matchers.containsString("req~trace_output_requirement~1"))
+                () -> assertThat(renderedOutput, Matchers.containsString("not ok")),
+                () -> assertThat(renderedOutput, Matchers.containsString("req~trace_output_requirement~1")),
+                () -> assertThat(result.output(), Matchers.containsString("\u001B["))
         );
     }
 
@@ -63,17 +70,18 @@ class OftTraceServiceTest {
         writeSuccessfulTraceProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
+        final String renderedOutput = stripAnsi(result.output());
 
         Assertions.assertAll(
                 () -> assertThat(result.isSuccessful(), is(true)),
                 () -> assertThat(
-                        result.output(),
+                        renderedOutput,
                         Matchers.startsWith(
                                 "Scanning base directory: " + temporaryDirectory.toAbsolutePath().normalize()
                                         + System.lineSeparator() + System.lineSeparator()
                         )
                 ),
-                () -> assertThat(result.output(), Matchers.containsString("ok -"))
+                () -> assertThat(renderedOutput, Matchers.containsString("ok -"))
         );
     }
 
@@ -84,14 +92,20 @@ class OftTraceServiceTest {
         writeUncleanTraceChainProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
+        final String renderedOutput = stripAnsi(result.output());
 
         Assertions.assertAll(
                 () -> assertThat(result.isSuccessful(), is(false)),
-                () -> assertThat(result.output(), Matchers.containsString("not ok - 3 total, 3 defect")),
-                () -> assertThat(result.output(), Matchers.containsString("dsn~chain_design~1")),
-                () -> assertThat(result.output(), Matchers.containsString("feat~chain_feature~1")),
-                () -> assertThat(result.output(), Matchers.containsString("req~chain_requirement~1"))
+                () -> assertThat(result.output(), Matchers.containsString("\u001B[")),
+                () -> assertThat(renderedOutput, Matchers.containsString("not ok - 3 total, 3 defect")),
+                () -> assertThat(renderedOutput, Matchers.containsString("dsn~chain_design~1")),
+                () -> assertThat(renderedOutput, Matchers.containsString("feat~chain_feature~1")),
+                () -> assertThat(renderedOutput, Matchers.containsString("req~chain_requirement~1"))
         );
+    }
+
+    private String stripAnsi(final String output) {
+        return ANSI_ESCAPE_SEQUENCE.matcher(output).replaceAll("");
     }
 
     private void writeSuccessfulTraceProject(final Path projectRoot) throws IOException {

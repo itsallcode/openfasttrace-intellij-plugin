@@ -95,7 +95,7 @@ final class OftTraceService {
         return ReportSettings.builder()
                 .outputFormat(ReportConstants.DEFAULT_REPORT_FORMAT)
                 .verbosity(ReportVerbosity.FAILURE_DETAILS)
-                .colorScheme(ColorScheme.BLACK_AND_WHITE)
+                .colorScheme(ColorScheme.COLOR)
                 .detailsSectionDisplay(DetailsSectionDisplay.COLLAPSE)
                 .build();
     }
