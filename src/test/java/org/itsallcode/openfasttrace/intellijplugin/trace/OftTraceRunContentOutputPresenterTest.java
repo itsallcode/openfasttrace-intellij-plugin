@@ -1,8 +1,12 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
 import com.intellij.execution.impl.ConsoleViewImpl;
+import com.intellij.execution.filters.HyperlinkInfo;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.testFramework.EdtTestUtil;
 import org.hamcrest.Matchers;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 
@@ -15,6 +19,7 @@ import java.util.regex.Pattern;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTestCase {
     private static final Pattern ANSI_ESCAPE_SEQUENCE = Pattern.compile("\u001B\\[[;\\d]*m");
@@ -65,10 +70,60 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
         }
     }
 
+    // [itest->dsn~open-specification-item-from-trace-output-window~1]
+    public void testGivenTraceOutputContainsDeclaredSpecificationItemWhenPresentedThenItCreatesNavigableConsoleHyperlink() {
+        myFixture.addFileToProject("doc/spec.md", """
+                req~trace_output_navigation_target~1
+                Needs: dsn
+                """);
+        final AtomicReference<ConsoleViewImpl> consoleRef = new AtomicReference<>();
+        final OftTraceRunContentOutputPresenter presenter = new OftTraceRunContentOutputPresenter(
+                project -> {
+                    final ConsoleViewImpl console =
+                            (ConsoleViewImpl) OftTraceRunContentOutputPresenter.createTraceConsole(project);
+                    consoleRef.set(console);
+                    return console;
+                },
+                (project, descriptor) -> {
+                }
+        );
+        try {
+            EdtTestUtil.runInEdtAndWait(() -> presenter.show(
+                    getProject(),
+                    "OpenFastTrace Trace: hyperlinks",
+                    OftTraceResult.failure("not ok req~trace_output_navigation_target~1" + System.lineSeparator())
+            ));
+            ApplicationManager.getApplication().invokeAndWait(() -> consoleRef.get().waitAllRequests());
+            ApplicationManager.getApplication().invokeAndWait(() -> consoleRef.get().getHyperlinks().waitForPendingFilters(5000));
+
+            final String consoleText = readConsoleText(consoleRef.get());
+            final HyperlinkInfo hyperlink = hyperlinkAt(
+                    consoleRef.get(),
+                    consoleText.indexOf("req~trace_output_navigation_target~1")
+            );
+
+            assertThat(hyperlink, notNullValue());
+
+            EdtTestUtil.runInEdtAndWait(() -> hyperlink.navigate(getProject()));
+
+            assertThat(selectedEditorFileName(), is("spec.md"));
+        } finally {
+            disposeConsole(consoleRef.get());
+        }
+    }
+
     private String readConsoleText(final ConsoleViewImpl console) {
         final AtomicReference<String> text = new AtomicReference<>();
         ApplicationManager.getApplication().invokeAndWait(() -> text.set(console.getText()));
         return text.get();
+    }
+
+    private HyperlinkInfo hyperlinkAt(final ConsoleViewImpl console, final int offset) {
+        final AtomicReference<HyperlinkInfo> hyperlink = new AtomicReference<>();
+        ApplicationManager.getApplication().invokeAndWait(() ->
+                hyperlink.set(console.getHyperlinks().getHyperlinkAt(offset))
+        );
+        return hyperlink.get();
     }
 
     private void restoreCycleBufferSize(final String previousBufferSize) {
@@ -91,6 +146,13 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
         if (console != null) {
             ApplicationManager.getApplication().invokeAndWait(() -> Disposer.dispose(console));
         }
+    }
+
+    private String selectedEditorFileName() {
+        final TextEditor selectedEditor = (TextEditor) FileEditorManager.getInstance(getProject()).getSelectedEditor();
+        assertThat(selectedEditor, notNullValue());
+        assertThat(selectedEditor.getFile(), Matchers.not(nullValue()));
+        return selectedEditor.getFile().getName();
     }
 
     private String stripAnsi(final String output) {

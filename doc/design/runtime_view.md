@@ -336,6 +336,18 @@ Covers:
 
 Needs: impl, itest
 
+### Open Specification Item from Trace Output Window
+`dsn~open-specification-item-from-trace-output-window~1`
+
+**Given** the trace-output presentation shows OpenFastTrace plain-text output that contains specification item IDs declared in the opened project
+**When** a user activates one of those item IDs in the trace output window
+**Then** the trace-output presentation resolves that ID through the project declaration index and navigates to the declaration anchor in the corresponding specification document
+
+Covers:
+- `scn~open-specification-item-from-trace-output-window~1`
+
+Needs: impl, itest
+
 ### Preserve Defect Count for Unclean Trace Chain in IDE Output Window
 `dsn~preserve-defect-count-for-unclean-trace-chain-in-output-window~1`
 

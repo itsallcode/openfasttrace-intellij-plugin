@@ -203,10 +203,11 @@ Needs: impl
 ### Trace Output Presentation
 `dsn~trace-output-presentation~1`
 
-The plugin provides a trace-output presentation component that opens an IDE output sub-window for each trace run, assigns a clear trace-specific content title, and renders both successful and failing OpenFastTrace text output through the same IDE-visible flow.
+The plugin provides a trace-output presentation component that opens an IDE output sub-window for each trace run, assigns a clear trace-specific content title, renders both successful and failing OpenFastTrace text output through the same IDE-visible flow, and adds declaration hyperlinks for OFT specification item IDs shown in that output when the corresponding items exist in the opened project.
 
 Covers:
 - `scn~show-successful-trace-output-in-ide-output-window~1`
 - `scn~show-failing-trace-output-in-ide-output-window~1`
+- `scn~open-specification-item-from-trace-output-window~1`
 
 Needs: impl

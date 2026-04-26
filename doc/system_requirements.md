@@ -308,6 +308,16 @@ Covers:
 
 Needs: scn
 
+### Open Specification Item from Trace Output Window
+`req~open-specification-item-from-trace-output-window~1`
+
+The plugin makes OpenFastTrace specification item IDs in the trace output window navigable to their declarations in the opened project. Users can jump from a reported item in the trace output directly to the defining specification item without searching manually.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
 ### Show Scanned Base Directory in Trace Output Window
 `req~show-scanned-base-directory-in-trace-output-window~1`
 
@@ -665,6 +675,18 @@ Needs: dsn
 
 Covers:
 - `req~show-trace-output-in-ide-output-window~1`
+
+Needs: dsn
+
+### Open Specification Item from Trace Output Window
+`scn~open-specification-item-from-trace-output-window~1`
+
+**Given** an IntelliJ project is open, the trace output window shows an OFT specification item ID from the opened project, and that item is declared in a supported specification document
+**When** a user activates that specification item ID in the trace output window
+**Then** the IDE opens the declaration of that specification item in the editor
+
+Covers:
+- `req~open-specification-item-from-trace-output-window~1`
 
 Needs: dsn
 

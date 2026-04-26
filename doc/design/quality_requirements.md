@@ -6,6 +6,21 @@ User-facing acceptance scenarios are defined in [System Requirements](../system_
 
 Terms such as `plugin`, `OpenFastTrace`, and `OFT` use the definitions from [System Requirements](../system_requirements.md).
 
+## Requirement Quality
+
+We have the following requirement hierachy in this project:
+
+1. `feat`: Top level feature as you would find on a product sheet (limited number)
+2. `req`: High level requirement
+3. `scn`: Given-when-then scenario
+4. `dsn`: Design requirement
+   `constr`: Technical constraint
+5. `impl`: Implementation
+   `utest`: Unit test
+   `itest`: Integration test
+
+Runtime design requirements `dsn` can only cover on scenario at a time `scn`. You can use OFT's forwarding notation if a technical requirement does not add new information to a user scenario.
+
 ## Code Quality
 
 1. Production code and test code follow clean-code principles as defined in the Clean Code book.

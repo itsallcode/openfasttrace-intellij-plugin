@@ -38,6 +38,7 @@ final class OftTraceRunContentOutputPresenter implements OftTraceOutputPresenter
     @Override
     public void show(final Project project, final String contentTitle, final OftTraceResult result) {
         final ConsoleView console = consoleFactory.apply(project);
+        console.addMessageFilter(new OftTraceConsoleFilter(project));
         print(console, result.statusMessage() + System.lineSeparator(), result.requiresAttention());
         print(console, System.lineSeparator(), false);
         ansiConsoleOutput.print(console, result.output());
