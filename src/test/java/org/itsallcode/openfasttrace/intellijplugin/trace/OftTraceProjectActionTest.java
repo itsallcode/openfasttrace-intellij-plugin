@@ -92,7 +92,7 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
         final Path projectRoot = createManagedTempDirectory("oft-trace-action-project");
         final Project project = projectProxy(projectRoot.toString(), "valid-project");
         final OftTraceProjectAction action = new OftTraceProjectAction(
-                testProject -> new OftTraceInputResolver().resolve(testProject.getBasePath()),
+                testProject -> OftTraceInputResolver.resolve(testProject.getBasePath()),
                 (runnerProject, inputPath, contentTitle) ->
                         runnerCall.set(new RunnerCall(runnerProject, inputPath, contentTitle)),
                 (presentedProject, contentTitle, result) ->
@@ -119,7 +119,7 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final Project project = projectProxy("/definitely/missing/openfasttrace/project", "invalid-project");
         final OftTraceProjectAction action = new OftTraceProjectAction(
-                testProject -> new OftTraceInputResolver().resolve(testProject.getBasePath()),
+                testProject -> OftTraceInputResolver.resolve(testProject.getBasePath()),
                 (runProject, inputPath, contentTitle) -> runnerCall.set(new RunnerCall(runProject, inputPath, contentTitle)),
                 (presentedProject, contentTitle, result) ->
                         presenterCall.set(new PresenterCall(presentedProject, contentTitle, result))
@@ -144,7 +144,7 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
         final AtomicReference<RunnerCall> runnerCall = new AtomicReference<>();
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final OftTraceProjectAction action = new OftTraceProjectAction(
-                testProject -> new OftTraceInputResolver().resolve(testProject.getBasePath()),
+                testProject -> OftTraceInputResolver.resolve(testProject.getBasePath()),
                 (project, inputPath, contentTitle) -> runnerCall.set(new RunnerCall(project, inputPath, contentTitle)),
                 (project, contentTitle, result) -> presenterCall.set(new PresenterCall(project, contentTitle, result))
         );

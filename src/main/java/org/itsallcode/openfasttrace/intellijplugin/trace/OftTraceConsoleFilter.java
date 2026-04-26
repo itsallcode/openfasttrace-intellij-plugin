@@ -20,10 +20,10 @@ final class OftTraceConsoleFilter implements Filter {
 
     // [impl->dsn~open-specification-item-from-trace-output-window~1]
     OftTraceConsoleFilter(final Project project) {
-        this(project, new OftTraceNavigationResolver(project));
+        this(new OftTraceNavigationResolver(project));
     }
 
-    OftTraceConsoleFilter(final Project project, final OftTraceNavigationResolver navigationResolver) {
+    OftTraceConsoleFilter(final OftTraceNavigationResolver navigationResolver) {
         this.navigationResolver = navigationResolver;
     }
 
@@ -45,7 +45,7 @@ final class OftTraceConsoleFilter implements Filter {
         return List.copyOf(resultItems);
     }
 
-    private ResultItem toResultItem(
+    private static ResultItem toResultItem(
             final int lineStartOffset,
             final OftTextSpan span,
             final HyperlinkInfo hyperlink

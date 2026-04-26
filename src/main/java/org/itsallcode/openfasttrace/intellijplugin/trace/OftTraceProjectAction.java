@@ -18,12 +18,8 @@ public final class OftTraceProjectAction extends DumbAwareAction {
     private final OftTraceOutputPresenter outputPresenter;
 
     public OftTraceProjectAction() {
-        this(new OftTraceInputResolver());
-    }
-
-    OftTraceProjectAction(final OftTraceInputResolver inputResolver) {
         this(
-                inputResolver::resolve,
+                OftTraceInputResolver::resolve,
                 new OftTraceBackgroundRunner(
                         new OftTraceService(),
                         new OftTraceRunContentOutputPresenter()

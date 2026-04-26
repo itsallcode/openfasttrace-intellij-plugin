@@ -29,9 +29,10 @@ public class OpenFastTraceUserGuideTest extends AbstractOftPlatformTestCase {
     }
 
     public void testGivenProjectWhenOpeningUserGuideWithDefaultOpenerThenTheTestFixtureThrowsNullPointerException() {
+        final Project project = getProject();
         final NullPointerException exception = Assertions.assertThrows(
                 NullPointerException.class,
-                () -> OpenFastTraceUserGuide.open(getProject(), OpenFastTraceUserGuide.TITLE, OpenFastTraceUserGuide.URL)
+                () -> OpenFastTraceUserGuide.open(project, OpenFastTraceUserGuide.TITLE, OpenFastTraceUserGuide.URL)
         );
 
         assertThat(exception.getMessage(), is(nullValue()));

@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.is;
 class OftTraceInputResolverTest {
     @Test
     void testGivenNullBasePathWhenResolvingThenItReturnsAnInvalidResolution() {
-        final OftTraceInputResolution resolution = new OftTraceInputResolver().resolve((String) null);
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve((String) null);
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -31,7 +31,7 @@ class OftTraceInputResolverTest {
     @Test
     void testGivenMissingDirectoryWhenResolvingThenItReturnsAnInvalidResolution(@TempDir final Path temporaryDirectory) {
         final OftTraceInputResolution resolution =
-                new OftTraceInputResolver().resolve(temporaryDirectory.resolve("missing").toString());
+                OftTraceInputResolver.resolve(temporaryDirectory.resolve("missing").toString());
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -44,7 +44,7 @@ class OftTraceInputResolverTest {
             throws IOException {
         final Path file = Files.writeString(temporaryDirectory.resolve("build.gradle.kts"), "plugins {}");
 
-        final OftTraceInputResolution resolution = new OftTraceInputResolver().resolve(file.toString());
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(file.toString());
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -54,7 +54,7 @@ class OftTraceInputResolverTest {
 
     @Test
     void testGivenDirectoryWhenResolvingThenItReturnsAValidResolution(@TempDir final Path temporaryDirectory) {
-        final OftTraceInputResolution resolution = new OftTraceInputResolver().resolve(temporaryDirectory.toString());
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(temporaryDirectory.toString());
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(true)),
@@ -66,7 +66,7 @@ class OftTraceInputResolverTest {
     void testGivenProjectWithValidBasePathWhenResolvingThenItUsesTheProjectBasePath(@TempDir final Path temporaryDirectory) {
         final Project project = projectProxy(temporaryDirectory.toString(), null, "trace-project");
 
-        final OftTraceInputResolution resolution = new OftTraceInputResolver().resolve(project);
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(project);
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(true)),
@@ -81,7 +81,7 @@ class OftTraceInputResolverTest {
         final Path projectFile = Files.writeString(ideaDirectory.resolve("misc.xml"), "<project/>");
         final Project project = projectProxy(ideaDirectory.toString(), projectFile.toString(), "trace-project");
 
-        final OftTraceInputResolution resolution = new OftTraceInputResolver().resolve(project);
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(project);
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(true)),

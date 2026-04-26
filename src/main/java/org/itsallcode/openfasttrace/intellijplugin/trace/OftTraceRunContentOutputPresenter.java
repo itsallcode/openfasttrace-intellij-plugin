@@ -9,6 +9,7 @@ import com.intellij.execution.ui.RunContentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -51,7 +52,7 @@ final class OftTraceRunContentOutputPresenter implements OftTraceOutputPresenter
         runContentShower.accept(project, descriptor);
     }
 
-    private void print(final ConsoleView console, final String text, final boolean isError) {
+    private static void print(final ConsoleView console, final String text, final boolean isError) {
         console.print(
                 text,
                 isError ? ConsoleViewContentType.ERROR_OUTPUT : ConsoleViewContentType.NORMAL_OUTPUT
@@ -64,7 +65,7 @@ final class OftTraceRunContentOutputPresenter implements OftTraceOutputPresenter
             System.setProperty(IDEA_CYCLE_BUFFER_SIZE, "disabled");
             final ConsoleViewImpl console = new ConsoleViewImpl(project, true);
             console.getComponent();
-            console.getEditor().getDocument().setCyclicBufferSize(0);
+            Objects.requireNonNull(console.getEditor()).getDocument().setCyclicBufferSize(0);
             return console;
         } finally {
             restoreCycleBufferSize(previousBufferSize);

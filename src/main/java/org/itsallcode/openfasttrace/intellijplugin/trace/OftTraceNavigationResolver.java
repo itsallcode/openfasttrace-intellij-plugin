@@ -1,5 +1,6 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
@@ -15,25 +16,10 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
 final class OftTraceNavigationResolver {
-    private static final String OPTIONAL_WHITESPACE = "\\s*";
-    private static final String ARTIFACT_TYPE = "\\p{Alpha}+";
-    private static final String NAME_PART = "\\p{L}[\\p{L}\\p{N}]*(?:[._-][\\p{L}\\p{N}]+)*";
-    private static final String COVERAGE_TAG_PATTERN = "\\[" + OPTIONAL_WHITESPACE
-            + "(?<sourceId>(?<sourceArtifact>" + ARTIFACT_TYPE + ")"
-            + "(?:~(?:(?<sourceName>" + NAME_PART + ")?~(?<sourceRevision>\\d+)))?)"
-            + OPTIONAL_WHITESPACE + "->" + OPTIONAL_WHITESPACE
-            + "(?<targetId>(?<targetArtifact>" + ARTIFACT_TYPE + ")~(?<targetName>" + NAME_PART
-            + ")~(?<targetRevision>\\d+))"
-            + OPTIONAL_WHITESPACE + "(?:>>" + OPTIONAL_WHITESPACE
-            + "(?<needsArtifactTypes>\\p{Alpha}+(?:" + OPTIONAL_WHITESPACE + "," + OPTIONAL_WHITESPACE
-            + "\\p{Alpha}+)*)" + OPTIONAL_WHITESPACE + ")?"
-            + "]";
-    private static final Pattern LINE_COVERAGE_TAG_PATTERN = Pattern.compile(COVERAGE_TAG_PATTERN);
+    private static final Logger LOG = Logger.getInstance(OftTraceNavigationResolver.class);
 
     private final Project project;
 
@@ -66,59 +52,71 @@ final class OftTraceNavigationResolver {
 
     private Optional<OftTraceNavigationTarget> findCoverageTagSourceTarget(final String specificationId) {
         final OftTraceNavigationTarget[] target = new OftTraceNavigationTarget[1];
-        ProjectFileIndex.getInstance(project).iterateContent(file -> {
-            if (!OftSupportedFiles.isCoverageTagFile(file)) {
-                return true;
-            }
-            final OftTraceNavigationTarget match = findCoverageTagTargetInFile(file, specificationId);
-            if (match != null) {
-                target[0] = match;
-                return false;
-            }
-            return true;
-        });
+        ProjectFileIndex.getInstance(project).iterateContent(file -> processCoverageTagFile(specificationId, target, file));
         return Optional.ofNullable(target[0]);
+    }
+
+    private boolean processCoverageTagFile(
+            final String specificationId,
+            final OftTraceNavigationTarget[] target,
+            final VirtualFile file
+    ) {
+        if (!OftSupportedFiles.isCoverageTagFile(file)) {
+            return true;
+        }
+        final OftTraceNavigationTarget match = findCoverageTagTargetInFile(file, specificationId);
+        if (match != null) {
+            target[0] = match;
+            return false;
+        }
+        return true;
     }
 
     private @Nullable OftTraceNavigationTarget findCoverageTagTargetInFile(
             final VirtualFile file,
             final String specificationId
     ) {
+        final String text;
         try {
-            final String text = currentFileText(file);
-            int lineNumber = 1;
-            int lineStartOffset = 0;
-            int cursor = 0;
-            while (cursor < text.length()) {
-                final int lineEnd = findLineEnd(text, cursor);
-                final String line = text.substring(cursor, lineEnd);
-                final OftTraceNavigationTarget target = findCoverageTagTargetInLine(
-                        file,
-                        line,
-                        lineNumber,
-                        lineStartOffset,
-                        specificationId
-                );
-                if (target != null) {
-                    return target;
-                }
-                final int nextCursor = skipLineSeparator(text, lineEnd);
-                lineStartOffset = nextCursor;
-                cursor = nextCursor;
-                lineNumber++;
-            }
-        } catch (final IOException exception) {
+            text = currentFileText(file);
+        } catch (final IllegalStateException exception) {
+            LOG.debug("Failed to read OFT trace navigation source file: " + file.getPath(), exception);
             return null;
+        }
+        int lineNumber = 1;
+        int lineStartOffset = 0;
+        int cursor = 0;
+        while (cursor < text.length()) {
+            final int lineEnd = findLineEnd(text, cursor);
+            final String line = text.substring(cursor, lineEnd);
+            final OftTraceNavigationTarget target = findCoverageTagTargetInLine(
+                    file,
+                    line,
+                    lineNumber,
+                    lineStartOffset,
+                    specificationId
+            );
+            if (target != null) {
+                return target;
+            }
+            final int nextCursor = skipLineSeparator(text, lineEnd);
+            lineStartOffset = nextCursor;
+            cursor = nextCursor;
+            lineNumber++;
         }
         return null;
     }
 
-    private String currentFileText(final VirtualFile file) throws IOException {
+    private static String currentFileText(final VirtualFile file) {
         final Document document = FileDocumentManager.getInstance().getCachedDocument(file);
         if (document != null) {
             return document.getText();
         }
-        return VfsUtilCore.loadText(file);
+        try {
+            return VfsUtilCore.loadText(file);
+        } catch (final IOException exception) {
+            throw new IllegalStateException("Failed to load OFT trace navigation source file " + file.getPath(), exception);
+        }
     }
 
     private @Nullable OftTraceNavigationTarget findCoverageTagTargetInLine(
@@ -128,13 +126,25 @@ final class OftTraceNavigationResolver {
             final int lineStartOffset,
             final String specificationId
     ) {
-        final Matcher matcher = LINE_COVERAGE_TAG_PATTERN.matcher(line);
+        int searchStart = 0;
         int lineMatchCount = 0;
-        while (matcher.find()) {
-            if (createCoverageTagSourceId(file, lineNumber, lineMatchCount, matcher).equals(specificationId)) {
-                return new OftTraceNavigationTarget(file, lineStartOffset + matcher.start("sourceId"));
+        while (searchStart < line.length()) {
+            final int openingBracket = line.indexOf('[', searchStart);
+            if (openingBracket < 0) {
+                return null;
             }
-            lineMatchCount++;
+            final int closingBracket = line.indexOf(']', openingBracket + 1);
+            if (closingBracket < 0) {
+                return null;
+            }
+            final ParsedCoverageTag tag = parseCoverageTag(line, openingBracket, closingBracket);
+            if (tag != null) {
+                if (createCoverageTagSourceId(file, lineNumber, lineMatchCount, tag).equals(specificationId)) {
+                    return new OftTraceNavigationTarget(file, lineStartOffset + tag.sourceIdStartOffset());
+                }
+                lineMatchCount++;
+            }
+            searchStart = closingBracket + 1;
         }
         return null;
     }
@@ -143,41 +153,37 @@ final class OftTraceNavigationResolver {
             final VirtualFile file,
             final int lineNumber,
             final int lineMatchCount,
-            final Matcher matcher
+            final ParsedCoverageTag tag
     ) {
-        final String sourceName = matcher.group("sourceName");
-        final int revision = parseRevision(matcher.group("sourceRevision"));
+        final String sourceName = tag.sourceName();
+        final int revision = tag.sourceRevision();
         final String name = sourceName != null
                 ? sourceName
-                : generateCoverageTagName(file, lineNumber, lineMatchCount, matcher);
-        return matcher.group("sourceArtifact") + "~" + name + "~" + revision;
+                : generateCoverageTagName(file, lineNumber, lineMatchCount, tag);
+        return tag.sourceArtifact() + "~" + name + "~" + revision;
     }
 
     private String generateCoverageTagName(
             final VirtualFile file,
             final int lineNumber,
             final int lineMatchCount,
-            final Matcher matcher
+            final ParsedCoverageTag tag
     ) {
-        final String targetName = matcher.group("targetName");
-        if (matcher.group("needsArtifactTypes") != null) {
+        final String targetName = tag.targetName();
+        if (tag.hasNeedsArtifactTypes()) {
             return targetName;
         }
-        final String uniqueName = file.getPath() + lineNumber + lineMatchCount + matcher.group("targetId");
+        final String uniqueName = file.getPath() + lineNumber + lineMatchCount + tag.targetId();
         return targetName + "-" + calculateCrc32(uniqueName);
     }
 
-    private int parseRevision(final @Nullable String revisionText) {
-        return revisionText == null ? 0 : Integer.parseInt(revisionText);
-    }
-
-    private long calculateCrc32(final String value) {
+    private static long calculateCrc32(final String value) {
         final CRC32 checksum = new CRC32();
         checksum.update(value.getBytes(StandardCharsets.UTF_8));
         return checksum.getValue();
     }
 
-    private int findLineEnd(final String text, final int cursor) {
+    private static int findLineEnd(final String text, final int cursor) {
         int index = cursor;
         while (index < text.length()) {
             final char current = text.charAt(index);
@@ -189,7 +195,7 @@ final class OftTraceNavigationResolver {
         return text.length();
     }
 
-    private int skipLineSeparator(final String text, final int cursor) {
+    private static int skipLineSeparator(final String text, final int cursor) {
         if (cursor >= text.length()) {
             return cursor;
         }
@@ -197,5 +203,215 @@ final class OftTraceNavigationResolver {
             return cursor + 2;
         }
         return cursor + 1;
+    }
+
+    private static @Nullable ParsedCoverageTag parseCoverageTag(
+            final String line,
+            final int openingBracket,
+            final int closingBracket
+    ) {
+        int cursor = skipWhitespace(line, openingBracket + 1, closingBracket);
+        final int sourceIdStartOffset = cursor;
+        final ParsedSource source = parseSource(line, cursor, closingBracket);
+        if (source == null) {
+            return null;
+        }
+        cursor = skipWhitespace(line, source.endOffset(), closingBracket);
+        if (!startsWith(line, cursor, "->") || cursor + 2 > closingBracket) {
+            return null;
+        }
+        cursor = skipWhitespace(line, cursor + 2, closingBracket);
+        final ParsedTarget target = parseTarget(line, cursor, closingBracket);
+        if (target == null) {
+            return null;
+        }
+        cursor = skipWhitespace(line, target.endOffset(), closingBracket);
+        boolean hasNeedsArtifactTypes = false;
+        if (startsWith(line, cursor, ">>")) {
+            cursor = skipWhitespace(line, cursor + 2, closingBracket);
+            final int needsEndOffset = parseNeedsArtifactTypes(line, cursor, closingBracket);
+            if (needsEndOffset < 0) {
+                return null;
+            }
+            cursor = skipWhitespace(line, needsEndOffset, closingBracket);
+            hasNeedsArtifactTypes = true;
+        }
+        if (cursor != closingBracket) {
+            return null;
+        }
+        return new ParsedCoverageTag(
+                sourceIdStartOffset,
+                source.artifactType(),
+                source.name(),
+                source.revision(),
+                target.id(),
+                target.name(),
+                hasNeedsArtifactTypes
+        );
+    }
+
+    private static @Nullable ParsedSource parseSource(final String line, final int startOffset, final int limit) {
+        final ParsedToken artifact = parseArtifactType(line, startOffset, limit);
+        if (artifact == null) {
+            return null;
+        }
+        int cursor = artifact.endOffset();
+        if (cursor >= limit || line.charAt(cursor) != '~') {
+            return new ParsedSource(artifact.value(), null, 0, cursor);
+        }
+        cursor++;
+        if (cursor >= limit) {
+            return null;
+        }
+        if (line.charAt(cursor) == '~') {
+            final ParsedNumber revision = parseUnsignedInteger(line, cursor + 1, limit);
+            if (revision == null) {
+                return null;
+            }
+            return new ParsedSource(artifact.value(), null, revision.value(), revision.endOffset());
+        }
+        final ParsedToken sourceName = parseName(line, cursor, limit);
+        if (sourceName == null || sourceName.endOffset() >= limit || line.charAt(sourceName.endOffset()) != '~') {
+            return null;
+        }
+        final ParsedNumber revision = parseUnsignedInteger(line, sourceName.endOffset() + 1, limit);
+        if (revision == null) {
+            return null;
+        }
+        return new ParsedSource(artifact.value(), sourceName.value(), revision.value(), revision.endOffset());
+    }
+
+    private static @Nullable ParsedTarget parseTarget(final String line, final int startOffset, final int limit) {
+        final ParsedToken artifact = parseArtifactType(line, startOffset, limit);
+        if (artifact == null || artifact.endOffset() >= limit || line.charAt(artifact.endOffset()) != '~') {
+            return null;
+        }
+        final ParsedToken name = parseName(line, artifact.endOffset() + 1, limit);
+        if (name == null || name.endOffset() >= limit || line.charAt(name.endOffset()) != '~') {
+            return null;
+        }
+        final ParsedNumber revision = parseUnsignedInteger(line, name.endOffset() + 1, limit);
+        if (revision == null) {
+            return null;
+        }
+        return new ParsedTarget(
+                artifact.value() + "~" + name.value() + "~" + revision.value(),
+                name.value(),
+                revision.endOffset()
+        );
+    }
+
+    private static int parseNeedsArtifactTypes(final String line, final int startOffset, final int limit) {
+        final ParsedToken firstArtifact = parseArtifactType(line, startOffset, limit);
+        if (firstArtifact == null) {
+            return -1;
+        }
+        int cursor = firstArtifact.endOffset();
+        while (true) {
+            final int commaOffset = skipWhitespace(line, cursor, limit);
+            if (commaOffset >= limit || line.charAt(commaOffset) != ',') {
+                return cursor;
+            }
+            final int nextArtifactOffset = skipWhitespace(line, commaOffset + 1, limit);
+            final ParsedToken artifact = parseArtifactType(line, nextArtifactOffset, limit);
+            if (artifact == null) {
+                return -1;
+            }
+            cursor = artifact.endOffset();
+        }
+    }
+
+    private static @Nullable ParsedToken parseArtifactType(final String line, final int startOffset, final int limit) {
+        return parseToken(line, startOffset, limit, Character::isLetter);
+    }
+
+    private static @Nullable ParsedToken parseName(final String line, final int startOffset, final int limit) {
+        if (startOffset >= limit || !Character.isLetter(line.charAt(startOffset))) {
+            return null;
+        }
+        int cursor = startOffset + 1;
+        while (cursor < limit) {
+            final char current = line.charAt(cursor);
+            if (Character.isLetterOrDigit(current)) {
+                cursor++;
+            } else if ((current == '.' || current == '_' || current == '-')
+                    && cursor + 1 < limit
+                    && Character.isLetterOrDigit(line.charAt(cursor + 1))) {
+                cursor += 2;
+                while (cursor < limit && Character.isLetterOrDigit(line.charAt(cursor))) {
+                    cursor++;
+                }
+            } else {
+                break;
+            }
+        }
+        return new ParsedToken(line.substring(startOffset, cursor), cursor);
+    }
+
+    private static @Nullable ParsedNumber parseUnsignedInteger(final String line, final int startOffset, final int limit) {
+        if (startOffset >= limit || !Character.isDigit(line.charAt(startOffset))) {
+            return null;
+        }
+        int cursor = startOffset + 1;
+        while (cursor < limit && Character.isDigit(line.charAt(cursor))) {
+            cursor++;
+        }
+        return new ParsedNumber(Integer.parseInt(line.substring(startOffset, cursor)), cursor);
+    }
+
+    private static @Nullable ParsedToken parseToken(
+            final String line,
+            final int startOffset,
+            final int limit,
+            final CharacterPredicate predicate
+    ) {
+        if (startOffset >= limit || !predicate.test(line.charAt(startOffset))) {
+            return null;
+        }
+        int cursor = startOffset + 1;
+        while (cursor < limit && predicate.test(line.charAt(cursor))) {
+            cursor++;
+        }
+        return new ParsedToken(line.substring(startOffset, cursor), cursor);
+    }
+
+    private static int skipWhitespace(final String value, final int startOffset, final int limit) {
+        int cursor = startOffset;
+        while (cursor < limit && Character.isWhitespace(value.charAt(cursor))) {
+            cursor++;
+        }
+        return cursor;
+    }
+
+    private static boolean startsWith(final String value, final int offset, final String prefix) {
+        return offset >= 0 && offset + prefix.length() <= value.length() && value.startsWith(prefix, offset);
+    }
+
+    @FunctionalInterface
+    private interface CharacterPredicate {
+        boolean test(char value);
+    }
+
+    private record ParsedCoverageTag(
+            int sourceIdStartOffset,
+            String sourceArtifact,
+            @Nullable String sourceName,
+            int sourceRevision,
+            String targetId,
+            String targetName,
+            boolean hasNeedsArtifactTypes
+    ) {
+    }
+
+    private record ParsedSource(String artifactType, @Nullable String name, int revision, int endOffset) {
+    }
+
+    private record ParsedTarget(String id, String name, int endOffset) {
+    }
+
+    private record ParsedToken(String value, int endOffset) {
+    }
+
+    private record ParsedNumber(int value, int endOffset) {
     }
 }

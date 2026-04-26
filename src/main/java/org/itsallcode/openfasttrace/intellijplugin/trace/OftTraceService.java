@@ -1,5 +1,6 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import org.itsallcode.openfasttrace.api.ColorScheme;
 import org.itsallcode.openfasttrace.api.DetailsSectionDisplay;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 final class OftTraceService {
+    private static final Logger LOG = Logger.getInstance(OftTraceService.class);
     private final Oft oft;
 
     // [impl->dsn~trace-execution-service~1]
@@ -38,22 +40,22 @@ final class OftTraceService {
     // [impl->dsn~preserve-defect-count-for-unclean-trace-chain-in-output-window~1]
     OftTraceResult traceProject(final Path inputPath, final OftTraceProgress progress) {
         try {
-            progress.phase("Importing OpenFastTrace items...", 0.15d);
+            progress.phase("Importing OpenFastTrace items...", 0.15D);
             progress.checkCanceled();
             final List<SpecificationItem> items = importItems(inputPath);
 
-            progress.phase("Linking OpenFastTrace items...", 0.4d);
+            progress.phase("Linking OpenFastTrace items...", 0.4D);
             progress.checkCanceled();
             final List<LinkedSpecificationItem> linkedItems = oft.link(items);
 
-            progress.phase("Tracing OpenFastTrace items...", 0.65d);
+            progress.phase("Tracing OpenFastTrace items...", 0.65D);
             progress.checkCanceled();
             final Trace trace = oft.trace(linkedItems);
 
-            progress.phase("Rendering OpenFastTrace report...", 0.9d);
+            progress.phase("Rendering OpenFastTrace report...", 0.9D);
             progress.checkCanceled();
             final String output = buildTraceOutput(inputPath, trace);
-            progress.phase("Finished OpenFastTrace trace.", 1.0d);
+            progress.phase("Finished OpenFastTrace trace.", 1.0D);
             return trace.hasNoDefects() ? OftTraceResult.success(output) : OftTraceResult.failure(output);
         } catch (final ProcessCanceledException exception) {
             throw exception;
@@ -91,7 +93,7 @@ final class OftTraceService {
         }
     }
 
-    private ReportSettings createReportSettings() {
+    private static ReportSettings createReportSettings() {
         return ReportSettings.builder()
                 .outputFormat(ReportConstants.DEFAULT_REPORT_FORMAT)
                 .verbosity(ReportVerbosity.FAILURE_DETAILS)
@@ -100,7 +102,7 @@ final class OftTraceService {
                 .build();
     }
 
-    private Path createTemporaryReportPath() {
+    private static Path createTemporaryReportPath() {
         try {
             return Files.createTempFile("openfasttrace-intellij-trace-", ".txt");
         } catch (final IOException exception) {
@@ -108,19 +110,22 @@ final class OftTraceService {
         }
     }
 
-    private void deleteTemporaryReportPath(final Path reportFile) {
+    private static void deleteTemporaryReportPath(final Path reportFile) {
         try {
             Files.deleteIfExists(reportFile);
         } catch (final IOException exception) {
-            // Temporary report clean-up is best-effort only.
+            LOG.debug("Failed to delete temporary OpenFastTrace report file: " + reportFile, exception);
         }
     }
 
-    private <T> T runWithPluginClassLoader(final Callable<T> action) {
+    private static <T> T runWithPluginClassLoader(final Callable<T> action) {
         final Thread currentThread = Thread.currentThread();
         final ClassLoader previousClassLoader = currentThread.getContextClassLoader();
+        final ClassLoader pluginClassLoader = previousClassLoader != null
+                ? previousClassLoader
+                : OftTraceService.class.getClassLoader();
         // OFT discovers importer and reporter plugins via ServiceLoader on the thread context class loader.
-        currentThread.setContextClassLoader(OftTraceService.class.getClassLoader());
+        currentThread.setContextClassLoader(pluginClassLoader);
         try {
             return action.call();
         } catch (final RuntimeException exception) {
@@ -132,7 +137,7 @@ final class OftTraceService {
         }
     }
 
-    private String formatException(final Path inputPath, final RuntimeException exception) {
+    private static String formatException(final Path inputPath, final RuntimeException exception) {
         final StringWriter stackTrace = new StringWriter();
         exception.printStackTrace(new PrintWriter(stackTrace));
         return "OpenFastTrace trace failed for input path " + inputPath + System.lineSeparator()

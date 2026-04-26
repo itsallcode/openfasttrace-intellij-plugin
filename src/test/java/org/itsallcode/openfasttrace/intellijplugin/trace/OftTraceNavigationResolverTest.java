@@ -13,6 +13,7 @@ import java.util.zip.CRC32;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 public class OftTraceNavigationResolverTest extends AbstractOftPlatformTestCase {
     public void testGivenUnsavedCoverageTagDocumentWhenResolvingGeneratedTraceItemThenItUsesLiveDocumentText() {
@@ -50,6 +51,19 @@ public class OftTraceNavigationResolverTest extends AbstractOftPlatformTestCase 
         assertThat(target, notNullValue());
         assertThat(target.file(), is(file.getVirtualFile()));
         assertThat(target.offset(), is(document.getText().indexOf("tst")));
+    }
+
+    public void testGivenVeryLargeMalformedCoverageTagWhenResolvingThenItReturnsWithoutStackOverflow() {
+        myFixture.addFileToProject(
+                "src/Main.java",
+                "// [tst->dsn~target~1 >> " + "req, ".repeat(10_000) + "]\n"
+        );
+
+        final OftTraceNavigationTarget target = new OftTraceNavigationResolver(getProject())
+                .resolve("tst~target~0")
+                .orElse(null);
+
+        assertThat(target, nullValue());
     }
 
     private String generatedCoverageItemId(
