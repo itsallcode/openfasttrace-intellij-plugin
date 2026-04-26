@@ -31,6 +31,7 @@ jacoco {
 
 sonar {
     properties {
+        property("sonar.projectKey", "org.itsallcode.openfasttrace:openfasttrace-intellij-plugin")
         property("sonar.organization", "itsallcode")
         property("sonar.host.url", "https://sonarcloud.io")
         property(

@@ -98,7 +98,7 @@ class OftDeclarationResolverTest {
 
     private static Stream<Arguments> coverageTagReferences() {
         final String targetId = "req~openfasttrace_navigation_target~1";
-        final String coverageTag = "// [impl->" + targetId + "]";
+        final String coverageTag = "// [impl" + "->" + targetId + "]";
         return Stream.of(
                 arguments(coverageTag.indexOf("impl"), "impl~openfasttrace_navigation_target~1"),
                 arguments(coverageTag.indexOf(targetId), targetId)

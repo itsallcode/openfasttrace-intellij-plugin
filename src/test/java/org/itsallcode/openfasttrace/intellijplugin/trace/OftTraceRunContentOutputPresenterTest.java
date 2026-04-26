@@ -120,11 +120,14 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
                 dsn~intellij-light-tests-keep-junit4-compatibility-dependency~1
                 Needs: tst
                 """);
-        final var coverageTagFile = myFixture.addFileToProject("src/AbstractOftPlatformTestCase.java", """
-                // [tst->dsn~intellij-light-tests-keep-junit4-compatibility-dependency~1]
-                abstract class AbstractOftPlatformTestCase {
-                }
-                """);
+        final var coverageTagFile = myFixture.addFileToProject(
+                "src/AbstractOftPlatformTestCase.java",
+                """
+                        // [tst""" + "->dsn~intellij-light-tests-keep-junit4-compatibility-dependency~1]\n" + """
+                        abstract class AbstractOftPlatformTestCase {
+                        }
+                        """
+        );
         final AtomicReference<ConsoleViewImpl> consoleRef = new AtomicReference<>();
         final OftTraceRunContentOutputPresenter presenter = new OftTraceRunContentOutputPresenter(
                 project -> {

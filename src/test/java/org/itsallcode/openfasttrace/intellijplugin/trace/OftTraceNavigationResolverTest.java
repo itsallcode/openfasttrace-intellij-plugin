@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.notNullValue;
 public class OftTraceNavigationResolverTest extends AbstractOftPlatformTestCase {
     public void testGivenUnsavedCoverageTagDocumentWhenResolvingGeneratedTraceItemThenItUsesLiveDocumentText() {
         final PsiFile file = myFixture.addFileToProject("src/Main.java", """
-                // [tst->dsn~old_target~1]
+                // [tst""" + "->dsn~old_target~1]\n" + """
                 class Main {
                 }
                 """);
