@@ -89,7 +89,7 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
     public void testGivenProjectWhenActionPerformsThenItStartsTheTraceRunnerWithTheProjectBasePath() throws IOException {
         final AtomicReference<RunnerCall> runnerCall = new AtomicReference<>();
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
-        final Path projectRoot = Files.createTempDirectory("oft-trace-action-project");
+        final Path projectRoot = createManagedTempDirectory("oft-trace-action-project");
         final Project project = projectProxy(projectRoot.toString(), "valid-project");
         final OftTraceProjectAction action = new OftTraceProjectAction(
                 testProject -> new OftTraceInputResolver().resolve(testProject.getBasePath()),
@@ -189,6 +189,10 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
                     default -> throw new UnsupportedOperationException(method.getName());
                 }
         );
+    }
+
+    private Path createManagedTempDirectory(final String directoryName) throws IOException {
+        return Files.createDirectories(Path.of(myFixture.getTempDirFixture().getTempDirPath()).resolve(directoryName));
     }
 
     private record RunnerCall(Project project, Path inputPath, String contentTitle) {

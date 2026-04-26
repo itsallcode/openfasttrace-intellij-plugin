@@ -16,12 +16,10 @@ import static org.hamcrest.Matchers.is;
 class OftTraceServiceTest {
     private static final Pattern ANSI_ESCAPE_SEQUENCE = Pattern.compile("\u001B\\[[;\\d]*m");
 
-    @TempDir
-    Path temporaryDirectory;
-
     // [itest->dsn~show-successful-trace-output-in-ide-output-window~1]
     @Test
-    void testGivenCleanTraceInputWhenTracingThenItReturnsSuccessfulPlainTextOutput() throws IOException {
+    void testGivenCleanTraceInputWhenTracingThenItReturnsSuccessfulPlainTextOutput(@TempDir final Path temporaryDirectory)
+            throws IOException {
         writeSuccessfulTraceProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
@@ -43,7 +41,8 @@ class OftTraceServiceTest {
 
     // [itest->dsn~show-failing-trace-output-in-ide-output-window~1]
     @Test
-    void testGivenDefectiveTraceInputWhenTracingThenItReturnsFailingPlainTextOutput() throws IOException {
+    void testGivenDefectiveTraceInputWhenTracingThenItReturnsFailingPlainTextOutput(@TempDir final Path temporaryDirectory)
+            throws IOException {
         writeFailingTraceProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
@@ -65,7 +64,9 @@ class OftTraceServiceTest {
 
     // [itest->dsn~show-scanned-base-directory-in-trace-output-window~1]
     @Test
-    void testGivenTraceInputWhenTracingThenItWritesTheScannedBaseDirectoryIntoTheTextOutput()
+    void testGivenTraceInputWhenTracingThenItWritesTheScannedBaseDirectoryIntoTheTextOutput(
+            @TempDir final Path temporaryDirectory
+    )
             throws IOException {
         writeSuccessfulTraceProject(temporaryDirectory);
 
@@ -87,7 +88,9 @@ class OftTraceServiceTest {
 
     // [itest->dsn~preserve-defect-count-for-unclean-trace-chain-in-output-window~1]
     @Test
-    void testGivenUncleanTraceChainWhenTracingThenItReportsTheExpectedDefectCountInTheTextOutput()
+    void testGivenUncleanTraceChainWhenTracingThenItReportsTheExpectedDefectCountInTheTextOutput(
+            @TempDir final Path temporaryDirectory
+    )
             throws IOException {
         writeUncleanTraceChainProject(temporaryDirectory);
 

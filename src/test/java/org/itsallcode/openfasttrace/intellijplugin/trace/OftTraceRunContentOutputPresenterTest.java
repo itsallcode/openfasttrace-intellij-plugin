@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
@@ -30,7 +31,7 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
 
     public void testGivenTwoThousandUncoveredRequirementsWhenPresentedThenTheIdeConsoleKeepsTheFullTraceOutput()
             throws IOException {
-        final Path temporaryDirectory = Files.createTempDirectory("oft-trace-output-presenter");
+        final Path temporaryDirectory = createManagedTempDirectory("oft-trace-output-presenter");
         writeLongFailingTraceProject(temporaryDirectory, 2000);
         final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
         final String renderedOutput = stripAnsi(result.output());
@@ -96,7 +97,7 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
                     OftTraceResult.failure("not ok req~trace_output_navigation_target~1" + System.lineSeparator())
             ));
             ApplicationManager.getApplication().invokeAndWait(() -> consoleRef.get().waitAllRequests());
-            ApplicationManager.getApplication().invokeAndWait(() -> consoleRef.get().getHyperlinks().waitForPendingFilters(5000));
+            ApplicationManager.getApplication().invokeAndWait(() -> Objects.requireNonNull(consoleRef.get().getHyperlinks()).waitForPendingFilters(5000));
 
             final String consoleText = readConsoleText(consoleRef.get());
             final HyperlinkInfo hyperlink = hyperlinkAt(
@@ -153,7 +154,7 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
                     OftTraceResult.failure("not ok " + generatedCoverageItemId + System.lineSeparator())
             ));
             ApplicationManager.getApplication().invokeAndWait(() -> consoleRef.get().waitAllRequests());
-            ApplicationManager.getApplication().invokeAndWait(() -> consoleRef.get().getHyperlinks().waitForPendingFilters(5000));
+            ApplicationManager.getApplication().invokeAndWait(() -> Objects.requireNonNull(consoleRef.get().getHyperlinks()).waitForPendingFilters(5000));
 
             final String consoleText = readConsoleText(consoleRef.get());
             final HyperlinkInfo hyperlink = hyperlinkAt(
@@ -180,7 +181,7 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
     private HyperlinkInfo hyperlinkAt(final ConsoleViewImpl console, final int offset) {
         final AtomicReference<HyperlinkInfo> hyperlink = new AtomicReference<>();
         ApplicationManager.getApplication().invokeAndWait(() ->
-                hyperlink.set(console.getHyperlinks().getHyperlinkAt(offset))
+                hyperlink.set(Objects.requireNonNull(console.getHyperlinks()).getHyperlinkAt(offset))
         );
         return hyperlink.get();
     }
@@ -233,6 +234,10 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
 
     private String stripAnsi(final String output) {
         return ANSI_ESCAPE_SEQUENCE.matcher(output).replaceAll("");
+    }
+
+    private Path createManagedTempDirectory(final String directoryName) throws IOException {
+        return Files.createDirectories(Path.of(myFixture.getTempDirFixture().getTempDirPath()).resolve(directoryName));
     }
 
     private void writeLongFailingTraceProject(final Path projectRoot, final int itemCount) throws IOException {
