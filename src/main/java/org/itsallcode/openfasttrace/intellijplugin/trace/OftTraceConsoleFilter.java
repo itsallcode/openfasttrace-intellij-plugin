@@ -4,10 +4,6 @@ import com.intellij.execution.filters.Filter;
 import com.intellij.execution.filters.HyperlinkInfo;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.indexing.FileBasedIndex;
-import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecification;
-import org.itsallcode.openfasttrace.intellijplugin.indexing.OftSpecificationIndex;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItemMatch;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSyntaxCore;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftTextSpan;
@@ -20,11 +16,15 @@ import java.util.List;
  * Adds declaration hyperlinks for OFT specification item IDs shown inside the trace console output.
  */
 final class OftTraceConsoleFilter implements Filter {
-    private final Project project;
+    private final OftTraceNavigationResolver navigationResolver;
 
     // [impl->dsn~open-specification-item-from-trace-output-window~1]
     OftTraceConsoleFilter(final Project project) {
-        this.project = project;
+        this(project, new OftTraceNavigationResolver(project));
+    }
+
+    OftTraceConsoleFilter(final Project project, final OftTraceNavigationResolver navigationResolver) {
+        this.navigationResolver = navigationResolver;
     }
 
     @Override
@@ -58,39 +58,14 @@ final class OftTraceConsoleFilter implements Filter {
     }
 
     private @Nullable HyperlinkInfo createHyperlink(final String specificationId) {
-        final OftTraceDeclaration declaration = findDeclaration(specificationId);
-        if (declaration == null) {
+        final OftTraceNavigationTarget target = navigationResolver.resolve(specificationId).orElse(null);
+        if (target == null) {
             return null;
         }
         return projectToNavigate -> new OpenFileDescriptor(
                 projectToNavigate,
-                declaration.file(),
-                declaration.specification().offset()
+                target.file(),
+                target.offset()
         ).navigate(true);
-    }
-
-    private @Nullable OftTraceDeclaration findDeclaration(final String specificationId) {
-        final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
-        final OftTraceDeclaration[] declaration = new OftTraceDeclaration[1];
-        FileBasedIndex.getInstance().processValues(
-                OftSpecificationIndex.SPECIFICATION_ID,
-                specificationId,
-                null,
-                (file, values) -> {
-                    if (!values.isEmpty()) {
-                        declaration[0] = new OftTraceDeclaration(file, values.getFirst());
-                        return false;
-                    }
-                    return true;
-                },
-                scope
-        );
-        return declaration[0];
-    }
-
-    private record OftTraceDeclaration(
-            com.intellij.openapi.vfs.VirtualFile file,
-            OftIndexedSpecification specification
-    ) {
     }
 }
