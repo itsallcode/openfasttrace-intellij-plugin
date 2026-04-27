@@ -92,19 +92,28 @@ final class OftTraceService {
     private static <T> T runWithPluginClassLoader(final Callable<T> action) {
         final Thread currentThread = Thread.currentThread();
         final ClassLoader previousClassLoader = currentThread.getContextClassLoader();
-        final ClassLoader pluginClassLoader = previousClassLoader != null
-                ? previousClassLoader
-                : OftTraceService.class.getClassLoader();
+        if (previousClassLoader == null) {
+            return callUnchecked(action);
+        }
         // OFT discovers importer and reporter plugins via ServiceLoader on the thread context class loader.
-        currentThread.setContextClassLoader(pluginClassLoader);
+        currentThread.setContextClassLoader(previousClassLoader);
+        try {
+            return callUnchecked(action);
+        } finally {
+            currentThread.setContextClassLoader(previousClassLoader);
+        }
+    }
+
+    private static <T> T callUnchecked(final Callable<T> action) {
         try {
             return action.call();
         } catch (final RuntimeException exception) {
             throw exception;
         } catch (final Exception exception) {
-            throw new IllegalStateException("Failed to run OpenFastTrace with the plugin class loader.", exception);
-        } finally {
-            currentThread.setContextClassLoader(previousClassLoader);
+            throw new IllegalStateException(
+                    "Failed to run OpenFastTrace with the plugin class loader.",
+                    exception
+            );
         }
     }
 

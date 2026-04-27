@@ -116,7 +116,10 @@ final class OftTraceNavigationResolver {
         try {
             return VfsUtilCore.loadText(file);
         } catch (final IOException exception) {
-            throw new IllegalStateException("Failed to load OFT trace navigation source file " + file.getPath(), exception);
+            throw new IllegalStateException(
+                    "Failed to load OFT trace navigation source file " + file.getPath(),
+                    exception
+            );
         }
     }
 
@@ -150,7 +153,7 @@ final class OftTraceNavigationResolver {
         return null;
     }
 
-    private String createCoverageTagSourceId(
+    private static String createCoverageTagSourceId(
             final VirtualFile file,
             final int lineNumber,
             final int lineMatchCount,
@@ -164,7 +167,7 @@ final class OftTraceNavigationResolver {
         return tag.sourceArtifact() + "~" + name + "~" + revision;
     }
 
-    private String generateCoverageTagName(
+    private static String generateCoverageTagName(
             final VirtualFile file,
             final int lineNumber,
             final int lineMatchCount,
@@ -212,7 +215,6 @@ final class OftTraceNavigationResolver {
             final int closingBracket
     ) {
         int cursor = skipWhitespace(line, openingBracket + 1, closingBracket);
-        final int sourceIdStartOffset = cursor;
         final ParsedSource source = parseSource(line, cursor, closingBracket);
         if (source == null) {
             return null;
@@ -241,7 +243,7 @@ final class OftTraceNavigationResolver {
             return null;
         }
         return new ParsedCoverageTag(
-                sourceIdStartOffset,
+                skipWhitespace(line, openingBracket + 1, closingBracket),
                 source.artifactType(),
                 source.name(),
                 source.revision(),
@@ -256,30 +258,7 @@ final class OftTraceNavigationResolver {
         if (artifact == null) {
             return null;
         }
-        int cursor = artifact.endOffset();
-        if (cursor >= limit || line.charAt(cursor) != '~') {
-            return new ParsedSource(artifact.value(), null, 0, cursor);
-        }
-        cursor++;
-        if (cursor >= limit) {
-            return null;
-        }
-        if (line.charAt(cursor) == '~') {
-            final ParsedNumber revision = parseUnsignedInteger(line, cursor + 1, limit);
-            if (revision == null) {
-                return null;
-            }
-            return new ParsedSource(artifact.value(), null, revision.value(), revision.endOffset());
-        }
-        final ParsedToken sourceName = parseName(line, cursor, limit);
-        if (sourceName == null || sourceName.endOffset() >= limit || line.charAt(sourceName.endOffset()) != '~') {
-            return null;
-        }
-        final ParsedNumber revision = parseUnsignedInteger(line, sourceName.endOffset() + 1, limit);
-        if (revision == null) {
-            return null;
-        }
-        return new ParsedSource(artifact.value(), sourceName.value(), revision.value(), revision.endOffset());
+        return parseSourceBody(line, limit, artifact);
     }
 
     private static @Nullable ParsedTarget parseTarget(final String line, final int startOffset, final int limit) {
@@ -330,26 +309,22 @@ final class OftTraceNavigationResolver {
         if (startOffset >= limit || !Character.isLetter(line.charAt(startOffset))) {
             return null;
         }
-        int cursor = startOffset + 1;
+        int cursor = advanceWhileLetterOrDigit(line, startOffset + 1, limit);
         while (cursor < limit) {
-            final char current = line.charAt(cursor);
-            if (Character.isLetterOrDigit(current)) {
-                cursor++;
-            } else if ((current == '.' || current == '_' || current == '-')
-                    && cursor + 1 < limit
-                    && Character.isLetterOrDigit(line.charAt(cursor + 1))) {
-                cursor += 2;
-                while (cursor < limit && Character.isLetterOrDigit(line.charAt(cursor))) {
-                    cursor++;
-                }
-            } else {
+            final int nextCursor = advanceAfterNameSeparator(line, cursor, limit);
+            if (nextCursor < 0) {
                 break;
             }
+            cursor = nextCursor;
         }
         return new ParsedToken(line.substring(startOffset, cursor), cursor);
     }
 
-    private static @Nullable ParsedNumber parseUnsignedInteger(final String line, final int startOffset, final int limit) {
+    private static @Nullable ParsedNumber parseUnsignedInteger(
+            final String line,
+            final int startOffset,
+            final int limit
+    ) {
         if (startOffset >= limit || !Character.isDigit(line.charAt(startOffset))) {
             return null;
         }
@@ -379,6 +354,94 @@ final class OftTraceNavigationResolver {
     private static int skipWhitespace(final String value, final int startOffset, final int limit) {
         int cursor = startOffset;
         while (cursor < limit && Character.isWhitespace(value.charAt(cursor))) {
+            cursor++;
+        }
+        return cursor;
+    }
+
+    private static @Nullable ParsedSource parseSourceBody(
+            final String line,
+            final int limit,
+            final ParsedToken artifact
+    ) {
+        final int cursor = artifact.endOffset();
+        if (!isTildeAt(line, cursor, limit)) {
+            return new ParsedSource(artifact.value(), null, 0, cursor);
+        }
+        final int detailsStartOffset = cursor + 1;
+        if (detailsStartOffset >= limit) {
+            return null;
+        }
+        if (isTildeAt(line, detailsStartOffset, limit)) {
+            return parseUnnamedSource(line, limit, artifact.value(), detailsStartOffset);
+        }
+        return parseNamedSource(line, limit, artifact.value(), detailsStartOffset);
+    }
+
+    private static @Nullable ParsedSource parseUnnamedSource(
+            final String line,
+            final int limit,
+            final String artifactType,
+            final int revisionMarkerOffset
+    ) {
+        final ParsedNumber revision = parseUnsignedInteger(line, revisionMarkerOffset + 1, limit);
+        if (revision == null) {
+            return null;
+        }
+        return new ParsedSource(artifactType, null, revision.value(), revision.endOffset());
+    }
+
+    private static @Nullable ParsedSource parseNamedSource(
+            final String line,
+            final int limit,
+            final String artifactType,
+            final int nameStartOffset
+    ) {
+        final ParsedToken sourceName = parseName(line, nameStartOffset, limit);
+        if (!isTokenFollowedByTilde(sourceName, line, limit)) {
+            return null;
+        }
+        final ParsedNumber revision = parseUnsignedInteger(line, sourceName.endOffset() + 1, limit);
+        if (revision == null) {
+            return null;
+        }
+        return new ParsedSource(artifactType, sourceName.value(), revision.value(), revision.endOffset());
+    }
+
+    private static boolean isTildeAt(final String line, final int offset, final int limit) {
+        return offset < limit && line.charAt(offset) == '~';
+    }
+
+    private static boolean isTokenFollowedByTilde(
+            final @Nullable ParsedToken token,
+            final String line,
+            final int limit
+    ) {
+        return token != null && token.endOffset() < limit && line.charAt(token.endOffset()) == '~';
+    }
+
+    private static int advanceAfterNameSeparator(final String line, final int cursor, final int limit) {
+        if (!isNameSeparatorAt(line, cursor, limit) || !hasNameCharacterAfterSeparator(line, cursor, limit)) {
+            return -1;
+        }
+        return advanceWhileLetterOrDigit(line, cursor + 2, limit);
+    }
+
+    private static boolean isNameSeparatorAt(final String line, final int cursor, final int limit) {
+        return cursor < limit && isNameSeparator(line.charAt(cursor));
+    }
+
+    private static boolean hasNameCharacterAfterSeparator(final String line, final int cursor, final int limit) {
+        return cursor + 1 < limit && Character.isLetterOrDigit(line.charAt(cursor + 1));
+    }
+
+    private static boolean isNameSeparator(final char current) {
+        return current == '.' || current == '_' || current == '-';
+    }
+
+    private static int advanceWhileLetterOrDigit(final String line, final int startOffset, final int limit) {
+        int cursor = startOffset;
+        while (cursor < limit && Character.isLetterOrDigit(line.charAt(cursor))) {
             cursor++;
         }
         return cursor;
