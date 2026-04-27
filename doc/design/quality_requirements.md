@@ -43,7 +43,8 @@ Runtime design requirements `dsn` can only cover on scenario at a time `scn`. Yo
 5. If multiple asserts are necessary and the latter asserts are not a follow-up symptom of the previous ones, the asserts must be wrapped in `assertAll`.
 6. When exceptions are asserted, then both type and message are validated.
 7. Where possible similar tests are bundled into parameterized tests (e.g., when multiple variants of input are tested against the same implementation method).
-8. Parameter validation is tested with multiple valid and invalid inputs. Testing valid and invalid input is done in separate test methods.
+8. Prefer parameterized tests over tests that exercise different scenarios of the same method under test with multiple asserts.
+9. Parameter validation is tested with multiple valid and invalid inputs. Testing valid and invalid input is done in separate test methods.
 
 ## Dependency Policy
 

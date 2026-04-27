@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.nio.file.FileSystems;
 import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -128,6 +130,59 @@ class OftTraceInputResolverTest {
         );
     }
 
+    @Test
+    void testGivenInvalidProjectPathWhenNormalizingThenItReturnsTheOriginalValue()
+            throws ReflectiveOperationException {
+        assertThat(
+                invokeStatic("normalizeProjectPath", new Class<?>[]{String.class}, "\0"),
+                is("\0")
+        );
+    }
+
+    @Test
+    void testGivenBlankProjectPathWhenNormalizingThenItReturnsItUnchanged() throws ReflectiveOperationException {
+        assertThat(
+                invokeStatic("normalizeProjectPath", new Class<?>[]{String.class}, "  "),
+                is("  ")
+        );
+    }
+
+    @Test
+    void testGivenIdeaDirectoryPathWhenLookingUpItsParentThenItReturnsTheProjectRoot(@TempDir final Path temporaryDirectory)
+            throws ReflectiveOperationException, IOException {
+        final Path ideaDirectory = Files.createDirectories(temporaryDirectory.resolve(".idea"));
+
+        assertThat(
+                invokeStatic("ideaDirectoryParent", new Class<?>[]{Path.class}, ideaDirectory),
+                is(temporaryDirectory)
+        );
+    }
+
+    @Test
+    void testGivenProjectFileInsideIdeaDirectoryWhenLookingUpItsParentThenItReturnsTheProjectRoot(
+            @TempDir final Path temporaryDirectory
+    ) throws ReflectiveOperationException, IOException {
+        final Path projectFile = Files.writeString(
+                Files.createDirectories(temporaryDirectory.resolve(".idea")).resolve("misc.xml"),
+                "<project/>"
+        );
+
+        assertThat(
+                invokeStatic("ideaDirectoryParent", new Class<?>[]{Path.class}, projectFile),
+                is(temporaryDirectory)
+        );
+    }
+
+    @Test
+    void testGivenRootPathWhenCheckingIdeaDirectoryThenItReturnsFalse() throws ReflectiveOperationException {
+        final Path rootPath = FileSystems.getDefault().getRootDirectories().iterator().next();
+
+        assertThat(
+                invokeStatic("isIdeaDirectory", new Class<?>[]{Path.class}, rootPath),
+                is(false)
+        );
+    }
+
     private Project projectProxy(final String basePath, final String projectFilePath, final String name) {
         return (Project) Proxy.newProxyInstance(
                 Project.class.getClassLoader(),
@@ -136,6 +191,7 @@ class OftTraceInputResolverTest {
                     case "getBasePath" -> basePath;
                     case "getProjectFilePath" -> projectFilePath;
                     case "getName" -> name;
+                    case "isDefault" -> false;
                     case "isDisposed" -> false;
                     case "equals" -> proxy == args[0];
                     case "hashCode" -> System.identityHashCode(proxy);
@@ -143,5 +199,12 @@ class OftTraceInputResolverTest {
                     default -> throw new UnsupportedOperationException(method.getName());
                 }
         );
+    }
+
+    private static Object invokeStatic(final String methodName, final Class<?>[] parameterTypes, final Object... arguments)
+            throws ReflectiveOperationException {
+        final Method method = OftTraceInputResolver.class.getDeclaredMethod(methodName, parameterTypes);
+        method.setAccessible(true);
+        return method.invoke(null, arguments);
     }
 }
