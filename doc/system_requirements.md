@@ -91,6 +91,13 @@ The plugin lets users open the OpenFastTrace user guide from within the IDE. Use
 
 Needs: req
 
+### Run OFT Trace
+`feat~run-oft-trace~1`
+
+The plugin lets users run an OpenFastTrace trace for the currently opened IntelliJ project and inspect the textual result inside the IDE.
+
+Needs: req
+
 ## User Requirements
 
 ### Syntax Highlighting
@@ -240,6 +247,114 @@ The plugin opens the OpenFastTrace user guide from GitHub in an integrated web v
 
 Covers:
 - `feat~open-oft-user-guide~1`
+
+Needs: scn
+
+### Run OFT Trace
+
+The following requirements refine the Run OFT Trace feature into user-visible capabilities.
+
+### Show Trace Project Action in Tools Menu
+`req~show-trace-project-action-in-tools-menu~1`
+
+The plugin adds an `OpenFastTrace` group with a `Trace Project` action to the global `Tools` menu. Users can find the trace entry in the established IDE location for project-level tooling actions.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Disable Trace Project Action without Open Project
+`req~disable-trace-project-action-without-open-project~1`
+
+The plugin disables the `Trace Project` action when no IntelliJ project is open.
+
+Rationale:
+
+Users cannot invoke the trace action when the IDE has no project context to trace.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Trace Open Project from Project Root
+`req~trace-open-project-from-project-root~1`
+
+The plugin traces the currently opened IntelliJ project by using the opened project directory as the default OpenFastTrace input root. Users can run a whole-project trace without manually selecting files and directories first.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Run Trace Project in Background
+`req~run-trace-project-in-background~1`
+
+The plugin runs the OpenFastTrace project trace in a background task with IDE progress reporting. Users can start a trace without blocking the editor UI while the trace is running.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Show Trace Output in IDE Output Window
+`req~show-trace-output-in-ide-output-window~1`
+
+The plugin shows the OpenFastTrace text trace output in an IDE output sub-window and keeps that output available after the trace finishes. Users can inspect the plain text result inside the IDE without looking at log files or an external terminal.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Open Specification Item from Trace Output Window
+`req~open-specification-item-from-trace-output-window~1`
+
+The plugin makes OpenFastTrace specification item IDs in the trace output window navigable to their declarations in the opened project. Users can jump from a reported item in the trace output directly to the defining specification item without searching manually.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Show Scanned Base Directory in Trace Output Window
+`req~show-scanned-base-directory-in-trace-output-window~1`
+
+When a project trace starts, the plugin writes the resolved project base directory that OpenFastTrace scans into the IDE output sub-window. Users can confirm the actual trace input root directly from the trace output.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Report Invalid Project Path before Trace Start
+`req~report-invalid-project-path-before-trace-start~1`
+
+The plugin reports when the opened project does not resolve to a valid local path before starting the trace. Users can see why the trace cannot start without inspecting plugin logs.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Show Failing Trace Result in IDE Output Window
+`req~show-failing-trace-result-in-ide-output-window~1`
+
+The plugin shows failing OpenFastTrace executions through the same IDE output flow as successful traces, including the text output and the failing result. Users can inspect trace failures without switching to plugin logs or an external terminal.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Show Defect Count for Unclean Trace Chain in IDE Output Window
+`req~show-defect-count-for-unclean-trace-chain-in-output-window~1`
+
+The plugin preserves the OpenFastTrace plain-text defect summary for an unclean trace chain in the IDE output window, including the reported total-item count and defect count. Users can verify how many trace issues OpenFastTrace found directly from the text result.
+
+Covers:
+- `feat~run-oft-trace~1`
 
 Needs: scn
 
@@ -495,5 +610,118 @@ Needs: dsn
 
 Covers:
 - `req~open-oft-user-guide-in-integrated-web-view~1`
+
+Needs: dsn
+
+### Run OFT Trace
+
+The following scenarios describe the trace action flow for the opened IntelliJ project.
+
+### Show Trace Project Action in Tools Menu
+`scn~show-trace-project-action-in-tools-menu~1`
+
+**Given** the OpenFastTrace plugin is installed and an IntelliJ project is open
+**When** a user opens the global `Tools` menu
+**Then** the menu contains an `OpenFastTrace` group with a `Trace Project` action
+
+Covers:
+- `req~show-trace-project-action-in-tools-menu~1`
+
+Needs: dsn
+
+### Disable Trace Project Action without Open Project
+`scn~disable-trace-project-action-without-open-project~1`
+
+**Given** the OpenFastTrace plugin is installed and no IntelliJ project is open
+**When** the IDE shows the global `Tools` menu or resolves the `Trace Project` action presentation
+**Then** the `Trace Project` action is disabled
+
+Covers:
+- `req~disable-trace-project-action-without-open-project~1`
+
+Needs: dsn
+
+### Run Trace Project in Background
+`scn~run-trace-project-in-background~1`
+
+**Given** an IntelliJ project is open and its project directory is available as a local file-system path
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the plugin starts an OpenFastTrace trace for that project directory in a background task with visible IDE progress instead of blocking the editor UI
+
+Covers:
+- `req~trace-open-project-from-project-root~1`
+- `req~run-trace-project-in-background~1`
+
+Needs: dsn
+
+### Reject Trace Project without Valid Project Path
+`scn~reject-trace-project-without-valid-project-path~1`
+
+**Given** an IntelliJ project is open but the plugin cannot resolve a valid local project directory for tracing
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the plugin reports that the trace cannot be started because the project path is missing or invalid
+
+Covers:
+- `req~report-invalid-project-path-before-trace-start~1`
+
+Needs: dsn
+
+### Show Successful Trace Output in IDE Output Window
+`scn~show-successful-trace-output-in-ide-output-window~1`
+
+**Given** an IntelliJ project is open, its project directory is a valid OFT trace input, and the OFT trace completes successfully
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the IDE shows the resulting OpenFastTrace text report in an output sub-window that remains available after the trace completes
+
+Covers:
+- `req~show-trace-output-in-ide-output-window~1`
+
+Needs: dsn
+
+### Open Specification Item from Trace Output Window
+`scn~open-specification-item-from-trace-output-window~1`
+
+**Given** an IntelliJ project is open, the trace output window shows an OFT specification item ID from the opened project, and that item is declared in a supported specification document
+**When** a user activates that specification item ID in the trace output window
+**Then** the IDE opens the declaration of that specification item in the editor
+
+Covers:
+- `req~open-specification-item-from-trace-output-window~1`
+
+Needs: dsn
+
+### Show Scanned Base Directory in Trace Output Window
+`scn~show-scanned-base-directory-in-trace-output-window~1`
+
+**Given** an IntelliJ project is open and its project directory resolves to a valid local OFT trace input
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the IDE output for that trace starts with the resolved base directory that the plugin passes to OpenFastTrace
+
+Covers:
+- `req~show-scanned-base-directory-in-trace-output-window~1`
+
+Needs: dsn
+
+### Show Failing Trace Output in IDE Output Window
+`scn~show-failing-trace-output-in-ide-output-window~1`
+
+**Given** an IntelliJ project is open, its project directory is a valid OFT trace input, and the OFT trace reports a failure
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the IDE shows the OpenFastTrace text output together with the failing result through the same trace output flow
+
+Covers:
+- `req~show-failing-trace-result-in-ide-output-window~1`
+
+Needs: dsn
+
+### Show Defect Count for Unclean Trace Chain in IDE Output Window
+`scn~show-defect-count-for-unclean-trace-chain-in-output-window~1`
+
+**Given** an IntelliJ project is open, its project directory is a valid OFT trace input, and the OFT trace finds an unclean feature-to-requirement-to-design chain with missing implementation coverage
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the IDE output contains the OpenFastTrace plain-text summary line with the reported total-item count and defect count for that unclean chain
+
+Covers:
+- `req~show-defect-count-for-unclean-trace-chain-in-output-window~1`
 
 Needs: dsn

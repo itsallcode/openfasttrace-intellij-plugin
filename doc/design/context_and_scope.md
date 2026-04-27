@@ -8,7 +8,7 @@ Terms such as `plugin`, `OpenFastTrace`, and `OFT` use the definitions from [Sys
 
 The plugin is an IntelliJ Platform plugin that runs inside JetBrains IDEs. The plugin logic stays inside the host IDE process and uses IntelliJ Platform extension points, services, indexes, editors, and navigation facilities.
 
-The MVP scope is limited to authoring support for OpenFastTrace documents and coverage tags inside the IDE. User-visible authoring features are defined in [System Requirements](../system_requirements.md). This chapter focuses on the technical system boundary behind those features.
+The initial product scope covers authoring support for OpenFastTrace documents and coverage tags inside the IDE and a first project-level trace action that runs OpenFastTrace for the opened IntelliJ project. User-visible features are defined in [System Requirements](../system_requirements.md). This chapter focuses on the technical system boundary behind those features.
 
 ## Supported Host Environment
 
@@ -28,9 +28,9 @@ The MVP also supports OpenFastTrace coverage tags in source, configuration, and 
 
 ## External Interfaces
 
-The primary technical context is the IntelliJ Platform itself. The plugin integrates with the editor infrastructure, PSI and parsing infrastructure, project model, symbol search, navigation, help actions, and the IDE state stores and caches that already exist in the platform.
+The primary technical context is the IntelliJ Platform itself. The plugin integrates with the editor infrastructure, PSI and parsing infrastructure, project model, symbol search, navigation, action system, background task infrastructure, console-style output views, and the IDE state stores and caches that already exist in the platform.
 
-The MVP stays as self-contained as possible. It does not require an external OpenFastTrace CLI installation, a local or remote tracing service, telemetry backends, or custom storage outside the standard IDE persistence mechanisms.
+The plugin stays as self-contained as possible. It does not require an external OpenFastTrace CLI installation, a local or remote tracing service, telemetry backends, or custom storage outside the standard IDE persistence mechanisms. The first trace integration uses the OpenFastTrace library in-process and renders the plain text report through IDE-provided output facilities.
 
 Network access in the MVP is limited to opening the OpenFastTrace user guide from its GitHub page. A later version may replace this with a bundled local copy of the guide.
 
@@ -42,11 +42,11 @@ The MVP does not introduce custom user preferences or project-specific configura
 
 The plugin relies on the standard IntelliJ Platform caches and state stores where the host IDE already persists indexes, plugin state, and related runtime data.
 
-## Explicit MVP Non-Goals
+## Explicit Non-Goals Of The First Tracing Increment
 
-The MVP does not execute OpenFastTrace tracing logic, generate tracing reports, perform batch validation, call the OpenFastTrace library, or integrate with an external OFT process.
+The first tracing increment does not add a dedicated problems-view reporter, inline editor annotations based on trace findings, automatic tracing on file save or project open, persistent trace settings, or report renderers beyond plain text IDE output.
 
-The MVP does not add broader IDE integrations such as inspections, intentions, tool windows, notifications, custom settings pages, or other advanced platform features beyond the minimum required authoring support.
+The plugin still does not add broader IDE integrations such as inspections, intentions, notifications, custom settings pages, or other advanced platform features beyond the minimum required authoring support and plain trace output presentation.
 
 The product strategy favors low complexity, predictable behavior, and usefulness for everyday engineering work over feature breadth. The plugin avoids add-on features that increase maintenance cost or distract from the core authoring workflow.
 

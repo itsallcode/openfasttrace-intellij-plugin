@@ -33,7 +33,7 @@ Covers:
 Needs: dsn
 
 ## Design (plain declaration)
-dsn~example_manual_trace_chain_plain~1
+dsn~dexample_manual_trace_chain_plain~1
 
 Design item for the plain requirement branch.
 

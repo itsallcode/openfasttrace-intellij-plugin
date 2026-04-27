@@ -80,7 +80,7 @@ public class OftHighlightingTest extends AbstractOftPlatformTestCase {
 
     // [itest->dsn~highlight-coverage-tag~1]
     public void testGivenSourceWithValidCoverageTagWhenHighlightingRunsThenCoverageTagIsHighlighted() {
-        final String coverageTag = "[impl->dsn~coverage-tag-support~1]";
+        final String coverageTag = "[impl" + "->dsn~coverage-tag-support~1]";
         myFixture.configureByText("Demo.java", "// " + coverageTag + "\n");
 
         final List<HighlightInfo> infos = myFixture.doHighlighting();
@@ -90,19 +90,19 @@ public class OftHighlightingTest extends AbstractOftPlatformTestCase {
 
     // [itest->dsn~ignore-invalid-coverage-tag~1]
     public void testGivenSourceWithInvalidCoverageTagWhenHighlightingRunsThenInvalidTextIsNotHighlighted() {
-        myFixture.configureByText("Demo.java", "// [impl->feat~broken~I]\n");
+        myFixture.configureByText("Demo.java", "// [impl" + "->feat~broken~I]\n");
 
         final List<HighlightInfo> infos = myFixture.doHighlighting();
 
-        assertThat(hasHighlight(infos, "[impl->feat~broken~I]", OftHighlighterKeys.COVERAGE_TAG), is(false));
+        assertThat(hasHighlight(infos, "[impl" + "->feat~broken~I]", OftHighlighterKeys.COVERAGE_TAG), is(false));
     }
 
     // [itest->dsn~tolerate-incomplete-coverage-tag~1]
     public void testGivenSourceWithIncompleteCoverageTagWhenHighlightingRunsThenIncompleteTextIsNotHighlighted() {
-        myFixture.configureByText("Demo.java", "// [impl->feat~unfinished~\n");
+        myFixture.configureByText("Demo.java", "// [impl" + "->feat~unfinished~\n");
 
         final List<HighlightInfo> infos = myFixture.doHighlighting();
 
-        assertThat(hasHighlight(infos, "[impl->feat~unfinished~", OftHighlighterKeys.COVERAGE_TAG), is(false));
+        assertThat(hasHighlight(infos, "[impl" + "->feat~unfinished~", OftHighlighterKeys.COVERAGE_TAG), is(false));
     }
 }

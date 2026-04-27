@@ -11,7 +11,7 @@ plugins {
     id("jacoco")
     id("com.diffplug.spotless") version "8.4.0"
     id("org.itsallcode.openfasttrace") version "3.1.1"
-    id("org.jetbrains.intellij.platform") version "2.14.0"
+    id("org.jetbrains.intellij.platform") version "2.15.0"
     id("org.sonarqube") version "7.2.3.7755"
     id("org.sonatype.gradle.plugins.scan") version "3.1.5"
 }
@@ -31,6 +31,7 @@ jacoco {
 
 sonar {
     properties {
+        property("sonar.projectKey", "org.itsallcode.openfasttrace:openfasttrace-intellij-plugin")
         property("sonar.organization", "itsallcode")
         property("sonar.host.url", "https://sonarcloud.io")
         property(
@@ -77,6 +78,8 @@ repositories {
 }
 
 dependencies {
+    implementation("org.itsallcode.openfasttrace:openfasttrace:${providers.gradleProperty("openfasttraceVersion").get()}")
+
     intellijPlatform {
         intellijIdea(providers.gradleProperty("platformVersion"))
         bundledPlugin("com.intellij.java")

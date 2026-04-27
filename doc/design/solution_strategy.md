@@ -2,7 +2,7 @@
 
 This chapter summarizes the main technical approach for realizing the system requirements.
 
-The solution strategy follows the shared IntelliJ Platform APIs first and keeps product-specific dependencies out of the MVP.
+The solution strategy follows the shared IntelliJ Platform APIs first and keeps product-specific dependencies out of the earliest editor-focused increment unless a user-visible feature requires them.
 
 ## Cross-IDE Plugin
 
@@ -47,10 +47,20 @@ For IntelliJ's search and navigation facilities, the declaration index is the so
 
 Coverage locations are still first-class data, but they belong in reference resolution and usage-style navigation. They are the places where the IDE should resolve from a usage to a declaration, and they are also the basis for `Go To Implementations` on a declared specification item.
 
-## MVP Scope And Deferred OFT Integration
+## Phased OFT Integration
 
-The MVP focuses on IDE integration for authoring OpenFastTrace specification items and coverage tags. It covers syntax highlighting, navigation to specification items, and opening the OpenFastTrace user guide.
+The initial increment focuses on IDE integration for authoring OpenFastTrace specification items and coverage tags. It covers syntax highlighting, navigation to specification items, and opening the OpenFastTrace user guide.
 
-The OpenFastTrace library is not part of the MVP implementation path for tracing logic. Tracing, report generation, and deeper semantic validation through the OpenFastTrace library are introduced later when the product scope extends beyond editor assistance and navigation.
+The next increment extends that editor support with in-process OpenFastTrace tracing for the opened IntelliJ project. The plugin adds the OpenFastTrace library as a runtime dependency, invokes it from plugin code, runs the trace through IntelliJ background-task infrastructure, and shows the plain text trace report in an IDE output sub-window.
 
-Deferring library integration keeps the MVP small and allows the initial implementation to validate the editor-facing workflows before adding tracing-specific behavior and the additional dependency surface that comes with it.
+This phased approach keeps the initial editor support small while still allowing the product to grow into project-level validation. It also limits the first tracing increment to established IDE concepts such as actions, progress indicators, and plain text output before the plugin invests in richer report interpretation such as Problems-view integration.
+
+## ANSI-Colored Trace Output
+
+The trace-output increment keeps OpenFastTrace responsible for generating terminal-colored plain-text reports and uses IntelliJ Platform APIs only for presentation inside the IDE.
+
+The plugin therefore does not translate OFT report semantics into its own color model. Instead, it preserves the raw OFT text output including ANSI escape sequences, lets OpenFastTrace emit a color-capable report instead of forcing black-and-white output, and decodes the ANSI sequences only at the IDE presentation boundary.
+
+For IDE rendering, the plugin prefers IntelliJ's existing ANSI-aware console support over custom parsing. This keeps the implementation aligned with platform behavior for colored process output and avoids a parallel ANSI parser inside the plugin.
+
+Failure presentation is likewise kept narrow. The plugin may emphasize the short trace status line as a failure, but it does not print the full OFT report body as one uniform error block. The report body should instead be rendered from ANSI-decoded chunks so OFT's intended mixed coloring remains visible in the output sub-window.

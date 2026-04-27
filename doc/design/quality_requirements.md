@@ -6,6 +6,21 @@ User-facing acceptance scenarios are defined in [System Requirements](../system_
 
 Terms such as `plugin`, `OpenFastTrace`, and `OFT` use the definitions from [System Requirements](../system_requirements.md).
 
+## Requirement Quality
+
+We have the following requirement hierachy in this project:
+
+1. `feat`: Top level feature as you would find on a product sheet (limited number)
+2. `req`: High level requirement
+3. `scn`: Given-when-then scenario
+4. `dsn`: Design requirement
+   `constr`: Technical constraint
+5. `impl`: Implementation
+   `utest`: Unit test
+   `itest`: Integration test
+
+Runtime design requirements `dsn` can only cover on scenario at a time `scn`. You can use OFT's forwarding notation if a technical requirement does not add new information to a user scenario.
+
 ## Code Quality
 
 1. Production code and test code follow clean-code principles as defined in the Clean Code book.
@@ -28,7 +43,8 @@ Terms such as `plugin`, `OpenFastTrace`, and `OFT` use the definitions from [Sys
 5. If multiple asserts are necessary and the latter asserts are not a follow-up symptom of the previous ones, the asserts must be wrapped in `assertAll`.
 6. When exceptions are asserted, then both type and message are validated.
 7. Where possible similar tests are bundled into parameterized tests (e.g., when multiple variants of input are tested against the same implementation method).
-8. Parameter validation is tested with multiple valid and invalid inputs. Testing valid and invalid input is done in separate test methods.
+8. Prefer parameterized tests over tests that exercise different scenarios of the same method under test with multiple asserts.
+9. Parameter validation is tested with multiple valid and invalid inputs. Testing valid and invalid input is done in separate test methods.
 
 ## Dependency Policy
 

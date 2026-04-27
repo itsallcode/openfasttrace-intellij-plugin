@@ -1,0 +1,71 @@
+package org.itsallcode.openfasttrace.intellijplugin.trace;
+
+import com.intellij.execution.filters.Filter;
+import com.intellij.execution.filters.HyperlinkInfo;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
+import com.intellij.openapi.project.Project;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItemMatch;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSyntaxCore;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.OftTextSpan;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Adds declaration hyperlinks for OFT specification item IDs shown inside the trace console output.
+ */
+final class OftTraceConsoleFilter implements Filter {
+    private final OftTraceNavigationResolver navigationResolver;
+
+    // [impl->dsn~open-specification-item-from-trace-output-window~1]
+    OftTraceConsoleFilter(final Project project) {
+        this(new OftTraceNavigationResolver(project));
+    }
+
+    OftTraceConsoleFilter(final OftTraceNavigationResolver navigationResolver) {
+        this.navigationResolver = navigationResolver;
+    }
+
+    @Override
+    public @Nullable Result applyFilter(final String line, final int entireLength) {
+        final int lineStartOffset = entireLength - line.length();
+        final List<ResultItem> resultItems = findConsoleResultItems(line, lineStartOffset);
+        return resultItems.isEmpty() ? null : new Result(resultItems);
+    }
+
+    private List<ResultItem> findConsoleResultItems(final String line, final int lineStartOffset) {
+        final List<ResultItem> resultItems = new ArrayList<>();
+        for (final OftSpecificationItemMatch match : OftSyntaxCore.findSpecificationItems(line)) {
+            final HyperlinkInfo hyperlink = createHyperlink(match.item().id());
+            if (hyperlink != null) {
+                resultItems.add(toResultItem(lineStartOffset, match.span(), hyperlink));
+            }
+        }
+        return List.copyOf(resultItems);
+    }
+
+    private static ResultItem toResultItem(
+            final int lineStartOffset,
+            final OftTextSpan span,
+            final HyperlinkInfo hyperlink
+    ) {
+        return new ResultItem(
+                lineStartOffset + span.startOffset(),
+                lineStartOffset + span.endOffset(),
+                hyperlink
+        );
+    }
+
+    private @Nullable HyperlinkInfo createHyperlink(final String specificationId) {
+        final OftTraceNavigationTarget target = navigationResolver.resolve(specificationId).orElse(null);
+        if (target == null) {
+            return null;
+        }
+        return projectToNavigate -> new OpenFileDescriptor(
+                projectToNavigate,
+                target.file(),
+                target.offset()
+        ).navigate(true);
+    }
+}

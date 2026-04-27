@@ -17,17 +17,17 @@ class OftSyntaxCoreTest {
 
     @Test
     void classifiesCoverageTags() {
-        final String validCoverageTag = "[impl->" + "dsn~coverage-tag-support~1]";
+        final String validCoverageTag = "[impl" + "->dsn~coverage-tag-support~1]";
         assertThat(
                 OftSyntaxCore.classifyCoverageTag(validCoverageTag),
                 is(OftFragmentStatus.VALID)
         );
         assertThat(
-                OftSyntaxCore.classifyCoverageTag("[impl->feat~foobar~I]"),
+                OftSyntaxCore.classifyCoverageTag("[impl" + "->feat~foobar~I]"),
                 is(OftFragmentStatus.INVALID)
         );
         assertThat(
-                OftSyntaxCore.classifyCoverageTag("[impl->feat~foobar~"),
+                OftSyntaxCore.classifyCoverageTag("[impl" + "->feat~foobar~"),
                 is(OftFragmentStatus.INCOMPLETE)
         );
     }
@@ -94,8 +94,8 @@ class OftSyntaxCoreTest {
 
     @Test
     void extractsCoverageTagSourceAndTargetSpansAndEffectiveSource() {
-        final String text = "// [impl->" + "req~openfasttrace_navigation_target~1]";
-        final OftCoverageTagMatch match = OftSyntaxCore.findCoverageTags(text).get(0);
+        final String text = "// [impl" + "->req~openfasttrace_navigation_target~1]";
+        final OftCoverageTagMatch match = OftSyntaxCore.findCoverageTags(text).getFirst();
 
         assertThat(text.substring(match.sourceSpan().startOffset(), match.sourceSpan().endOffset()), is("impl"));
         assertThat(
