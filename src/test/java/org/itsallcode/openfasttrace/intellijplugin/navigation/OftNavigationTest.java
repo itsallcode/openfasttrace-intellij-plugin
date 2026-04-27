@@ -199,11 +199,14 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
                 req~openfasttrace_navigation_target~1
                 Needs: impl
                 """);
-        final PsiFile sourceFile = myFixture.addFileToProject("src/Main.java", """
-                // [<caret>impl->req~openfasttrace_navigation_target~1]
-                class Main {
-                }
-                """);
+        final PsiFile sourceFile = myFixture.addFileToProject(
+                "src/Main.java",
+                """
+                        // [<caret>impl""" + "->req~openfasttrace_navigation_target~1]\n" + """
+                        class Main {
+                        }
+                        """
+        );
         myFixture.configureFromExistingVirtualFile(sourceFile.getVirtualFile());
 
         EdtTestUtil.runInEdtAndWait(() -> myFixture.performEditorAction(IdeActions.ACTION_GOTO_DECLARATION));
@@ -217,11 +220,14 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
                 req~openfasttrace_navigation_target~1
                 Needs: dsn
                 """);
-        final PsiFile sourceFile = myFixture.addFileToProject("src/Main.java", """
-                // [impl-><caret>req~openfasttrace_navigation_target~1]
-                class Main {
-                }
-                """);
+        final PsiFile sourceFile = myFixture.addFileToProject(
+                "src/Main.java",
+                """
+                        // [impl""" + "-><caret>req~openfasttrace_navigation_target~1]\n" + """
+                        class Main {
+                        }
+                        """
+        );
         myFixture.configureFromExistingVirtualFile(sourceFile.getVirtualFile());
 
         EdtTestUtil.runInEdtAndWait(() -> myFixture.performEditorAction(IdeActions.ACTION_GOTO_DECLARATION));
@@ -235,11 +241,14 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
                 Covers:
                 - req~openfasttrace_navigation_target~1
                 """);
-        final PsiFile sourceFile = myFixture.addFileToProject("src/Main.java", """
-                // [<caret>impl->req~openfasttrace_navigation_target~1]
-                class Main {
-                }
-                """);
+        final PsiFile sourceFile = myFixture.addFileToProject(
+                "src/Main.java",
+                """
+                        // [<caret>impl""" + "->req~openfasttrace_navigation_target~1]\n" + """
+                        class Main {
+                        }
+                        """
+        );
         myFixture.configureFromExistingVirtualFile(sourceFile.getVirtualFile());
 
         final Editor editor = myFixture.getEditor();
@@ -259,11 +268,14 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
                 req~openfasttrace_navigation_target~1
                 Needs: impl
                 """);
-        final PsiFile sourceFile = myFixture.addFileToProject("src/Main.java", """
-                // [<caret>impl->req~openfasttrace_navigation_target~1]
-                class Main {
-                }
-                """);
+        final PsiFile sourceFile = myFixture.addFileToProject(
+                "src/Main.java",
+                """
+                        // [<caret>impl""" + "->req~openfasttrace_navigation_target~1]\n" + """
+                        class Main {
+                        }
+                        """
+        );
         myFixture.configureFromExistingVirtualFile(sourceFile.getVirtualFile());
 
         final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getEditor().getCaretModel().getOffset());
@@ -281,11 +293,14 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
                 req~openfasttrace_navigation_target~1
                 Needs: impl
                 """);
-        final PsiFile sourceFile = myFixture.addFileToProject("src/Main.java", """
-                // [impl-><caret>req~openfasttrace_navigation_target~1]
-                class Main {
-                }
-                """);
+        final PsiFile sourceFile = myFixture.addFileToProject(
+                "src/Main.java",
+                """
+                        // [impl""" + "-><caret>req~openfasttrace_navigation_target~1]\n" + """
+                        class Main {
+                        }
+                        """
+        );
         myFixture.configureFromExistingVirtualFile(sourceFile.getVirtualFile());
 
         final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getEditor().getCaretModel().getOffset());

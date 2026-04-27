@@ -10,6 +10,9 @@ build/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/dataSources/
+.idea/dataSources.local.xml
+.idea/dataSources.xml
 *.iws
 *.iml
 *.ipr
