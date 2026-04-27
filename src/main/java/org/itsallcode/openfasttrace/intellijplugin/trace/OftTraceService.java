@@ -1,6 +1,5 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import org.itsallcode.openfasttrace.api.ColorScheme;
 import org.itsallcode.openfasttrace.api.DetailsSectionDisplay;
@@ -13,25 +12,24 @@ import org.itsallcode.openfasttrace.api.report.ReportConstants;
 import org.itsallcode.openfasttrace.api.report.ReportVerbosity;
 import org.itsallcode.openfasttrace.core.Oft;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 final class OftTraceService {
-    private static final Logger LOG = Logger.getInstance(OftTraceService.class);
     private final Oft oft;
+    private final OftTraceReportRenderer reportRenderer;
 
     // [impl->dsn~trace-execution-service~1]
     OftTraceService() {
-        this(Oft.create());
+        this(Oft.create(), new OftPlainTextTraceReportRenderer());
     }
 
-    OftTraceService(final Oft oft) {
+    OftTraceService(final Oft oft, final OftTraceReportRenderer reportRenderer) {
         this.oft = oft;
+        this.reportRenderer = reportRenderer;
     }
 
     // [impl->dsn~show-successful-trace-output-in-ide-output-window~1]
@@ -79,18 +77,7 @@ final class OftTraceService {
     }
 
     private String renderTrace(final Trace trace) {
-        final Path reportFile = createTemporaryReportPath();
-        try {
-            runWithPluginClassLoader(() -> {
-                oft.reportToPath(trace, reportFile, createReportSettings());
-                return null;
-            });
-            return Files.readString(reportFile);
-        } catch (final IOException exception) {
-            throw new IllegalStateException("Failed to read OpenFastTrace report from " + reportFile, exception);
-        } finally {
-            deleteTemporaryReportPath(reportFile);
-        }
+        return runWithPluginClassLoader(() -> reportRenderer.render(trace, createReportSettings()));
     }
 
     private static ReportSettings createReportSettings() {
@@ -100,22 +87,6 @@ final class OftTraceService {
                 .colorScheme(ColorScheme.COLOR)
                 .detailsSectionDisplay(DetailsSectionDisplay.COLLAPSE)
                 .build();
-    }
-
-    private static Path createTemporaryReportPath() {
-        try {
-            return Files.createTempFile("openfasttrace-intellij-trace-", ".txt");
-        } catch (final IOException exception) {
-            throw new IllegalStateException("Failed to create a temporary OpenFastTrace report file.", exception);
-        }
-    }
-
-    private static void deleteTemporaryReportPath(final Path reportFile) {
-        try {
-            Files.deleteIfExists(reportFile);
-        } catch (final IOException exception) {
-            LOG.debug("Failed to delete temporary OpenFastTrace report file: " + reportFile, exception);
-        }
     }
 
     private static <T> T runWithPluginClassLoader(final Callable<T> action) {
