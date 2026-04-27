@@ -1,11 +1,13 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
+import org.itsallcode.openfasttrace.core.Oft;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
@@ -104,6 +106,33 @@ class OftTraceServiceTest {
                 () -> assertThat(renderedOutput, Matchers.containsString("dsn~chain_design~1")),
                 () -> assertThat(renderedOutput, Matchers.containsString("feat~chain_feature~1")),
                 () -> assertThat(renderedOutput, Matchers.containsString("req~chain_requirement~1"))
+        );
+    }
+
+    @Test
+    void testGivenRuntimeExceptionWhenTracingThenItReturnsAnErrorResult(@TempDir final Path temporaryDirectory) {
+        final Oft oft = (Oft) Proxy.newProxyInstance(
+                Oft.class.getClassLoader(),
+                new Class<?>[]{Oft.class},
+                (proxy, method, args) -> switch (method.getName()) {
+                    case "importItems" -> throw new IllegalStateException("boom");
+                    case "equals" -> proxy == args[0];
+                    case "hashCode" -> System.identityHashCode(proxy);
+                    case "toString" -> "OftProxy";
+                    default -> throw new UnsupportedOperationException(method.getName());
+                }
+        );
+        final OftTraceReportRenderer renderer = (trace, settings) -> {
+            throw new AssertionError("renderer must not be called");
+        };
+
+        final OftTraceResult result = new OftTraceService(oft, renderer).traceProject(temporaryDirectory, OftTraceProgress.NONE);
+
+        Assertions.assertAll(
+                () -> assertThat(result.isSuccessful(), is(false)),
+                () -> assertThat(result.statusMessage(), is("OpenFastTrace trace failed unexpectedly.")),
+                () -> assertThat(result.output(), Matchers.containsString("OpenFastTrace trace failed for input path")),
+                () -> assertThat(result.output(), Matchers.containsString("IllegalStateException: boom"))
         );
     }
 

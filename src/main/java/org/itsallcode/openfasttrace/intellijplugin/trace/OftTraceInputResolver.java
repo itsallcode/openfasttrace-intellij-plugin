@@ -10,11 +10,11 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 final class OftTraceInputResolver {
+    private static final Logger LOG = Logger.getInstance(OftTraceInputResolver.class);
+
     private OftTraceInputResolver() {
         // Prevent constructor invocation.
     }
-
-    private static final Logger LOG = Logger.getInstance(OftTraceInputResolver.class);
 
     static OftTraceInputResolution resolve(final Project project) {
         final OftTraceInputResolution basePathResolution = resolve(

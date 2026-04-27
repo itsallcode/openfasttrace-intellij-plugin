@@ -29,6 +29,19 @@ class OftTraceInputResolverTest {
     }
 
     @Test
+    void testGivenBlankBasePathWhenResolvingThenItReturnsAnInvalidResolution() {
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve("   ");
+
+        Assertions.assertAll(
+                () -> assertThat(resolution.isValid(), is(false)),
+                () -> assertThat(
+                        resolution.errorMessage(),
+                        Matchers.containsString("does not expose a local base path")
+                )
+        );
+    }
+
+    @Test
     void testGivenMissingDirectoryWhenResolvingThenItReturnsAnInvalidResolution(@TempDir final Path temporaryDirectory) {
         final OftTraceInputResolution resolution =
                 OftTraceInputResolver.resolve(temporaryDirectory.resolve("missing").toString());
@@ -63,6 +76,16 @@ class OftTraceInputResolverTest {
     }
 
     @Test
+    void testGivenInvalidBasePathStringWhenResolvingThenItReturnsAnInvalidResolution() {
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve("\0");
+
+        Assertions.assertAll(
+                () -> assertThat(resolution.isValid(), is(false)),
+                () -> assertThat(resolution.errorMessage(), Matchers.containsString("base path is invalid"))
+        );
+    }
+
+    @Test
     void testGivenProjectWithValidBasePathWhenResolvingThenItUsesTheProjectBasePath(@TempDir final Path temporaryDirectory) {
         final Project project = projectProxy(temporaryDirectory.toString(), null, "trace-project");
 
@@ -80,6 +103,22 @@ class OftTraceInputResolverTest {
         final Path ideaDirectory = Files.createDirectories(temporaryDirectory.resolve(".idea"));
         final Path projectFile = Files.writeString(ideaDirectory.resolve("misc.xml"), "<project/>");
         final Project project = projectProxy(ideaDirectory.toString(), projectFile.toString(), "trace-project");
+
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(project);
+
+        Assertions.assertAll(
+                () -> assertThat(resolution.isValid(), is(true)),
+                () -> assertThat(resolution.inputPath(), is(temporaryDirectory))
+        );
+    }
+
+    @Test
+    void testGivenInvalidBasePathAndRegularProjectFileWhenResolvingThenItUsesTheProjectFileParent(
+            @TempDir final Path temporaryDirectory
+    )
+            throws IOException {
+        final Path projectFile = Files.writeString(temporaryDirectory.resolve("build.gradle.kts"), "plugins {}");
+        final Project project = projectProxy("missing", projectFile.toString(), "trace-project");
 
         final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(project);
 

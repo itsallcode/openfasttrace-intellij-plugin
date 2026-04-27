@@ -52,7 +52,8 @@ final class OftTraceNavigationResolver {
 
     private Optional<OftTraceNavigationTarget> findCoverageTagSourceTarget(final String specificationId) {
         final OftTraceNavigationTarget[] target = new OftTraceNavigationTarget[1];
-        ProjectFileIndex.getInstance(project).iterateContent(file -> processCoverageTagFile(specificationId, target, file));
+        ProjectFileIndex.getInstance(project)
+                .iterateContent(file -> processCoverageTagFile(specificationId, target, file));
         return Optional.ofNullable(target[0]);
     }
 
