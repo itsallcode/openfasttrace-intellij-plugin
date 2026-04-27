@@ -31,7 +31,7 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
 
     public void testGivenTwoThousandUncoveredRequirementsWhenPresentedThenTheIdeConsoleKeepsTheFullTraceOutput()
             throws IOException {
-        final Path temporaryDirectory = createManagedTempDirectory("oft-trace-output-presenter");
+        final Path temporaryDirectory = createManagedTestArtifactDirectory("trace-run-content-output-presenter-input");
         writeLongFailingTraceProject(temporaryDirectory, 2000);
         final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
         final String renderedOutput = stripAnsi(result.output());
@@ -234,10 +234,6 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
 
     private String stripAnsi(final String output) {
         return ANSI_ESCAPE_SEQUENCE.matcher(output).replaceAll("");
-    }
-
-    private Path createManagedTempDirectory(final String directoryName) throws IOException {
-        return Files.createDirectories(Path.of(myFixture.getTempDirFixture().getTempDirPath()).resolve(directoryName));
     }
 
     private void writeLongFailingTraceProject(final Path projectRoot, final int itemCount) throws IOException {
