@@ -14,7 +14,7 @@ class OftTraceNavigationResolverParserTest {
     @Test
     void testGivenNamedSourceAndNeedsWhenParsingCoverageTagThenItReturnsAllFields()
             throws ReflectiveOperationException {
-        final String line = "[ tst~my.name_1-target~12 -> dsn~target.name-2~34 >> req, dsn ]";
+        final String line = coverageTag(" tst~my.name_1-target~12 -> dsn~target.name-2~34 >> req, dsn ");
 
         final Object tag = parseCoverageTag(line);
 
@@ -30,7 +30,7 @@ class OftTraceNavigationResolverParserTest {
     @Test
     void testGivenUnnamedSourceWhenParsingCoverageTagThenItReturnsRevisionOnlySource()
             throws ReflectiveOperationException {
-        final Object tag = parseCoverageTag("[tst~~7->dsn~target~1]");
+        final Object tag = parseCoverageTag(coverageTag("tst~~7->dsn~target~1"));
 
         assertThat(tag, notNullValue());
         assertThat(recordComponent(tag, "sourceArtifact"), is("tst"));
@@ -40,12 +40,12 @@ class OftTraceNavigationResolverParserTest {
 
     @Test
     void testGivenInvalidCoverageTagsWhenParsingThenItReturnsNull() throws ReflectiveOperationException {
-        assertThat(parseCoverageTag("[1->dsn~target~1]"), nullValue());
-        assertThat(parseCoverageTag("[tst dsn~target~1]"), nullValue());
-        assertThat(parseCoverageTag("[tst->1]"), nullValue());
-        assertThat(parseCoverageTag("[tst->dsn~target~1 >> ]"), nullValue());
-        assertThat(parseCoverageTag("[tst->dsn~target~1 trailing]"), nullValue());
-        assertThat(parseCoverageTag("[tst~]"), nullValue());
+        assertThat(parseCoverageTag(coverageTag("1->dsn~target~1")), nullValue());
+        assertThat(parseCoverageTag(coverageTag("tst dsn~target~1")), nullValue());
+        assertThat(parseCoverageTag(coverageTag("tst->1")), nullValue());
+        assertThat(parseCoverageTag(coverageTag("tst->dsn~target~1 >> ")), nullValue());
+        assertThat(parseCoverageTag(coverageTag("tst->dsn~target~1 trailing")), nullValue());
+        assertThat(parseCoverageTag(coverageTag("tst~")), nullValue());
     }
 
     @Test
@@ -60,7 +60,7 @@ class OftTraceNavigationResolverParserTest {
     void testGivenGeneratedAndNamedCoverageIdsWhenScanningLineThenItResolvesMatchingOffsets()
             throws ReflectiveOperationException {
         final LightVirtualFile file = new LightVirtualFile("Main.java", "");
-        final String line = "// [tst->dsn~first~1] [tst~named~3->dsn~second~2]";
+        final String line = "// " + coverageTag("tst->dsn~first~1") + " " + coverageTag("tst~named~3->dsn~second~2");
         final int secondOpeningBracket = line.indexOf('[', line.indexOf(']') + 1);
         final int secondClosingBracket = line.indexOf(']', secondOpeningBracket + 1);
         final Object secondTag = parseCoverageTag(line, secondOpeningBracket, secondClosingBracket);
@@ -86,7 +86,7 @@ class OftTraceNavigationResolverParserTest {
         assertThat(secondTarget, notNullValue());
         assertThat(secondTarget.offset(), is(7 + line.indexOf("tst~named~3")));
 
-        final Object needsTag = parseCoverageTag("[tst->dsn~target~1 >> req]");
+        final Object needsTag = parseCoverageTag(coverageTag("tst->dsn~target~1 >> req"));
         final String needsId = (String) invokeStatic(
                 "createCoverageTagSourceId",
                 new Class<?>[]{com.intellij.openapi.vfs.VirtualFile.class, int.class, int.class, needsTag.getClass()},
@@ -121,7 +121,7 @@ class OftTraceNavigationResolverParserTest {
                         "findCoverageTagTargetInLine",
                         new Class<?>[]{com.intellij.openapi.vfs.VirtualFile.class, String.class, int.class, int.class, String.class},
                         file,
-                        "[tst->dsn~target~1",
+                        unclosedCoverageTag("tst->dsn~target~1"),
                         1,
                         0,
                         "tst~target~0"
@@ -148,6 +148,14 @@ class OftTraceNavigationResolverParserTest {
 
     private static Object parseCoverageTag(final String line) throws ReflectiveOperationException {
         return parseCoverageTag(line, 0, line.length() - 1);
+    }
+
+    private static String coverageTag(final String body) {
+        return "[" + body + "]";
+    }
+
+    private static String unclosedCoverageTag(final String body) {
+        return "[" + body;
     }
 
     private static Object parseCoverageTag(final String line, final int openingBracket, final int closingBracket)

@@ -56,7 +56,7 @@ public class OftTraceNavigationResolverTest extends AbstractOftPlatformTestCase 
     public void testGivenVeryLargeMalformedCoverageTagWhenResolvingThenItReturnsWithoutStackOverflow() {
         myFixture.addFileToProject(
                 "src/Main.java",
-                "// [tst->dsn~target~1 >> " + "req, ".repeat(10_000) + "]\n"
+                "// " + "[" + "tst->dsn~target~1 >> " + "req, ".repeat(10_000) + "]\n"
         );
 
         final OftTraceNavigationTarget target = new OftTraceNavigationResolver(getProject())
