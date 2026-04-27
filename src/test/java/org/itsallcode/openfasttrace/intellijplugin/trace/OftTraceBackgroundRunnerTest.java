@@ -249,7 +249,7 @@ class OftTraceBackgroundRunnerTest {
         final Path sourceDirectory = Files.createDirectories(projectRoot.resolve("src"));
         Files.writeString(
                 sourceDirectory.resolve("Main.java"),
-                "// [impl->req~trace_output_requirement~1]" + System.lineSeparator()
+                "// [impl" + "->req~trace_output_requirement~1]" + System.lineSeparator()
                         + "class Main {" + System.lineSeparator()
                         + "}" + System.lineSeparator()
         );
