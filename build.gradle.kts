@@ -11,7 +11,7 @@ plugins {
     id("jacoco")
     id("com.diffplug.spotless") version "8.4.0"
     id("org.itsallcode.openfasttrace") version "3.1.1"
-    id("org.jetbrains.intellij.platform") version "2.14.0"
+    id("org.jetbrains.intellij.platform") version "2.15.0"
     id("org.sonarqube") version "7.2.3.7755"
     id("org.sonatype.gradle.plugins.scan") version "3.1.5"
 }
