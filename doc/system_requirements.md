@@ -288,6 +288,56 @@ Covers:
 
 Needs: scn
 
+### Configure Trace Scope in Project Settings
+`req~configure-trace-scope-in-project-settings~1`
+
+The plugin integrates OpenFastTrace trace-scope settings into IntelliJ project configuration. Users can configure whether the `Trace Project` action traces the whole opened project or only selected resources and can edit the selected-resource paths directly in the IDE settings workflow.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Trace Selected Project Resources
+`req~trace-selected-project-resources~1`
+
+The plugin can trace selected project resources instead of the whole opened project directory. Users can restrict the OpenFastTrace scan to the resources they intend to include in the trace.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Include IntelliJ Source Directories in Selected-Resource Trace
+`req~include-intellij-source-directories-in-selected-resource-trace~1`
+
+When selected-resource tracing is active, the plugin can include source directories known to IntelliJ in the effective OpenFastTrace input set. Users do not need to discover and configure ordinary source roots by hand.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Include IntelliJ Test Directories in Selected-Resource Trace
+`req~include-intellij-test-directories-in-selected-resource-trace~1`
+
+When selected-resource tracing is active, the plugin can include test directories known to IntelliJ in the effective OpenFastTrace input set. Users do not need to discover and configure ordinary test roots by hand.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Add Project-Relative Paths to Selected-Resource Trace
+`req~add-project-relative-paths-to-selected-resource-trace~1`
+
+When selected-resource tracing is active, the plugin lets users add additional trace inputs through a multi-line text field in the project settings. Each non-empty line specifies one file or directory path relative to the opened project directory that OpenFastTrace should scan. If the user has not changed that setting, the field contains exactly one default entry: `doc/`.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
 ### Run Trace Project in Background
 `req~run-trace-project-in-background~1`
 
@@ -322,6 +372,16 @@ Needs: scn
 `req~show-scanned-base-directory-in-trace-output-window~1`
 
 When a project trace starts, the plugin writes the resolved project base directory that OpenFastTrace scans into the IDE output sub-window. Users can confirm the actual trace input root directly from the trace output.
+
+Covers:
+- `feat~run-oft-trace~1`
+
+Needs: scn
+
+### Show Resolved Trace Inputs in Trace Output Window
+`req~show-resolved-trace-inputs-in-trace-output-window~1`
+
+When a project trace starts with selected-resource tracing, the plugin writes the resolved files and directories that it passes to OpenFastTrace into the IDE output sub-window. Users can confirm the actual configured trace scope directly from the trace output.
 
 Covers:
 - `feat~run-oft-trace~1`
@@ -654,6 +714,67 @@ Covers:
 
 Needs: dsn
 
+### Configure Trace Scope in Project Settings
+`scn~configure-trace-scope-in-project-settings~1`
+
+**Given** an IntelliJ project is open
+**When** a user opens the project settings for the OpenFastTrace plugin
+**Then** the user can choose whether `Trace Project` traces the whole project or only selected resources and, for selected-resource tracing, can edit the additional trace paths in a multi-line project-settings field that contains exactly one default entry, `doc/`, until the user changes it
+
+Covers:
+- `req~configure-trace-scope-in-project-settings~1`
+
+Needs: dsn
+
+### Trace Selected Project Resources
+`scn~trace-selected-project-resources~1`
+
+**Given** an IntelliJ project is open and the OpenFastTrace project settings are configured for selected-resource tracing
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the plugin starts the trace by passing only the resolved selected resources to OpenFastTrace instead of the whole project directory
+
+Covers:
+- `req~trace-selected-project-resources~1`
+- `req~run-trace-project-in-background~1`
+
+Needs: dsn
+
+### Include IntelliJ Source Directories in Selected-Resource Trace
+`scn~include-intellij-source-directories-in-selected-resource-trace~1`
+
+**Given** an IntelliJ project is open, selected-resource tracing is active, and the source-directory option is enabled
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the plugin includes the IntelliJ source directories in the effective OpenFastTrace input set
+
+Covers:
+- `req~include-intellij-source-directories-in-selected-resource-trace~1`
+
+Needs: dsn
+
+### Include IntelliJ Test Directories in Selected-Resource Trace
+`scn~include-intellij-test-directories-in-selected-resource-trace~1`
+
+**Given** an IntelliJ project is open, selected-resource tracing is active, and the test-directory option is enabled
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the plugin includes the IntelliJ test directories in the effective OpenFastTrace input set
+
+Covers:
+- `req~include-intellij-test-directories-in-selected-resource-trace~1`
+
+Needs: dsn
+
+### Add Project-Relative Paths to Selected-Resource Trace
+`scn~add-project-relative-paths-to-selected-resource-trace~1`
+
+**Given** an IntelliJ project is open, selected-resource tracing is active, and the OpenFastTrace project settings multi-line field contains additional project-relative file or directory paths
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the plugin resolves those project-relative files and directories against the opened project and includes them in the effective OpenFastTrace input set
+
+Covers:
+- `req~add-project-relative-paths-to-selected-resource-trace~1`
+
+Needs: dsn
+
 ### Reject Trace Project without Valid Project Path
 `scn~reject-trace-project-without-valid-project-path~1`
 
@@ -699,6 +820,18 @@ Needs: dsn
 
 Covers:
 - `req~show-scanned-base-directory-in-trace-output-window~1`
+
+Needs: dsn
+
+### Show Resolved Trace Inputs in Trace Output Window
+`scn~show-resolved-trace-inputs-in-trace-output-window~1`
+
+**Given** an IntelliJ project is open, selected-resource tracing is active, and the plugin resolved the configured trace files and directories successfully
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the IDE output for that trace lists the resolved files and directories that the plugin passes to OpenFastTrace
+
+Covers:
+- `req~show-resolved-trace-inputs-in-trace-output-window~1`
 
 Needs: dsn
 
