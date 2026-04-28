@@ -25,7 +25,10 @@ class OftTraceServiceTest {
             throws IOException {
         writeSuccessfulTraceProject(temporaryDirectory);
 
-        final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
+        final OftTraceResult result = new OftTraceService().traceProject(
+                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceProgress.NONE
+        );
         final String renderedOutput = stripAnsi(result.output());
 
         Assertions.assertAll(
@@ -54,7 +57,10 @@ class OftTraceServiceTest {
         try (URLClassLoader foreignClassLoader = new URLClassLoader(new java.net.URL[0], null)) {
             currentThread.setContextClassLoader(foreignClassLoader);
 
-            final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
+            final OftTraceResult result = new OftTraceService().traceProject(
+                    OftTraceInputs.wholeProject(temporaryDirectory),
+                    OftTraceProgress.NONE
+            );
             final String renderedOutput = stripAnsi(result.output());
 
             Assertions.assertAll(
@@ -74,7 +80,10 @@ class OftTraceServiceTest {
             throws IOException {
         writeFailingTraceProject(temporaryDirectory);
 
-        final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
+        final OftTraceResult result = new OftTraceService().traceProject(
+                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceProgress.NONE
+        );
         final String renderedOutput = stripAnsi(result.output());
 
         Assertions.assertAll(
@@ -99,7 +108,10 @@ class OftTraceServiceTest {
             throws IOException {
         writeSuccessfulTraceProject(temporaryDirectory);
 
-        final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
+        final OftTraceResult result = new OftTraceService().traceProject(
+                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceProgress.NONE
+        );
         final String renderedOutput = stripAnsi(result.output());
 
         Assertions.assertAll(
@@ -123,7 +135,10 @@ class OftTraceServiceTest {
             throws IOException {
         writeUncleanTraceChainProject(temporaryDirectory);
 
-        final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
+        final OftTraceResult result = new OftTraceService().traceProject(
+                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceProgress.NONE
+        );
         final String renderedOutput = stripAnsi(result.output());
 
         Assertions.assertAll(
@@ -153,7 +168,10 @@ class OftTraceServiceTest {
             throw new AssertionError("renderer must not be called");
         };
 
-        final OftTraceResult result = new OftTraceService(oft, renderer).traceProject(temporaryDirectory, OftTraceProgress.NONE);
+        final OftTraceResult result = new OftTraceService(oft, renderer).traceProject(
+                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceProgress.NONE
+        );
 
         Assertions.assertAll(
                 () -> assertThat(result.isSuccessful(), is(false)),
@@ -165,6 +183,33 @@ class OftTraceServiceTest {
 
     private String stripAnsi(final String output) {
         return ANSI_ESCAPE_SEQUENCE.matcher(output).replaceAll("");
+    }
+
+    // [itest->dsn~trace-selected-project-resources~1]
+    // [itest->dsn~show-resolved-trace-inputs-in-trace-output-window~1]
+    @Test
+    void testGivenSelectedResourceInputsWhenTracingThenItListsConfiguredInputsAndIgnoresOutOfScopeArtifacts(
+            @TempDir final Path temporaryDirectory
+    ) throws IOException {
+        writeSuccessfulTraceProject(temporaryDirectory);
+        writeOutOfScopeDefect(temporaryDirectory);
+
+        final Path docDirectory = temporaryDirectory.resolve("doc");
+        final Path sourceDirectory = temporaryDirectory.resolve("src");
+        final OftTraceResult result = new OftTraceService().traceProject(
+                OftTraceInputs.selectedResources(java.util.List.of(docDirectory, sourceDirectory)),
+                OftTraceProgress.NONE
+        );
+        final String renderedOutput = stripAnsi(result.output());
+
+        Assertions.assertAll(
+                () -> assertThat(result.isSuccessful(), is(true)),
+                () -> assertThat(renderedOutput, Matchers.startsWith("Scanning configured trace inputs:")),
+                () -> assertThat(renderedOutput, Matchers.containsString("- " + docDirectory.toAbsolutePath().normalize())),
+                () -> assertThat(renderedOutput, Matchers.containsString("- " + sourceDirectory.toAbsolutePath().normalize())),
+                () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("unwanted_requirement"))),
+                () -> assertThat(renderedOutput, Matchers.containsString("ok - 3 total"))
+        );
     }
 
     private void writeSuccessfulTraceProject(final Path projectRoot) throws IOException {
@@ -227,6 +272,19 @@ class OftTraceServiceTest {
 
                 Covers:
                 - `feat~trace_output_feature~1`
+
+                Needs: impl
+                """
+        );
+    }
+
+    private void writeOutOfScopeDefect(final Path projectRoot) throws IOException {
+        final Path examplesDirectory = Files.createDirectories(projectRoot.resolve("examples"));
+        Files.writeString(
+                examplesDirectory.resolve("ignored.md"),
+                """
+                ### Requirement
+                `req~unwanted_requirement~1`
 
                 Needs: impl
                 """

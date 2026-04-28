@@ -9,8 +9,6 @@ import org.jspecify.annotations.NonNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Path;
-
 final class OftTraceBackgroundRunner implements OftTraceRunner {
     private final OftTraceService traceService;
     private final OftTraceOutputPresenter outputPresenter;
@@ -22,8 +20,8 @@ final class OftTraceBackgroundRunner implements OftTraceRunner {
 
     // [impl->dsn~run-trace-project-in-background~1]
     @Override
-    public void run(final Project project, final Path inputPath, final String contentTitle) {
-        ProgressManager.getInstance().run(new TraceTask(project, inputPath, contentTitle));
+    public void run(final Project project, final OftTraceInputs inputs, final String contentTitle) {
+        ProgressManager.getInstance().run(new TraceTask(project, inputs, contentTitle));
     }
 
     private static String formatThrowable(final Throwable error) {
@@ -36,21 +34,21 @@ final class OftTraceBackgroundRunner implements OftTraceRunner {
     }
 
     private final class TraceTask extends Task.Backgroundable {
-        private final Path inputPath;
+        private final OftTraceInputs inputs;
         private final String contentTitle;
         private OftTraceResult result;
 
-        private TraceTask(final Project project, final Path inputPath, final String contentTitle) {
+        private TraceTask(final Project project, final OftTraceInputs inputs, final String contentTitle) {
             super(project, "OpenFastTrace Trace Project", true);
-            this.inputPath = inputPath;
+            this.inputs = inputs;
             this.contentTitle = contentTitle;
         }
 
         @Override
         public void run(final ProgressIndicator indicator) {
             indicator.setIndeterminate(false);
-            indicator.setText2(inputPath.toString());
-            result = traceService.traceProject(inputPath, new IndicatorProgress(indicator));
+            indicator.setText2(inputs.progressText());
+            result = traceService.traceProject(inputs, new IndicatorProgress(indicator));
         }
 
         @Override

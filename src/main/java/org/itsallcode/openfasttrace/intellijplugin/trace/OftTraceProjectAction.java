@@ -47,11 +47,11 @@ public final class OftTraceProjectAction extends DumbAwareAction {
         final String contentTitle = createContentTitle(project);
         final OftTraceInputResolution resolution = projectInputResolver.apply(project);
         if (!resolution.isValid()) {
-            // [impl->dsn~reject-trace-project-without-valid-project-path~1]
+            // [impl->dsn~reject-trace-project-without-valid-project-path~2]
             outputPresenter.show(project, contentTitle, OftTraceResult.invalidInput(resolution.errorMessage()));
             return;
         }
-        traceRunner.run(project, resolution.inputPath(), contentTitle);
+        traceRunner.run(project, resolution.inputs(), contentTitle);
     }
 
     @Override

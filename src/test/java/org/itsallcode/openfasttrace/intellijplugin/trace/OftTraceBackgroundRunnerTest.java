@@ -33,7 +33,7 @@ class OftTraceBackgroundRunnerTest {
                 new OftTraceService(),
                 (project, contentTitle, result) -> presenterCall.set(new PresenterCall(project, contentTitle, result))
         );
-        final Task.Backgroundable task = newTraceTask(runner, temporaryDirectory, "Trace");
+        final Task.Backgroundable task = newTraceTask(runner, OftTraceInputs.wholeProject(temporaryDirectory), "Trace");
         final List<String> progressEvents = new ArrayList<>();
         final ProgressIndicator indicator = progressIndicator(progressEvents);
 
@@ -75,7 +75,7 @@ class OftTraceBackgroundRunnerTest {
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final Task.Backgroundable task = newTraceTask(
                 new OftTraceBackgroundRunner(new OftTraceService(), capturePresenter(presenterCall)),
-                Path.of("."),
+                OftTraceInputs.wholeProject(Path.of(".")),
                 "Trace"
         );
 
@@ -94,7 +94,7 @@ class OftTraceBackgroundRunnerTest {
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final Task.Backgroundable task = newTraceTask(
                 new OftTraceBackgroundRunner(new OftTraceService(), capturePresenter(presenterCall)),
-                Path.of("."),
+                OftTraceInputs.wholeProject(Path.of(".")),
                 "Trace"
         );
 
@@ -111,7 +111,7 @@ class OftTraceBackgroundRunnerTest {
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final Task.Backgroundable task = newTraceTask(
                 new OftTraceBackgroundRunner(new OftTraceService(), capturePresenter(presenterCall)),
-                Path.of("."),
+                OftTraceInputs.wholeProject(Path.of(".")),
                 "Trace"
         );
 
@@ -133,14 +133,14 @@ class OftTraceBackgroundRunnerTest {
 
     private static Task.Backgroundable newTraceTask(
             final OftTraceBackgroundRunner runner,
-            final Path inputPath,
+            final OftTraceInputs inputs,
             final String contentTitle
     ) throws Exception {
         final Constructor<?> constructor = Class.forName(
                 "org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceBackgroundRunner$TraceTask"
-        ).getDeclaredConstructor(OftTraceBackgroundRunner.class, Project.class, Path.class, String.class);
+        ).getDeclaredConstructor(OftTraceBackgroundRunner.class, Project.class, OftTraceInputs.class, String.class);
         constructor.setAccessible(true);
-        return (Task.Backgroundable) constructor.newInstance(runner, null, inputPath, contentTitle);
+        return (Task.Backgroundable) constructor.newInstance(runner, null, inputs, contentTitle);
     }
 
     private static void invokeTaskLifecycle(final Task.Backgroundable task, final String methodName, final Object... arguments)

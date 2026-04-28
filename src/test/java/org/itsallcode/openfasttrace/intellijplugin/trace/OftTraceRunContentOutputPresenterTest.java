@@ -33,7 +33,10 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
             throws IOException {
         final Path temporaryDirectory = createManagedTestArtifactDirectory("trace-run-content-output-presenter-input");
         writeLongFailingTraceProject(temporaryDirectory, 2000);
-        final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
+        final OftTraceResult result = new OftTraceService().traceProject(
+                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceProgress.NONE
+        );
         final String renderedOutput = stripAnsi(result.output());
         final AtomicReference<ConsoleViewImpl> consoleRef = new AtomicReference<>();
         final String previousBufferSize = System.getProperty("idea.cycle.buffer.size");

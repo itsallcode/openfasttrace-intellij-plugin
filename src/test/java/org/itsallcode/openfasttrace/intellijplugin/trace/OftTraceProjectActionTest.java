@@ -91,9 +91,9 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
         final Path projectRoot = createManagedTestArtifactDirectory("trace-project-action-input");
         final Project project = projectProxy(projectRoot.toString(), "valid-project");
         final OftTraceProjectAction action = new OftTraceProjectAction(
-                testProject -> OftTraceInputResolver.resolve(testProject.getBasePath()),
-                (runnerProject, inputPath, contentTitle) ->
-                        runnerCall.set(new RunnerCall(runnerProject, inputPath, contentTitle)),
+                testProject -> OftTraceInputResolution.valid(OftTraceInputs.wholeProject(projectRoot)),
+                (runnerProject, inputs, contentTitle) ->
+                        runnerCall.set(new RunnerCall(runnerProject, inputs, contentTitle)),
                 (presentedProject, contentTitle, result) ->
                         presenterCall.set(new PresenterCall(presentedProject, contentTitle, result))
         );
@@ -103,7 +103,7 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
         Assertions.assertAll(
                 () -> assertThat(runnerCall.get(), notNullValue()),
                 () -> assertThat(runnerCall.get().project(), sameInstance(project)),
-                () -> assertThat(runnerCall.get().inputPath(), is(projectRoot)),
+                () -> assertThat(runnerCall.get().inputs().inputPaths(), contains(projectRoot)),
                 () -> assertThat(
                         runnerCall.get().contentTitle(),
                         is(OftTraceProjectAction.createContentTitle(project))
@@ -112,14 +112,14 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
         );
     }
 
-    // [itest->dsn~reject-trace-project-without-valid-project-path~1]
+    // [itest->dsn~reject-trace-project-without-valid-project-path~2]
     public void testGivenInvalidProjectBasePathWhenActionPerformsThenItReportsTheStartupFailureThroughThePresenter() {
         final AtomicReference<RunnerCall> runnerCall = new AtomicReference<>();
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final Project project = projectProxy("/definitely/missing/openfasttrace/project", "invalid-project");
         final OftTraceProjectAction action = new OftTraceProjectAction(
-                testProject -> OftTraceInputResolver.resolve(testProject.getBasePath()),
-                (runProject, inputPath, contentTitle) -> runnerCall.set(new RunnerCall(runProject, inputPath, contentTitle)),
+                testProject -> OftTraceInputResolution.invalid("The current project base path does not exist"),
+                (runProject, inputs, contentTitle) -> runnerCall.set(new RunnerCall(runProject, inputs, contentTitle)),
                 (presentedProject, contentTitle, result) ->
                         presenterCall.set(new PresenterCall(presentedProject, contentTitle, result))
         );
@@ -143,8 +143,8 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
         final AtomicReference<RunnerCall> runnerCall = new AtomicReference<>();
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final OftTraceProjectAction action = new OftTraceProjectAction(
-                testProject -> OftTraceInputResolver.resolve(testProject.getBasePath()),
-                (project, inputPath, contentTitle) -> runnerCall.set(new RunnerCall(project, inputPath, contentTitle)),
+                testProject -> OftTraceInputResolution.invalid("unused"),
+                (project, inputs, contentTitle) -> runnerCall.set(new RunnerCall(project, inputs, contentTitle)),
                 (project, contentTitle, result) -> presenterCall.set(new PresenterCall(project, contentTitle, result))
         );
 
@@ -190,7 +190,7 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
         );
     }
 
-    private record RunnerCall(Project project, Path inputPath, String contentTitle) {
+    private record RunnerCall(Project project, OftTraceInputs inputs, String contentTitle) {
     }
 
     private record PresenterCall(Project project, String contentTitle, OftTraceResult result) {
