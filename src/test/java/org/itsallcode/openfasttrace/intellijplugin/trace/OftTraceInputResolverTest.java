@@ -8,18 +8,19 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.FileSystems;
 import java.lang.reflect.Proxy;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
 class OftTraceInputResolverTest {
     @Test
-    void testGivenNullBasePathWhenResolvingThenItReturnsAnInvalidResolution() {
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve((String) null);
+    void testGivenNullBasePathWhenResolvingProjectRootThenItReturnsAnInvalidResolution() {
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot(null);
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -31,8 +32,8 @@ class OftTraceInputResolverTest {
     }
 
     @Test
-    void testGivenBlankBasePathWhenResolvingThenItReturnsAnInvalidResolution() {
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve("   ");
+    void testGivenBlankBasePathWhenResolvingProjectRootThenItReturnsAnInvalidResolution() {
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot("   ");
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -44,9 +45,11 @@ class OftTraceInputResolverTest {
     }
 
     @Test
-    void testGivenMissingDirectoryWhenResolvingThenItReturnsAnInvalidResolution(@TempDir final Path temporaryDirectory) {
+    void testGivenMissingDirectoryWhenResolvingProjectRootThenItReturnsAnInvalidResolution(
+            @TempDir final Path temporaryDirectory
+    ) {
         final OftTraceInputResolution resolution =
-                OftTraceInputResolver.resolve(temporaryDirectory.resolve("missing").toString());
+                OftTraceInputResolver.resolveProjectRoot(temporaryDirectory.resolve("missing").toString());
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -55,11 +58,12 @@ class OftTraceInputResolverTest {
     }
 
     @Test
-    void testGivenFilePathWhenResolvingThenItReturnsAnInvalidResolution(@TempDir final Path temporaryDirectory)
-            throws IOException {
+    void testGivenFilePathWhenResolvingProjectRootThenItReturnsAnInvalidResolution(
+            @TempDir final Path temporaryDirectory
+    ) throws IOException {
         final Path file = Files.writeString(temporaryDirectory.resolve("build.gradle.kts"), "plugins {}");
 
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(file.toString());
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot(file.toString());
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -68,18 +72,21 @@ class OftTraceInputResolverTest {
     }
 
     @Test
-    void testGivenDirectoryWhenResolvingThenItReturnsAValidResolution(@TempDir final Path temporaryDirectory) {
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(temporaryDirectory.toString());
+    void testGivenDirectoryWhenResolvingProjectRootThenItReturnsAWholeProjectResolution(
+            @TempDir final Path temporaryDirectory
+    ) {
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot(temporaryDirectory.toString());
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(true)),
-                () -> assertThat(resolution.inputPath(), is(temporaryDirectory))
+                () -> assertThat(resolution.inputs().isWholeProject(), is(true)),
+                () -> assertThat(resolution.inputs().inputPaths(), contains(temporaryDirectory))
         );
     }
 
     @Test
-    void testGivenInvalidBasePathStringWhenResolvingThenItReturnsAnInvalidResolution() {
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve("\0");
+    void testGivenInvalidBasePathStringWhenResolvingProjectRootThenItReturnsAnInvalidResolution() {
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot("\0");
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -88,14 +95,113 @@ class OftTraceInputResolverTest {
     }
 
     @Test
-    void testGivenProjectWithValidBasePathWhenResolvingThenItUsesTheProjectBasePath(@TempDir final Path temporaryDirectory) {
+    void testGivenWholeProjectSettingsWhenResolvingThenItUsesTheProjectBasePath(@TempDir final Path temporaryDirectory) {
         final Project project = projectProxy(temporaryDirectory.toString(), null, "trace-project");
 
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(project);
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(
+                project,
+                new OftTraceSettingsSnapshot(OftTraceScopeMode.WHOLE_PROJECT, true, true, "doc/")
+        );
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(true)),
-                () -> assertThat(resolution.inputPath(), is(temporaryDirectory))
+                () -> assertThat(resolution.inputs().isWholeProject(), is(true)),
+                () -> assertThat(resolution.inputs().inputPaths(), contains(temporaryDirectory))
+        );
+    }
+
+    @Test
+    // [itest->dsn~add-project-relative-paths-to-selected-resource-trace~1]
+    void testGivenSelectedResourceSettingsWhenResolvingThenItUsesAdditionalProjectRelativePaths(
+            @TempDir final Path temporaryDirectory
+    ) throws IOException {
+        final Path docDirectory = Files.createDirectories(temporaryDirectory.resolve("doc"));
+        final Path configFile = Files.writeString(temporaryDirectory.resolve("trace.conf"), "value");
+        final Project project = projectProxy(temporaryDirectory.toString(), null, "trace-project");
+
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(
+                project,
+                new OftTraceSettingsSnapshot(
+                        OftTraceScopeMode.SELECTED_RESOURCES,
+                        false,
+                        false,
+                        "doc/\ntrace.conf"
+                )
+        );
+
+        Assertions.assertAll(
+                () -> assertThat(resolution.isValid(), is(true)),
+                () -> assertThat(resolution.inputs().isWholeProject(), is(false)),
+                () -> assertThat(resolution.inputs().inputPaths(), contains(docDirectory, configFile))
+        );
+    }
+
+    @Test
+    void testGivenSelectedResourceSettingsWithMissingAdditionalPathWhenResolvingThenItReturnsAnInvalidResolution(
+            @TempDir final Path temporaryDirectory
+    ) {
+        final Project project = projectProxy(temporaryDirectory.toString(), null, "trace-project");
+
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(
+                project,
+                new OftTraceSettingsSnapshot(
+                        OftTraceScopeMode.SELECTED_RESOURCES,
+                        false,
+                        false,
+                        "missing"
+                )
+        );
+
+        Assertions.assertAll(
+                () -> assertThat(resolution.isValid(), is(false)),
+                () -> assertThat(resolution.errorMessage(), Matchers.containsString("does not exist"))
+        );
+    }
+
+    @Test
+    void testGivenSelectedResourceSettingsWithAbsoluteAdditionalPathWhenResolvingThenItReturnsAnInvalidResolution(
+            @TempDir final Path temporaryDirectory
+    ) {
+        final Project project = projectProxy(temporaryDirectory.toString(), null, "trace-project");
+
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(
+                project,
+                new OftTraceSettingsSnapshot(
+                        OftTraceScopeMode.SELECTED_RESOURCES,
+                        false,
+                        false,
+                        temporaryDirectory.toString()
+                )
+        );
+
+        Assertions.assertAll(
+                () -> assertThat(resolution.isValid(), is(false)),
+                () -> assertThat(resolution.errorMessage(), Matchers.containsString("must be project-relative"))
+        );
+    }
+
+    @Test
+    void testGivenSelectedResourceSettingsWithoutAnyInputsWhenResolvingThenItReturnsAnInvalidResolution(
+            @TempDir final Path temporaryDirectory
+    ) {
+        final Project project = projectProxy(temporaryDirectory.toString(), null, "trace-project");
+
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(
+                project,
+                new OftTraceSettingsSnapshot(
+                        OftTraceScopeMode.SELECTED_RESOURCES,
+                        false,
+                        false,
+                        ""
+                )
+        );
+
+        Assertions.assertAll(
+                () -> assertThat(resolution.isValid(), is(false)),
+                () -> assertThat(
+                        resolution.errorMessage(),
+                        Matchers.containsString("does not resolve to any files or directories")
+                )
         );
     }
 
@@ -106,27 +212,14 @@ class OftTraceInputResolverTest {
         final Path projectFile = Files.writeString(ideaDirectory.resolve("misc.xml"), "<project/>");
         final Project project = projectProxy(ideaDirectory.toString(), projectFile.toString(), "trace-project");
 
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(project);
-
-        Assertions.assertAll(
-                () -> assertThat(resolution.isValid(), is(true)),
-                () -> assertThat(resolution.inputPath(), is(temporaryDirectory))
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(
+                project,
+                new OftTraceSettingsSnapshot(OftTraceScopeMode.WHOLE_PROJECT, true, true, "doc/")
         );
-    }
-
-    @Test
-    void testGivenInvalidBasePathAndRegularProjectFileWhenResolvingThenItUsesTheProjectFileParent(
-            @TempDir final Path temporaryDirectory
-    )
-            throws IOException {
-        final Path projectFile = Files.writeString(temporaryDirectory.resolve("build.gradle.kts"), "plugins {}");
-        final Project project = projectProxy("missing", projectFile.toString(), "trace-project");
-
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(project);
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(true)),
-                () -> assertThat(resolution.inputPath(), is(temporaryDirectory))
+                () -> assertThat(resolution.inputs().inputPaths(), contains(temporaryDirectory))
         );
     }
 
@@ -148,8 +241,9 @@ class OftTraceInputResolverTest {
     }
 
     @Test
-    void testGivenIdeaDirectoryPathWhenLookingUpItsParentThenItReturnsTheProjectRoot(@TempDir final Path temporaryDirectory)
-            throws ReflectiveOperationException, IOException {
+    void testGivenIdeaDirectoryPathWhenLookingUpItsParentThenItReturnsTheProjectRoot(
+            @TempDir final Path temporaryDirectory
+    ) throws ReflectiveOperationException, IOException {
         final Path ideaDirectory = Files.createDirectories(temporaryDirectory.resolve(".idea"));
 
         assertThat(

@@ -5,7 +5,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
-// [[plugin-build-uses-intellij-platform-gradle-plugin:1]]
+// [bld->dsn~plugin-build-uses-intellij-platform-gradle-plugin~1]
 plugins {
     id("java")
     id("jacoco")

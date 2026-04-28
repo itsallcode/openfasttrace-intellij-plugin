@@ -14,9 +14,9 @@ import org.itsallcode.openfasttrace.core.Oft;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 final class OftTraceService {
     private static final ClassLoader PLUGIN_CLASS_LOADER = OftTraceService.class.getClassLoader();
@@ -38,11 +38,11 @@ final class OftTraceService {
     // [impl->dsn~show-scanned-base-directory-in-trace-output-window~1]
     // [impl->dsn~show-failing-trace-output-in-ide-output-window~1]
     // [impl->dsn~preserve-defect-count-for-unclean-trace-chain-in-output-window~1]
-    OftTraceResult traceProject(final Path inputPath, final OftTraceProgress progress) {
+    OftTraceResult traceProject(final OftTraceInputs inputs, final OftTraceProgress progress) {
         try {
             progress.phase("Importing OpenFastTrace items...", 0.15D);
             progress.checkCanceled();
-            final List<SpecificationItem> items = importItems(inputPath);
+            final List<SpecificationItem> items = importItems(inputs);
 
             progress.phase("Linking OpenFastTrace items...", 0.4D);
             progress.checkCanceled();
@@ -54,28 +54,42 @@ final class OftTraceService {
 
             progress.phase("Rendering OpenFastTrace report...", 0.9D);
             progress.checkCanceled();
-            final String output = buildTraceOutput(inputPath, trace);
+            final String output = buildTraceOutput(inputs, trace);
             progress.phase("Finished OpenFastTrace trace.", 1.0D);
             return trace.hasNoDefects() ? OftTraceResult.success(output) : OftTraceResult.failure(output);
         } catch (final ProcessCanceledException exception) {
             throw exception;
         } catch (final RuntimeException exception) {
-            return OftTraceResult.error(formatException(inputPath, exception));
+            return OftTraceResult.error(formatException(inputs, exception));
         }
     }
 
-    private List<SpecificationItem> importItems(final Path inputPath) {
+    private List<SpecificationItem> importItems(final OftTraceInputs inputs) {
         final ImportSettings settings = ImportSettings.builder()
-                .addInputs(inputPath)
+                .addInputs(inputs.inputPaths())
                 .build();
         return runWithPluginClassLoader(() -> oft.importItems(settings));
     }
 
-    private String buildTraceOutput(final Path inputPath, final Trace trace) {
-        return "Scanning base directory: " + inputPath.toAbsolutePath().normalize()
+    private String buildTraceOutput(final OftTraceInputs inputs, final Trace trace) {
+        return buildInputHeader(inputs) + renderTrace(trace);
+    }
+
+    private String buildInputHeader(final OftTraceInputs inputs) {
+        if (inputs.isWholeProject()) {
+            return "Scanning base directory: " + inputs.inputPaths().getFirst().toAbsolutePath().normalize()
+                    + System.lineSeparator()
+                    + System.lineSeparator();
+        }
+        // [impl->dsn~show-resolved-trace-inputs-in-trace-output-window~1]
+        return "Scanning configured trace inputs:"
                 + System.lineSeparator()
                 + System.lineSeparator()
-                + renderTrace(trace);
+                + inputs.inputPaths().stream()
+                        .map(path -> "- " + path.toAbsolutePath().normalize())
+                        .collect(Collectors.joining(System.lineSeparator()))
+                + System.lineSeparator()
+                + System.lineSeparator();
     }
 
     private String renderTrace(final Trace trace) {
@@ -116,10 +130,10 @@ final class OftTraceService {
         }
     }
 
-    private static String formatException(final Path inputPath, final RuntimeException exception) {
+    private static String formatException(final OftTraceInputs inputs, final RuntimeException exception) {
         final StringWriter stackTrace = new StringWriter();
         exception.printStackTrace(new PrintWriter(stackTrace));
-        return "OpenFastTrace trace failed for input path " + inputPath + System.lineSeparator()
+        return "OpenFastTrace trace failed for input path(s) " + inputs.inputPaths() + System.lineSeparator()
                 + System.lineSeparator()
                 + stackTrace;
     }

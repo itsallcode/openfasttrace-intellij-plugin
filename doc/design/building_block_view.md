@@ -34,6 +34,7 @@ package "OpenFastTrace Plugin" {
   component "Coverage Tag\nSupport" as CoverageSupport
   component "Specification Item\nIndex" as SpecIndex
   component "Specification Item\nNavigation" as NavigationSupport
+  component "Trace Configuration\nIntegration" as TraceConfigurationSupport
   component "Trace Action\nIntegration" as TraceActionSupport
   component "Trace Execution\nService" as TraceExecutionSupport
   component "Trace Output\nPresentation" as TraceOutputSupport
@@ -53,12 +54,15 @@ RstSupport --> IdeEditor
 CoverageSupport --> IdeEditor
 SpecIndex --> IdeEditor
 NavigationSupport --> IdeNavigation
+TraceConfigurationSupport --> IdeActions
 TraceActionSupport --> IdeActions
 TraceExecutionSupport --> IdeTasks
 TraceOutputSupport --> IdeOutput
 UserGuideSupport --> IdeHelp
 
+TraceActionSupport --> TraceConfigurationSupport
 TraceActionSupport --> ProjectRoot : reads path
+TraceConfigurationSupport --> ProjectRoot : reads settings roots
 TraceExecutionSupport --> ProjectRoot : traces
 TraceExecutionSupport --> OftTraceLibrary
 MarkdownSupport --> ProjectSpecs : reads
@@ -174,10 +178,25 @@ Covers:
 
 Needs: impl
 
+### Trace Configuration Integration
+`dsn~trace-configuration-integration~1`
+
+The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project, exposes those settings through project configuration UI, and resolves the selected-resource options into a normalized OpenFastTrace input set assembled from IntelliJ source roots, IntelliJ test roots, and additional project-relative paths.
+
+Covers:
+- `scn~configure-trace-scope-in-project-settings~1`
+- `scn~trace-selected-project-resources~1`
+- `scn~include-intellij-source-directories-in-selected-resource-trace~1`
+- `scn~include-intellij-test-directories-in-selected-resource-trace~1`
+- `scn~add-project-relative-paths-to-selected-resource-trace~1`
+- `scn~show-per-line-validation-for-additional-trace-paths~1`
+
+Needs: impl
+
 ### Trace Action Integration
 `dsn~trace-action-integration~1`
 
-The plugin provides a trace-action component that contributes an `OpenFastTrace` action group with a `Trace Project` action under the global `Tools` menu. This component is responsible for exposing the entry only in an opened project context and for handing the action invocation to project-path resolution and trace execution.
+The plugin provides a trace-action component that contributes an `OpenFastTrace` action group with a `Trace Project` action under the global `Tools` menu. This component is responsible for exposing the entry only in an opened project context and for handing the action invocation to trace-configuration resolution and trace execution.
 
 Covers:
 - `scn~show-trace-project-action-in-tools-menu~1`
@@ -190,14 +209,18 @@ Needs: impl
 ### Trace Execution Service
 `dsn~trace-execution-service~1`
 
-The plugin provides a trace-execution service that resolves the current project root as the default OpenFastTrace input, validates that path before starting work, invokes the OpenFastTrace library in a background task, supports cancellation through IntelliJ progress infrastructure, and captures the textual trace output together with the final success or failure status.
+The plugin provides a trace-execution service that accepts the effective OpenFastTrace input set resolved for the current project, validates that input set before starting work, invokes the OpenFastTrace library in a background task, supports cancellation through IntelliJ progress infrastructure, and captures the textual trace output together with the final success or failure status.
+
+Because OpenFastTrace discovers importers and reporters through Java `ServiceLoader`, this service executes OFT import and report-rendering calls with the plugin class loader as the thread context class loader and restores the previous context loader afterward.
 
 Because OpenFastTrace discovers importers and reporters through Java `ServiceLoader`, this service executes OFT import and report-rendering calls with the plugin class loader as the thread context class loader and restores the previous context loader afterward.
 
 Covers:
 - `scn~run-trace-project-in-background~1`
+- `scn~trace-selected-project-resources~1`
 - `scn~reject-trace-project-without-valid-project-path~1`
 - `scn~show-successful-trace-output-in-ide-output-window~1`
+- `scn~show-resolved-trace-inputs-in-trace-output-window~1`
 - `scn~show-failing-trace-output-in-ide-output-window~1`
 
 Needs: impl

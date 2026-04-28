@@ -1,18 +1,16 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
-import java.nio.file.Path;
-
 final class OftTraceInputResolution {
-    private final Path inputPath;
+    private final OftTraceInputs inputs;
     private final String errorMessage;
 
-    private OftTraceInputResolution(final Path inputPath, final String errorMessage) {
-        this.inputPath = inputPath;
+    private OftTraceInputResolution(final OftTraceInputs inputs, final String errorMessage) {
+        this.inputs = inputs;
         this.errorMessage = errorMessage;
     }
 
-    static OftTraceInputResolution valid(final Path inputPath) {
-        return new OftTraceInputResolution(inputPath, null);
+    static OftTraceInputResolution valid(final OftTraceInputs inputs) {
+        return new OftTraceInputResolution(inputs, null);
     }
 
     static OftTraceInputResolution invalid(final String errorMessage) {
@@ -20,11 +18,11 @@ final class OftTraceInputResolution {
     }
 
     boolean isValid() {
-        return inputPath != null;
+        return inputs != null;
     }
 
-    Path inputPath() {
-        return inputPath;
+    OftTraceInputs inputs() {
+        return inputs;
     }
 
     String errorMessage() {
