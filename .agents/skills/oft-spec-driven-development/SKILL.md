@@ -171,6 +171,15 @@ Out of scope:
 - [ ] <tests derived from quality requirements>
 - [ ] Keep the OpenFastTrace trace clean
 - [ ] Keep required build and plugin verification tasks green
+
+### Update user documentation
+
+- [ ] Update the end user documentation in README.md
+
+## Version and Changelog Update
+
+- [ ] Raise the version to 0.3.0 (this is a feature release)
+- [ ] Write the changelog entry for 0.3.0
 ```
 
 Keep verification items concrete. Do not leave them as generic "run tests" placeholders when the quality requirements demand more specific checks.

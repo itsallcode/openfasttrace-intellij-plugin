@@ -79,11 +79,11 @@ That settings model should stay separate from the raw OFT service so the configu
 - [x] Add trace execution tests that prove OFT receives only the configured whitelist inputs in selected-resource mode
 - [x] Keep existing whole-project trace tests green and cover backward-compatible default behavior for projects without explicit settings
 - [x] Keep the OpenFastTrace trace clean for the requirement and design artifacts in scope
-- [ ] Keep path coverage at or above the documented threshold
+- [x] Keep path coverage at or above the documented threshold
 - [x] Keep dependency policy unchanged and avoid adding new third-party libraries unless a design decision is approved first
-- [ ] Keep required Gradle test, trace, packaging, and plugin verification tasks green
-- [ ] Keep SonarQube Cloud quality-gate checks green
-- [ ] Keep OSS Index audit results clean
+- [x] Keep required Gradle test, trace, packaging, and plugin verification tasks green
+- [x] Keep SonarQube Cloud quality-gate checks green
+- [x] Keep OSS Index audit results clean
 
 ### Update user documentation
 
