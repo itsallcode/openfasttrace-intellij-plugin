@@ -213,6 +213,8 @@ The plugin provides a trace-execution service that accepts the effective OpenFas
 
 Because OpenFastTrace discovers importers and reporters through Java `ServiceLoader`, this service executes OFT import and report-rendering calls with the plugin class loader as the thread context class loader and restores the previous context loader afterward.
 
+Because OpenFastTrace discovers importers and reporters through Java `ServiceLoader`, this service executes OFT import and report-rendering calls with the plugin class loader as the thread context class loader and restores the previous context loader afterward.
+
 Covers:
 - `scn~run-trace-project-in-background~1`
 - `scn~trace-selected-project-resources~1`
