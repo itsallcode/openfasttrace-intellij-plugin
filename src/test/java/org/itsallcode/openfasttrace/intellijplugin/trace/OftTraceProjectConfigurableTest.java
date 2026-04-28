@@ -1,6 +1,7 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 import org.junit.jupiter.api.Assertions;
 
@@ -68,11 +69,62 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
         final ConfigurationException exception =
                 Assertions.assertThrows(ConfigurationException.class, configurable::apply);
 
-        assertTrue(exception.getMessage().contains("must be project-relative"));
+        assertTrue(exception.getLocalizedMessage().contains("must be project-relative"));
+    }
+
+    // [itest->dsn~show-per-line-validation-for-additional-trace-paths~1]
+    public void testGivenSelectedResourceSettingsWithMissingPathWhenResettingConfigurableThenItShowsPerLineValidation()
+            throws Exception {
+        final var validationRoot = createManagedTestArtifactDirectory("trace-settings-validation-root");
+        final Project project = projectProxy(validationRoot.toString(), "validation-project");
+        OftTraceProjectSettings.getInstance(project).updateFrom(new OftTraceSettingsSnapshot(
+                OftTraceScopeMode.SELECTED_RESOURCES,
+                true,
+                true,
+                "doc/\nmissing"
+        ));
+        final OftTraceProjectConfigurable configurable = new OftTraceProjectConfigurable(project);
+        configurable.createComponent();
+
+        configurable.reset();
+
+        assertEquals(
+                "Resolved relative to: " + validationRoot.toAbsolutePath().normalize(),
+                component(configurable).resolvedRelativeToText()
+        );
+        assertTrue(component(configurable).validationMessagesText().contains("Line 1: 'doc/' not found"));
+        assertTrue(component(configurable).validationMessagesText().contains("Line 2: 'missing' not found"));
+    }
+
+    public void testGivenWholeProjectModeWhenResettingConfigurableThenItDoesNotShowPerLineValidation() {
+        final OftTraceProjectConfigurable configurable = new OftTraceProjectConfigurable(getProject());
+        configurable.createComponent();
+
+        configurable.reset();
+
+        assertEquals("", component(configurable).resolvedRelativeToText());
+        assertEquals("", component(configurable).validationMessagesText());
     }
 
     private static OftTraceSettingsSnapshot configurableSettings(final OftTraceProjectConfigurable configurable) {
         return component(configurable).getSettings();
+    }
+
+    private Project projectProxy(final String basePath, final String name) {
+        return (Project) java.lang.reflect.Proxy.newProxyInstance(
+                Project.class.getClassLoader(),
+                new Class<?>[]{Project.class},
+                (proxy, method, args) -> switch (method.getName()) {
+                    case "getBasePath" -> basePath;
+                    case "getName" -> name;
+                    case "getService" -> getProject().getService((Class<?>) args[0]);
+                    case "isDisposed" -> false;
+                    case "equals" -> proxy == args[0];
+                    case "hashCode" -> System.identityHashCode(proxy);
+                    case "toString" -> "Project[" + name + "]";
+                    default -> throw new UnsupportedOperationException(method.getName());
+                }
+        );
     }
 
     private static OftTraceSettingsComponent component(final OftTraceProjectConfigurable configurable) {

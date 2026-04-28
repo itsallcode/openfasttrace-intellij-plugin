@@ -50,8 +50,7 @@ public class OftTraceInputResolverPlatformTest extends AbstractOftPlatformTestCa
         }
     }
 
-    private void configureModuleRoots(final Path contentRoot, final Path sourceDirectory, final Path testDirectory)
-            throws IOException {
+    private void configureModuleRoots(final Path contentRoot, final Path sourceDirectory, final Path testDirectory) {
         final VirtualFile contentRootFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(contentRoot);
         final VirtualFile sourceDirectoryFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourceDirectory);
         final VirtualFile testDirectoryFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(testDirectory);

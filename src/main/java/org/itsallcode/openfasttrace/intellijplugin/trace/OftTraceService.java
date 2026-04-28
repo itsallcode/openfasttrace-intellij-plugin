@@ -14,7 +14,6 @@ import org.itsallcode.openfasttrace.core.Oft;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;

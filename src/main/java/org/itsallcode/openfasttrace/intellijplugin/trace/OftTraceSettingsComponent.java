@@ -1,6 +1,5 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
-import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -12,8 +11,11 @@ import com.intellij.util.ui.FormBuilder;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.nio.file.Path;
 
 final class OftTraceSettingsComponent {
     private final JBRadioButton wholeProjectRadioButton =
@@ -25,9 +27,13 @@ final class OftTraceSettingsComponent {
     private final JBCheckBox includeTestRootsCheckBox =
             new JBCheckBox("Include IntelliJ test directories");
     private final JBTextArea additionalPathsTextArea = new JBTextArea();
+    private final JBLabel resolvedRelativeToLabel = new JBLabel();
+    private final JBTextArea validationMessagesArea = new JBTextArea();
+    private final Path projectRoot;
     private final JPanel panel;
 
-    OftTraceSettingsComponent() {
+    OftTraceSettingsComponent(final Path projectRoot) {
+        this.projectRoot = projectRoot;
         final ButtonGroup traceScopeGroup = new ButtonGroup();
         traceScopeGroup.add(wholeProjectRadioButton);
         traceScopeGroup.add(selectedResourcesRadioButton);
@@ -36,6 +42,27 @@ final class OftTraceSettingsComponent {
         additionalPathsTextArea.setLineWrap(false);
         additionalPathsTextArea.setRows(5);
         additionalPathsTextArea.setColumns(40);
+        additionalPathsTextArea.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(final DocumentEvent event) {
+                updateValidationFeedback();
+            }
+
+            @Override
+            public void removeUpdate(final DocumentEvent event) {
+                updateValidationFeedback();
+            }
+
+            @Override
+            public void changedUpdate(final DocumentEvent event) {
+                updateValidationFeedback();
+            }
+        });
+        validationMessagesArea.setEditable(false);
+        validationMessagesArea.setOpaque(false);
+        validationMessagesArea.setFocusable(false);
+        validationMessagesArea.setLineWrap(true);
+        validationMessagesArea.setWrapStyleWord(true);
         final JComponent scrollPane = new JBScrollPane(additionalPathsTextArea);
         scrollPane.setPreferredSize(new Dimension(420, 110));
         final JBPanel<?> additionalPathsPanel = new JBPanel<>(new BorderLayout(0, 4));
@@ -44,6 +71,10 @@ final class OftTraceSettingsComponent {
                 BorderLayout.NORTH
         );
         additionalPathsPanel.add(scrollPane, BorderLayout.CENTER);
+        final JBPanel<?> additionalPathsFeedbackPanel = new JBPanel<>(new BorderLayout(0, 4));
+        additionalPathsFeedbackPanel.add(resolvedRelativeToLabel, BorderLayout.NORTH);
+        additionalPathsFeedbackPanel.add(validationMessagesArea, BorderLayout.CENTER);
+        additionalPathsPanel.add(additionalPathsFeedbackPanel, BorderLayout.SOUTH);
         panel = FormBuilder.createFormBuilder()
                 .addComponent(wholeProjectRadioButton)
                 .addComponent(selectedResourcesRadioButton)
@@ -90,10 +121,34 @@ final class OftTraceSettingsComponent {
                 && additionalPathsTextArea.isEnabled();
     }
 
+    String resolvedRelativeToText() {
+        return resolvedRelativeToLabel.getText();
+    }
+
+    String validationMessagesText() {
+        return validationMessagesArea.getText();
+    }
+
     private void updateSelectedResourcesEnabledState() {
         final boolean enabled = selectedResourcesRadioButton.isSelected();
         includeSourceRootsCheckBox.setEnabled(enabled);
         includeTestRootsCheckBox.setEnabled(enabled);
         additionalPathsTextArea.setEnabled(enabled);
+        resolvedRelativeToLabel.setEnabled(enabled);
+        validationMessagesArea.setEnabled(enabled);
+        updateValidationFeedback();
+    }
+
+    // [impl->dsn~show-per-line-validation-for-additional-trace-paths~1]
+    private void updateValidationFeedback() {
+        if (!selectedResourcesRadioButton.isSelected() || projectRoot == null) {
+            resolvedRelativeToLabel.setText("");
+            validationMessagesArea.setText("");
+            return;
+        }
+        final OftAdditionalTracePathValidation validation =
+                OftAdditionalTracePathValidation.validate(projectRoot, additionalPathsTextArea.getText());
+        resolvedRelativeToLabel.setText(validation.resolvedRelativeToText());
+        validationMessagesArea.setText(String.join(System.lineSeparator(), validation.messages()));
     }
 }

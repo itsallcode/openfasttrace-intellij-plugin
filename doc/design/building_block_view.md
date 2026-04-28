@@ -189,6 +189,7 @@ Covers:
 - `scn~include-intellij-source-directories-in-selected-resource-trace~1`
 - `scn~include-intellij-test-directories-in-selected-resource-trace~1`
 - `scn~add-project-relative-paths-to-selected-resource-trace~1`
+- `scn~show-per-line-validation-for-additional-trace-paths~1`
 
 Needs: impl
 

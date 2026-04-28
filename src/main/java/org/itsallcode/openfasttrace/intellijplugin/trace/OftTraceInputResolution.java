@@ -1,7 +1,5 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
-import java.nio.file.Path;
-
 final class OftTraceInputResolution {
     private final OftTraceInputs inputs;
     private final String errorMessage;

@@ -775,6 +775,18 @@ Covers:
 
 Needs: dsn
 
+### Show Per-Line Validation for Additional Trace Paths
+`scn~show-per-line-validation-for-additional-trace-paths~1`
+
+**Given** an IntelliJ project is open, selected-resource tracing is active, and the user edits the multi-line field for additional project-relative trace paths
+**When** one or more non-empty lines do not resolve to valid files or directories below the opened project directory
+**Then** the project settings show a non-blocking validation hint for each invalid line below the field so the user can see which configured paths are not found.
+
+Covers:
+- `req~add-project-relative-paths-to-selected-resource-trace~1`
+
+Needs: dsn
+
 ### Reject Trace Project without Valid Project Path
 `scn~reject-trace-project-without-valid-project-path~1`
 

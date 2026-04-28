@@ -34,7 +34,7 @@ public final class OftTraceProjectConfigurable implements SearchableConfigurable
     @Override
     public JComponent createComponent() {
         if (component == null) {
-            component = new OftTraceSettingsComponent();
+            component = new OftTraceSettingsComponent(projectRoot());
         }
         return component.getPanel();
     }
@@ -75,6 +75,18 @@ public final class OftTraceProjectConfigurable implements SearchableConfigurable
                         "Additional trace path must be project-relative: " + additionalPath
                 );
             }
+        }
+    }
+
+    private Path projectRoot() {
+        final String basePath = project.getBasePath();
+        if (basePath == null || basePath.isBlank()) {
+            return null;
+        }
+        try {
+            return Path.of(basePath);
+        } catch (final InvalidPathException exception) {
+            return null;
         }
     }
 }

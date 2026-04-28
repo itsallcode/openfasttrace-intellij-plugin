@@ -63,9 +63,9 @@ final class OftTraceProjectSettings implements PersistentStateComponent<OftTrace
     }
 
     static final class State {
-        public String traceScopeMode = OftTraceScopeMode.WHOLE_PROJECT.name();
-        public boolean includeSourceRoots = true;
-        public boolean includeTestRoots = true;
-        public String additionalPathsText = DEFAULT_ADDITIONAL_PATH;
+        String traceScopeMode = OftTraceScopeMode.WHOLE_PROJECT.name();
+        boolean includeSourceRoots = true;
+        boolean includeTestRoots = true;
+        String additionalPathsText = DEFAULT_ADDITIONAL_PATH;
     }
 }

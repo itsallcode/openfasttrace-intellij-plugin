@@ -49,45 +49,45 @@ That settings model should stay separate from the raw OFT service so the configu
 
 - [x] Extend `doc/system_requirements.md` so the trace feature no longer assumes only `req~trace-open-project-from-project-root~1`, but also specifies configurable whole-project vs selected-resource tracing
 - [x] Add or update user-facing requirements and scenarios for project-level trace configuration, including source-root inclusion, test-root inclusion, and additional relative trace paths
-- [ ] Require user review of system requirements
-- [ ] Update the design documentation so trace configuration becomes an explicit plugin building block instead of an implicit project-root resolver
-- [ ] Update runtime design items for the trace flow to describe how configured inputs are resolved, validated, and handed to OpenFastTrace
-- [ ] Require user review of design
+- [x] Require user review of system requirements
+- [x] Update the design documentation so trace configuration becomes an explicit plugin building block instead of an implicit project-root resolver
+- [x] Update runtime design items for the trace flow to describe how configured inputs are resolved, validated, and handed to OpenFastTrace
+- [x] Require user review of design
 
 ### Project Settings Integration
 
-- [ ] Add a persistent project-level settings model for trace scope mode and selected-resource options
-- [ ] Integrate the trace settings into IntelliJ project configuration in a way that is discoverable from normal project settings navigation
-- [ ] Provide a settings UI that lets users choose whole-project tracing or selected-resource tracing
-- [ ] In selected-resource mode, provide toggles for including IntelliJ source roots and IntelliJ test roots, both enabled by default
-- [ ] Provide a multi-line field for additional project-relative files or directories with default value `doc/`
-- [ ] Validate configured additional paths and present invalid entries in a way users can correct before or during trace execution
+- [x] Add a persistent project-level settings model for trace scope mode and selected-resource options
+- [x] Integrate the trace settings into IntelliJ project configuration in a way that is discoverable from normal project settings navigation
+- [x] Provide a settings UI that lets users choose whole-project tracing or selected-resource tracing
+- [x] In selected-resource mode, provide toggles for including IntelliJ source roots and IntelliJ test roots, both enabled by default
+- [x] Provide a multi-line field for additional project-relative files or directories with default value `doc/`
+- [x] Validate configured additional paths and present invalid entries in a way users can correct before or during trace execution
 
 ### Trace Input Resolution And Execution
 
-- [ ] Replace the single-path trace input resolver with a configuration-aware resolver that produces the effective OFT input set for the current project
-- [ ] Resolve IntelliJ source and test roots through project/module metadata instead of hard-coded path conventions
-- [ ] Normalize, de-duplicate, and validate the effective trace inputs before starting the OFT run
-- [ ] Keep whole-project tracing as the default behavior for existing projects that have no explicit GH-19 settings yet
-- [ ] Update the trace service so it can import from the effective configured input list rather than only one base directory
-- [ ] Update the trace output text so users can verify which configured directories and files were scanned for the current run
+- [x] Replace the single-path trace input resolver with a configuration-aware resolver that produces the effective OFT input set for the current project
+- [x] Resolve IntelliJ source and test roots through project/module metadata instead of hard-coded path conventions
+- [x] Normalize, de-duplicate, and validate the effective trace inputs before starting the OFT run
+- [x] Keep whole-project tracing as the default behavior for existing projects that have no explicit GH-19 settings yet
+- [x] Update the trace service so it can import from the effective configured input list rather than only one base directory
+- [x] Update the trace output text so users can verify which configured directories and files were scanned for the current run
 
 ### Automated Verification
 
-- [ ] Add focused tests for persistent trace settings defaults, storage, and project-settings UI behavior
-- [ ] Add tests for configuration-aware input resolution from source roots, test roots, additional relative paths, and invalid path entries
-- [ ] Add trace execution tests that prove OFT receives only the configured whitelist inputs in selected-resource mode
-- [ ] Keep existing whole-project trace tests green and cover backward-compatible default behavior for projects without explicit settings
-- [ ] Keep the OpenFastTrace trace clean for the requirement and design artifacts in scope
+- [x] Add focused tests for persistent trace settings defaults, storage, and project-settings UI behavior
+- [x] Add tests for configuration-aware input resolution from source roots, test roots, additional relative paths, and invalid path entries
+- [x] Add trace execution tests that prove OFT receives only the configured whitelist inputs in selected-resource mode
+- [x] Keep existing whole-project trace tests green and cover backward-compatible default behavior for projects without explicit settings
+- [x] Keep the OpenFastTrace trace clean for the requirement and design artifacts in scope
 - [ ] Keep path coverage at or above the documented threshold
-- [ ] Keep dependency policy unchanged and avoid adding new third-party libraries unless a design decision is approved first
+- [x] Keep dependency policy unchanged and avoid adding new third-party libraries unless a design decision is approved first
 - [ ] Keep required Gradle test, trace, packaging, and plugin verification tasks green
 - [ ] Keep SonarQube Cloud quality-gate checks green
 - [ ] Keep OSS Index audit results clean
 
 ### Update user documentation
 
-- [ ] Update the end user documentation in README.md
+- [x] Update the end user documentation in README.md
 
 ## Version and Changelog Update
 

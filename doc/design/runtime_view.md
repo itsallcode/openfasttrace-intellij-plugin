@@ -348,6 +348,18 @@ Covers:
 
 Needs: impl, itest
 
+### Show Per-Line Validation for Additional Trace Paths
+`dsn~show-per-line-validation-for-additional-trace-paths~1`
+
+**Given** selected-resource tracing is active and the user edits the multi-line field for additional project-relative trace paths
+**When** the trace-configuration component validates the configured lines against the opened project directory
+**Then** it keeps the field editable, ignores empty lines, and shows a non-blocking validation hint below the field for each non-empty line that does not resolve to a valid file or directory.
+
+Covers:
+- `scn~show-per-line-validation-for-additional-trace-paths~1`
+
+Needs: impl, itest
+
 ### Reject Trace Project without Valid Project Path
 `dsn~reject-trace-project-without-valid-project-path~2`
 
