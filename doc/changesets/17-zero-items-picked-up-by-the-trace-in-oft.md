@@ -70,3 +70,36 @@ The likely fault line is the OpenFastTrace library's use of `ServiceLoader` for 
 
 - [ ] Raise the version to 0.2.1 (this is a bugfix release)
 - [ ] Write the changelog entry for 0.2.1
+
+## Lessons Learned
+
+### Regression Origin
+
+On the visible `main` branch history, the regression was introduced in commit `a3e909c` (`Feature/12 run oft trace from the plugin (#15)`), which added `OftTraceService`.
+
+That commit already contained the faulty class-loader handoff:
+
+- it read the current thread context class loader into `previousClassLoader`
+- it then called `currentThread.setContextClassLoader(previousClassLoader)`
+
+So the code never actually switched to the plugin class loader before calling OpenFastTrace. In the IntelliJ runtime this breaks OFT importer and reporter discovery because OFT uses Java `ServiceLoader` against the thread context class loader.
+
+### Why Existing Tests Missed It
+
+The tests added in `a3e909c` exercised trace behavior only under the default JUnit/Gradle test runtime. In that environment the active thread context class loader already exposed the OFT service registrations, so tracing still imported items and the bug stayed hidden.
+
+The tests at that time also focused on:
+
+- success vs. failure result status
+- output-window text rendering
+- defect-count preservation
+- error handling
+
+They did not simulate the IntelliJ-specific class-loader boundary by replacing the thread context class loader with a foreign loader that lacks OFT service registrations.
+
+### Preventive Takeaway
+
+For integrations that depend on `ServiceLoader`, reflection, or other class-loader-sensitive discovery mechanisms, unit tests must include at least one hostile-runtime case that runs under a deliberately unsuitable thread context class loader and verifies both:
+
+- the functional outcome still works
+- the previous thread context class loader is restored afterward
