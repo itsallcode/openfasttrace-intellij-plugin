@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Imported from openfasttrace-ide-templates/jetbrains_ide_live_templates/oft_live_templates.xml
+  and maintained locally for plugin packaging.
+  GH-22 adds the missing scn template and keeps the rest close to the imported set.
+-->
+<!-- [impl->dsn~insert-oft-scenario-live-template~1] -->
+<templateSet group="OpenFastTrace">
+  <template
+      name="arch"
+      value="$HEADER_LEVEL$ $TITLE$&#10;`arch~$NAME$~1`&#10;&#10;$DESCRIPTION$&#10;&#10;COMMENT:&#10;&#10;$COMMENT$&#10;&#10;Covers:&#10;&#10;* `$COVERED$`&#10;&#10;Needs: dsn&#10;&#10;$END$"
+      description="OFT Architectural Requirement"
+      toReformat="false"
+      toShortenFQNames="true">
+    <variable name="HEADER_LEVEL" expression="enum(&quot;###&quot;, &quot;####&quot;, &quot;#####&quot;, &quot;######&quot;, &quot;##&quot;)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="TITLE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="DESCRIPTION" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="COMMENT" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="COVERED" expression="" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="OTHER" value="true"/>
+    </context>
+  </template>
+  <template
+      name="bconstr"
+      value="$HEADER_LEVEL$ $TITLE$&#10;`bconstr~$NAME$~1`&#10;&#10;$DESCRIPTION$&#10;&#10;Rationale:&#10;&#10;$RATIONALE$&#10;&#10;Needs: req&#10;&#10;$END$&#10;"
+      description="OFT Business Constraint"
+      toReformat="false"
+      toShortenFQNames="true">
+    <variable name="HEADER_LEVEL" expression="enum(&quot;##&quot;, &quot;###&quot;, &quot;####&quot;, &quot;#####&quot;, &quot;######&quot;)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="TITLE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="DESCRIPTION" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="RATIONALE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="OTHER" value="true"/>
+    </context>
+  </template>
+  <template
+      name="constr"
+      value="$HEADER_LEVEL$ $TITLE$&#10;`constr~$NAME$~1`&#10;&#10;$DESCRIPTION$&#10;&#10;Rationale:&#10;&#10;$RATIONALE$&#10;&#10;Needs: dsn&#10;&#10;$END$&#10;"
+      description="OFT Technical Constraint"
+      toReformat="false"
+      toShortenFQNames="true">
+    <variable name="HEADER_LEVEL" expression="enum(&quot;###&quot;, &quot;####&quot;, &quot;#####&quot;, &quot;######&quot;, &quot;##&quot;)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="TITLE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="DESCRIPTION" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="RATIONALE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="OTHER" value="true"/>
+    </context>
+  </template>
+  <template
+      name="dsn"
+      value="$HEADER_LEVEL$ $TITLE$&#10;`dsn~$NAME$~1`&#10;&#10;$DESCRIPTION$&#10;&#10;Covers:&#10;&#10;* `$COVERED$`&#10;&#10;Needs: impl, $TEST_TYPE$&#10;&#10;$END$"
+      description="OFT Design"
+      toReformat="false"
+      toShortenFQNames="true">
+    <variable name="HEADER_LEVEL" expression="enum(&quot;###&quot;, &quot;####&quot;, &quot;#####&quot;, &quot;######&quot;, &quot;##&quot;)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="TITLE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="DESCRIPTION" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="COVERED" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="TEST_TYPE" expression="enum(&quot;utest&quot;, &quot;itest&quot;, &quot;stest&quot;)" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="OTHER" value="true"/>
+    </context>
+  </template>
+  <template
+      name="feat"
+      value="$HEADER_LEVEL$ $TITLE$&#10;`feat~$NAME$~1`&#10;&#10;$DESCRIPTION$&#10;&#10;Rationale:&#10;&#10;$RATIONALE$&#10;&#10;Needs: req&#10;&#10;$END$&#10;"
+      description="OFT Feature"
+      toReformat="false"
+      toShortenFQNames="true">
+    <variable name="HEADER_LEVEL" expression="enum(&quot;##&quot;, &quot;###&quot;, &quot;####&quot;, &quot;#####&quot;, &quot;######&quot;)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="TITLE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="DESCRIPTION" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="RATIONALE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="OTHER" value="true"/>
+    </context>
+  </template>
+  <template
+      name="qg"
+      value="$HEADER_LEVEL$ $TITLE$&#10;`qg~$NAME$~1`&#10;&#10;$DESCRIPTION$&#10;&#10;Rationale:&#10;&#10;$RATIONALE$&#10;&#10;Needs: qs&#10;&#10;$END$"
+      description="OFT Quality Goal"
+      toReformat="false"
+      toShortenFQNames="true">
+    <variable name="HEADER_LEVEL" expression="enum(&quot;##&quot;, &quot;###&quot;, &quot;####&quot;, &quot;#####&quot;, &quot;######&quot;)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="TITLE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="DESCRIPTION" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="RATIONALE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="OTHER" value="true"/>
+    </context>
+  </template>
+  <template
+      name="qs"
+      value="$HEADER_LEVEL$ $TITLE$&#10;`qs~$NAME$~1`&#10;&#10;$DESCRIPTION$&#10;&#10;Covers:&#10;&#10;* `$COVERED$`&#10;&#10;Needs: dsn, $TEST_TYPE$&#10;&#10;$END$"
+      description="OFT Quality Scenario"
+      toReformat="false"
+      toShortenFQNames="true">
+    <variable name="HEADER_LEVEL" expression="enum(&quot;###&quot;, &quot;####&quot;, &quot;#####&quot;, &quot;######&quot;, &quot;##&quot;)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="TITLE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="DESCRIPTION" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="COVERED" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="TEST_TYPE" expression="enum(&quot;utest&quot;, &quot;itest&quot;, &quot;stest&quot;)" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="OTHER" value="true"/>
+    </context>
+  </template>
+  <template
+      name="req"
+      value="$HEADER_LEVEL$ $TITLE$&#10;`req~$NAME$~1`&#10;&#10;$DESCRIPTION$&#10;&#10;Covers:&#10;&#10;* [`$COVERED$`](#$MARKDOWN_LINK$)&#10;&#10;Needs: req&#10;&#10;$END$"
+      description="OFT High-Level Requirement"
+      toReformat="false"
+      toShortenFQNames="true">
+    <variable name="HEADER_LEVEL" expression="enum(&quot;###&quot;, &quot;####&quot;, &quot;#####&quot;, &quot;######&quot;, &quot;##&quot;)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="TITLE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="DESCRIPTION" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="COVERED" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="MARKDOWN_LINK" expression="" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="OTHER" value="true"/>
+    </context>
+  </template>
+  <template
+      name="scn"
+      value="$HEADER_LEVEL$ $TITLE$&#10;`scn~$NAME$~1`&#10;&#10;**Given** $GIVEN$&#10;**When** $WHEN$&#10;**Then** $THEN$&#10;&#10;Covers:&#10;- `$COVERED$`&#10;&#10;Needs: dsn&#10;&#10;$END$"
+      description="OFT Scenario"
+      toReformat="false"
+      toShortenFQNames="true">
+    <variable name="HEADER_LEVEL" expression="enum(&quot;###&quot;, &quot;####&quot;, &quot;#####&quot;, &quot;######&quot;, &quot;##&quot;)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="TITLE" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
+    <variable name="GIVEN" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="WHEN" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="THEN" expression="" defaultValue="" alwaysStopAt="true"/>
+    <variable name="COVERED" expression="" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="OTHER" value="true"/>
+    </context>
+  </template>
+</templateSet>

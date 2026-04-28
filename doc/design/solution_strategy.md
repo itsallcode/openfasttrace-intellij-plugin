@@ -20,6 +20,8 @@ Specification item declarations are exposed through the IDE symbol and navigatio
 
 Parsing and syntax-aware editor behavior use the IntelliJ parsing, PSI, lexer, and highlighting infrastructure. The plugin builds only the OpenFastTrace-specific parts that are missing and reuses the existing editor, indexing, and navigation services for the rest.
 
+Authoring shortcuts use IntelliJ's live-template infrastructure instead of custom OpenFastTrace-specific insertion dialogs or wizards. The plugin bundles a repository-owned OFT live-template XML file, registers it through the standard live-template extension point, and keeps template behavior within the declarative capabilities that IntelliJ already provides by default.
+
 This strategy reduces custom code, lowers maintenance effort, and improves cross-IDE compatibility because the implementation stays aligned with the platform abstractions that JetBrains supports across products.
 
 ## OFT Specification Item Index
