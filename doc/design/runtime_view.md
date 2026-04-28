@@ -281,19 +281,79 @@ Needs: impl, itest
 
 **Given** an IntelliJ project is open and its base directory resolves to a valid local file-system path
 **When** a user invokes `Tools | OpenFastTrace | Trace Project`
-**Then** the trace-action component starts a background task, the trace-execution service invokes the OpenFastTrace library for that project path, and the IDE keeps the editor UI responsive while showing progress for the running trace.
+**Then** the trace-action component starts a background task, the trace-configuration component resolves the effective OpenFastTrace inputs for the project, the trace-execution service invokes the OpenFastTrace library for those inputs, and the IDE keeps the editor UI responsive while showing progress for the running trace.
 
 Covers:
 - `scn~run-trace-project-in-background~1`
 
 Needs: impl, itest
 
+### Configure Trace Scope in Project Settings
+`dsn~configure-trace-scope-in-project-settings~1`
+
+**Given** an IntelliJ project is open
+**When** a user opens the OpenFastTrace project settings
+**Then** the trace-configuration component loads the persisted trace-scope mode and lets the user switch between whole-project tracing and selected-resource tracing for that project.
+
+Covers:
+- `scn~configure-trace-scope-in-project-settings~1`
+
+Needs: impl, itest
+
+### Trace Selected Project Resources
+`dsn~trace-selected-project-resources~1`
+
+**Given** an IntelliJ project is open and OpenFastTrace project settings are configured for selected-resource tracing
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the trace-configuration component resolves only the configured source roots, test roots, and additional project-relative paths and the trace-execution service passes only those inputs to OpenFastTrace.
+
+Covers:
+- `scn~trace-selected-project-resources~1`
+
+Needs: impl, itest
+
+### Include IntelliJ Source Directories in Selected-Resource Trace
+`dsn~include-intellij-source-directories-in-selected-resource-trace~1`
+
+**Given** selected-resource tracing is active and the source-directory option is enabled
+**When** the trace-configuration component resolves the effective OpenFastTrace inputs for the opened IntelliJ project
+**Then** it includes the project source roots known to IntelliJ in that input set.
+
+Covers:
+- `scn~include-intellij-source-directories-in-selected-resource-trace~1`
+
+Needs: impl, itest
+
+### Include IntelliJ Test Directories in Selected-Resource Trace
+`dsn~include-intellij-test-directories-in-selected-resource-trace~1`
+
+**Given** selected-resource tracing is active and the test-directory option is enabled
+**When** the trace-configuration component resolves the effective OpenFastTrace inputs for the opened IntelliJ project
+**Then** it includes the project test roots known to IntelliJ in that input set.
+
+Covers:
+- `scn~include-intellij-test-directories-in-selected-resource-trace~1`
+
+Needs: impl, itest
+
+### Add Project-Relative Paths to Selected-Resource Trace
+`dsn~add-project-relative-paths-to-selected-resource-trace~1`
+
+**Given** selected-resource tracing is active and the OpenFastTrace project settings contain additional project-relative paths
+**When** the trace-configuration component resolves the effective OpenFastTrace inputs for the opened project
+**Then** it resolves those paths against the project directory, keeps the valid files and directories as trace inputs, and rejects invalid configured paths before the trace starts.
+
+Covers:
+- `scn~add-project-relative-paths-to-selected-resource-trace~1`
+
+Needs: impl, itest
+
 ### Reject Trace Project without Valid Project Path
-`dsn~reject-trace-project-without-valid-project-path~1`
+`dsn~reject-trace-project-without-valid-project-path~2`
 
 **Given** an IntelliJ project is open but its base directory is missing, invalid, or not usable as a local OpenFastTrace input path
 **When** a user invokes `Tools | OpenFastTrace | Trace Project`
-**Then** the trace-action flow stops before starting the background trace run and reports the invalid project-path condition through the IDE-visible, trace flow.
+**Then** the trace-action flow stops before starting the background trace run and reports the invalid project-path or configured-input condition through the IDE-visible trace flow.
 
 Covers:
 - `scn~reject-trace-project-without-valid-project-path~1`
@@ -321,6 +381,18 @@ Needs: impl, itest
 
 Covers:
 - `scn~show-scanned-base-directory-in-trace-output-window~1`
+
+Needs: impl, itest
+
+### Show Resolved Trace Inputs in Trace Output Window
+`dsn~show-resolved-trace-inputs-in-trace-output-window~1`
+
+**Given** a user starts a selected-resource trace and the plugin has resolved the files and directories that it will pass to OpenFastTrace
+**When** the trace-execution service prepares the plain-text trace output for the IDE output sub-window
+**Then** it lists those resolved trace inputs before the OpenFastTrace report body so the output window shows the actual configured scan scope.
+
+Covers:
+- `scn~show-resolved-trace-inputs-in-trace-output-window~1`
 
 Needs: impl, itest
 

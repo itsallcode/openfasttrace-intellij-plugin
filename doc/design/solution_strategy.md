@@ -55,6 +55,8 @@ The next increment extends that editor support with in-process OpenFastTrace tra
 
 This phased approach keeps the initial editor support small while still allowing the product to grow into project-level validation. It also limits the first tracing increment to established IDE concepts such as actions, progress indicators, and plain text output before the plugin invests in richer report interpretation such as Problems-view integration.
 
+The trace-path configuration increment keeps that action-centric workflow but moves trace input selection into project-scoped settings. The plugin resolves either the whole project directory or a whitelist-style input set assembled from IntelliJ source roots, IntelliJ test roots, and additional project-relative paths. This matches OpenFastTrace's input model while keeping trace configuration reproducible for a project instead of relying on ad-hoc per-run path selection.
+
 ## ANSI-Colored Trace Output
 
 The trace-output increment keeps OpenFastTrace responsible for generating terminal-colored plain-text reports and uses IntelliJ Platform APIs only for presentation inside the IDE.
