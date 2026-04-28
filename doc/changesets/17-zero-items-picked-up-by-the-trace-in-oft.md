@@ -60,16 +60,16 @@ The likely fault line is the OpenFastTrace library's use of `ServiceLoader` for 
 - [x] Keep existing trace-service and trace-background tests green after the class-loader fix
 - [x] Add or update tests so successful tracing proves that real specification items and coverage tags are imported and linked under plugin-like class-loader conditions
 - [x] Keep the OpenFastTrace trace clean for the requirement and design artifacts in scope
-- [ ] Keep path coverage at or above the documented threshold
+- [x] Keep path coverage at or above the documented threshold
 - [x] Keep dependency policy unchanged and avoid adding new third-party libraries
-- [ ] Keep plugin verification and packaging checks green through the standard Gradle verification flow
-- [ ] Keep SonarQube Cloud quality-gate checks green
-- [ ] Keep OSS Index audit results clean
+- [x] Keep plugin verification and packaging checks green through the standard Gradle verification flow
+- [x] Keep SonarQube Cloud quality-gate checks green
+- [x] Keep OSS Index audit results clean
 
 ## Version and Changelog Update
 
-- [ ] Raise the version to 0.2.1 (this is a bugfix release)
-- [ ] Write the changelog entry for 0.2.1
+- [x] Raise the version to 0.2.1 (this is a bugfix release)
+- [x] Write the changelog entry for 0.2.1
 
 ## Lessons Learned
 
