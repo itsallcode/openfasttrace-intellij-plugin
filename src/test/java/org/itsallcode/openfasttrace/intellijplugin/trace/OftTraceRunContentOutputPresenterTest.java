@@ -2,6 +2,7 @@ package org.itsallcode.openfasttrace.intellijplugin.trace;
 
 import com.intellij.execution.impl.ConsoleViewImpl;
 import com.intellij.execution.filters.HyperlinkInfo;
+import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.TextEditor;
@@ -173,6 +174,27 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
         } finally {
             disposeConsole(consoleRef.get());
         }
+    }
+
+    public void testGivenTraceOutputWhenPresentedThenRunContentDescriptorGetsAnId() {
+        final AtomicReference<RunContentDescriptor> descriptorRef = new AtomicReference<>();
+        final OftTraceRunContentOutputPresenter presenter = new OftTraceRunContentOutputPresenter(
+                OftTraceRunContentOutputPresenter::createTraceConsole,
+                (project, descriptor) -> {
+                    descriptorRef.set(descriptor);
+                    Disposer.dispose(descriptor);
+                }
+        );
+
+        EdtTestUtil.runInEdtAndWait(() -> presenter.show(
+                getProject(),
+                "OpenFastTrace Trace: descriptor-id",
+                OftTraceResult.success("ok" + System.lineSeparator())
+        ));
+
+        assertThat(descriptorRef.get(), notNullValue());
+        assertThat(descriptorRef.get().getId(), notNullValue());
+        assertThat(descriptorRef.get().getId().getUid(), Matchers.greaterThan(0));
     }
 
     private String readConsoleText(final ConsoleViewImpl console) {

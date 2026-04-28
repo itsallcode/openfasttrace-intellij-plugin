@@ -1,5 +1,6 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
+import com.intellij.execution.RunContentDescriptorId;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.impl.ConsoleViewImpl;
 import com.intellij.execution.ui.ConsoleView;
@@ -10,11 +11,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 final class OftTraceRunContentOutputPresenter implements OftTraceOutputPresenter {
     public static final String IDEA_CYCLE_BUFFER_SIZE = "idea.cycle.buffer.size";
+    private static final AtomicInteger NEXT_DESCRIPTOR_ID = new AtomicInteger(1);
     private final Function<Project, ConsoleView> consoleFactory;
     private final BiConsumer<Project, RunContentDescriptor> runContentShower;
     private final OftAnsiConsoleOutput ansiConsoleOutput = new OftAnsiConsoleOutput();
@@ -48,6 +51,7 @@ final class OftTraceRunContentOutputPresenter implements OftTraceOutputPresenter
         }
         final RunContentDescriptor descriptor =
                 new RunContentDescriptor(console, null, console.getComponent(), contentTitle);
+        descriptor.setId(new OftRunContentDescriptorId(NEXT_DESCRIPTOR_ID.getAndIncrement()));
         Disposer.register(descriptor, console);
         runContentShower.accept(project, descriptor);
     }
@@ -77,6 +81,13 @@ final class OftTraceRunContentOutputPresenter implements OftTraceOutputPresenter
             System.clearProperty(IDEA_CYCLE_BUFFER_SIZE);
         } else {
             System.setProperty(IDEA_CYCLE_BUFFER_SIZE, previousBufferSize);
+        }
+    }
+
+    private record OftRunContentDescriptorId(int uid) implements RunContentDescriptorId {
+        @Override
+        public int getUid() {
+            return uid;
         }
     }
 }
