@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 final class OftTraceService {
+    private static final ClassLoader PLUGIN_CLASS_LOADER = OftTraceService.class.getClassLoader();
+
     private final Oft oft;
     private final OftTraceReportRenderer reportRenderer;
 
@@ -92,11 +94,8 @@ final class OftTraceService {
     private static <T> T runWithPluginClassLoader(final Callable<T> action) {
         final Thread currentThread = Thread.currentThread();
         final ClassLoader previousClassLoader = currentThread.getContextClassLoader();
-        if (previousClassLoader == null) {
-            return callUnchecked(action);
-        }
         // OFT discovers importer and reporter plugins via ServiceLoader on the thread context class loader.
-        currentThread.setContextClassLoader(previousClassLoader);
+        currentThread.setContextClassLoader(PLUGIN_CLASS_LOADER);
         try {
             return callUnchecked(action);
         } finally {

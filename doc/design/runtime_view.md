@@ -304,7 +304,7 @@ Needs: impl, itest
 `dsn~show-successful-trace-output-in-ide-output-window~1`
 
 **Given** a background OpenFastTrace trace run completes successfully for the opened IntelliJ project
-**When** the trace-execution service finishes and hands the captured text report to trace-output presentation
+**When** the trace-execution service temporarily switches the thread context class loader to the plugin class loader for OFT importer and reporter discovery, restores the previous context loader afterward, and hands the captured text report to trace-output presentation
 **Then** the plugin opens or updates an IDE output sub-window for that trace run and shows the OpenFastTrace text output under a clear trace-specific content title.
 
 Covers:
