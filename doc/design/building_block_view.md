@@ -35,6 +35,7 @@ package "OpenFastTrace Plugin" {
   component "Coverage Tag\nSupport" as CoverageSupport
   component "Specification Item\nIndex" as SpecIndex
   component "Specification Item\nNavigation" as NavigationSupport
+  component "Specification Item\nCompletion" as CompletionSupport
   component "Live Template\nIntegration" as LiveTemplateSupport
   component "Trace Configuration\nIntegration" as TraceConfigurationSupport
   component "Trace Action\nIntegration" as TraceActionSupport
@@ -56,6 +57,8 @@ RstSupport --> IdeEditor
 CoverageSupport --> IdeEditor
 SpecIndex --> IdeEditor
 NavigationSupport --> IdeNavigation
+CompletionSupport --> SpecIndex
+CompletionSupport --> IdeEditor
 LiveTemplateSupport --> IdeLiveTemplates
 LiveTemplateSupport --> IdeEditor
 TraceConfigurationSupport --> IdeActions
@@ -170,6 +173,16 @@ Covers:
 - `scn~open-specification-item-from-coverage-tag-right-side~1`
 
 Needs: impl
+
+### Specification Item Completion
+`dsn~specification-item-completion~1`
+
+The plugin provides a specification-item completion component that activates IntelliJ basic completion only for OFT item references under `Covers:` in supported specification documents, reads declared specification item IDs from the project-local declaration index, and presents those IDs in a deterministic order based on full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches.
+
+Covers:
+- `scn~complete-specification-item-id-in-covers-section~1`
+
+Needs: impl, utest
 
 ### User Guide Integration
 `dsn~user-guide-integration~1`

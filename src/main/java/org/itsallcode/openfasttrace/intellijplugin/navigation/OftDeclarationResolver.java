@@ -300,6 +300,22 @@ final class OftDeclarationResolver {
         return List.copyOf(matches);
     }
 
+    static boolean isInsideCoversSection(final CharSequence text, final int offset) {
+        final int boundedOffset = Math.clamp(offset, 0, text.length());
+        int lineStart = 0;
+        boolean insideCoversSection = false;
+        while (lineStart <= text.length()) {
+            final int lineEnd = findLineEnd(text, lineStart);
+            final CharSequence line = text.subSequence(lineStart, lineEnd);
+            insideCoversSection = updateSectionState(line, insideCoversSection);
+            if (boundedOffset <= lineEnd) {
+                return insideCoversSection;
+            }
+            lineStart = lineEnd + 1;
+        }
+        return false;
+    }
+
     private static int findLineEnd(final CharSequence text, final int lineStart) {
         int lineEnd = lineStart;
         while (lineEnd < text.length() && text.charAt(lineEnd) != '\n') {
