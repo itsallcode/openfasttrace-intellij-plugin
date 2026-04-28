@@ -46,6 +46,7 @@ Use an IntelliJ Platform IDE and install/build this plugin to get OFT support wh
 The plugin currently focuses on:
 * syntax highlighting for OFT items in supported files
 * navigation support (`Go To Declaration`, symbol search, and related navigation paths)
+* bundled OFT live templates for common specification items, including a scenario template
 * project-wide or selected-resource OFT tracing from `Tools | OpenFastTrace | Trace Project`
 * clickable specification item IDs directly from the trace output window, including generated IDs created from coverage tags
 * quick access to the OpenFastTrace user guide from the IDE help menu
@@ -70,6 +71,8 @@ For manual IDE testing, launch a sandbox IDE with the plugin:
 After the sandbox IDE opens a project, configure trace scope under `Settings | Tools | OpenFastTrace`. By default, `Trace Project` scans the whole opened project. If you switch to selected-resource tracing, the plugin includes IntelliJ source roots, IntelliJ test roots, and one default additional project-relative path entry, `doc/`, until you change it. Additional files or directories are entered one per line.
 
 Run an OFT trace from `Tools | OpenFastTrace | Trace Project` or use the default shortcut `Ctrl+Alt+Shift+O`. The plugin traces the configured inputs in the background and shows the plain text result in an IDE output tab with ANSI colors preserved. You can click specification item IDs in the report to jump to their declarations, including source-side items generated from coverage tags.
+
+The plugin also bundles an `OpenFastTrace` live-template group under `Settings | Editor | Live Templates`. Use abbreviations such as `feat`, `req`, `dsn`, and `scn` in a supported editing context, then press `Tab` to insert an OFT item skeleton. The `scn` template inserts a scenario stub with placeholders for `Given`, `When`, `Then`, and the covered requirement.
 
 ## Installation
 ### Runtime Dependencies

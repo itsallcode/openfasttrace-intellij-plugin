@@ -6,6 +6,9 @@
     ]]></description>
 
     <extensions defaultExtensionNs="com.intellij">
+        <!-- [impl->dsn~live-template-integration~1] -->
+        <!-- [impl->dsn~show-oft-live-templates-in-live-template-settings~1] -->
+        <defaultLiveTemplates file="/liveTemplates/OpenFastTrace.xml"/>
         <fileBasedIndex implementation="org.itsallcode.openfasttrace.intellijplugin.indexing.OftSpecificationIndex"/>
         <gotoSymbolContributor implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftChooseByNameContributor"/>
         <gotoDeclarationHandler implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftGotoDeclarationHandler"/>

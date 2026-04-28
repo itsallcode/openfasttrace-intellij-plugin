@@ -11,6 +11,7 @@ skinparam componentStyle rectangle
 package "JetBrains IDE / IntelliJ Platform" {
   component "Editor and PSI\nInfrastructure" as IdeEditor
   component "Symbol Search and\nNavigation Infrastructure" as IdeNavigation
+  component "Live Template\nInfrastructure" as IdeLiveTemplates
   component "Action System" as IdeActions
   component "Background Task and\nProgress Infrastructure" as IdeTasks
   component "Output View and\nRun Content Infrastructure" as IdeOutput
@@ -34,6 +35,7 @@ package "OpenFastTrace Plugin" {
   component "Coverage Tag\nSupport" as CoverageSupport
   component "Specification Item\nIndex" as SpecIndex
   component "Specification Item\nNavigation" as NavigationSupport
+  component "Live Template\nIntegration" as LiveTemplateSupport
   component "Trace Configuration\nIntegration" as TraceConfigurationSupport
   component "Trace Action\nIntegration" as TraceActionSupport
   component "Trace Execution\nService" as TraceExecutionSupport
@@ -54,6 +56,8 @@ RstSupport --> IdeEditor
 CoverageSupport --> IdeEditor
 SpecIndex --> IdeEditor
 NavigationSupport --> IdeNavigation
+LiveTemplateSupport --> IdeLiveTemplates
+LiveTemplateSupport --> IdeEditor
 TraceConfigurationSupport --> IdeActions
 TraceActionSupport --> IdeActions
 TraceExecutionSupport --> IdeTasks
@@ -175,6 +179,17 @@ The plugin contributes an OpenFastTrace user guide action to the IDE Help menu a
 Covers:
 - `scn~show-oft-user-guide-in-help-menu~1`
 - `scn~open-oft-user-guide-in-integrated-web-view~1`
+
+Needs: impl
+
+### Live Template Integration
+`dsn~live-template-integration~1`
+
+The plugin provides a live-template integration component that packages a repository-owned OpenFastTrace live-template XML resource, registers that resource with IntelliJ's default live-template extension point, and keeps the bundled template set aligned with the imported upstream OFT templates plus the plugin-local scenario template.
+
+Covers:
+- `scn~show-oft-live-templates-in-live-template-settings~1`
+- `scn~insert-oft-scenario-live-template~1`
 
 Needs: impl
 

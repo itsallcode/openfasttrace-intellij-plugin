@@ -250,6 +250,32 @@ Covers:
 
 Needs: impl, itest
 
+## Live Templates
+
+### Show OFT Live Templates in Live Template Settings
+`dsn~show-oft-live-templates-in-live-template-settings~1`
+
+**Given** the plugin is loaded into the IDE
+**When** IntelliJ loads the plugin's default live-template resources and a user opens the live-template settings
+**Then** the IDE shows an `OpenFastTrace` live-template group contributed from the plugin resources.
+
+Covers:
+- `scn~show-oft-live-templates-in-live-template-settings~1`
+
+Needs: impl, itest
+
+### Insert OFT Scenario Live Template
+`dsn~insert-oft-scenario-live-template~1`
+
+**Given** the bundled OpenFastTrace live-template group is available in a supported editing context
+**When** a user expands the `scn` live template
+**Then** IntelliJ inserts the scenario template text from the bundled plugin resource and lets the user tab through the placeholders for the title, item name, `Given`, `When`, `Then`, and covered requirement.
+
+Covers:
+- `scn~insert-oft-scenario-live-template~1`
+
+Needs: impl, itest
+
 ## Trace Project
 
 ### Show Trace Project Action in Tools Menu

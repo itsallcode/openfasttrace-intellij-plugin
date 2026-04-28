@@ -91,6 +91,13 @@ The plugin lets users open the OpenFastTrace user guide from within the IDE. Use
 
 Needs: req
 
+### OFT Live Templates
+`feat~oft-live-templates~1`
+
+The plugin bundles OpenFastTrace live templates for common specification items. Users can insert OFT item skeletons directly in the IDE instead of copying and adapting existing text manually.
+
+Needs: req
+
 ### Run OFT Trace
 `feat~run-oft-trace~1`
 
@@ -247,6 +254,30 @@ The plugin opens the OpenFastTrace user guide from GitHub in an integrated web v
 
 Covers:
 - `feat~open-oft-user-guide~1`
+
+Needs: scn
+
+### OFT Live Templates
+
+The following requirements refine the OFT live-template feature into user-visible capabilities.
+
+### Bundle OFT Live Templates
+`req~bundle-oft-live-templates~1`
+
+The plugin bundles an OpenFastTrace live-template group into the IDE installation. Users can access OFT live templates without importing template files manually.
+
+Covers:
+- `feat~oft-live-templates~1`
+
+Needs: scn
+
+### Provide OFT Scenario Live Template
+`req~provide-oft-scenario-live-template~1`
+
+The bundled OpenFastTrace live-template group includes a scenario template for `scn` items. Users can insert a scenario skeleton with placeholders for the scenario title, item name, given-when-then text, and covered requirement.
+
+Covers:
+- `feat~oft-live-templates~1`
 
 Needs: scn
 
@@ -670,6 +701,34 @@ Needs: dsn
 
 Covers:
 - `req~open-oft-user-guide-in-integrated-web-view~1`
+
+Needs: dsn
+
+### OFT Live Templates
+
+The following scenarios describe how bundled OFT live templates become available and how the scenario template is inserted.
+
+### Show OFT Live Templates in Live Template Settings
+`scn~show-oft-live-templates-in-live-template-settings~1`
+
+**Given** the OpenFastTrace plugin is installed in the IDE
+**When** a user opens the IDE live-template settings
+**Then** the settings contain an `OpenFastTrace` live-template group with the bundled OFT templates
+
+Covers:
+- `req~bundle-oft-live-templates~1`
+
+Needs: dsn
+
+### Insert OFT Scenario Live Template
+`scn~insert-oft-scenario-live-template~1`
+
+**Given** the OpenFastTrace plugin is installed and a user edits an OFT specification document in a live-template context
+**When** the user expands the `scn` live template
+**Then** the IDE inserts an OFT scenario skeleton with placeholders for the title, item name, `Given`, `When`, `Then`, and covered requirement
+
+Covers:
+- `req~provide-oft-scenario-live-template~1`
 
 Needs: dsn
 
