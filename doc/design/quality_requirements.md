@@ -23,16 +23,16 @@ Runtime design requirements `dsn` can only cover on scenario at a time `scn`. Yo
 
 ## Code Quality
 
-1. Production code and test code follow clean-code principles as defined in the Clean Code book.
+1. Production code and test code follow clean-code principles.
 2. The implementation prefers speaking names over explanatory comments. Comments are only acceptable when intent cannot be expressed clearly in code.
 3. Abbreviations are only used where they are guaranteed common (meaning everyone knows them) otherwise all symbol names are written out.
-3. Methods avoid side effects where possible.
-4. Methods stay short and keep cyclomatic complexity low. When behavior grows beyond a small, readable unit, the design is refactored into smaller collaborating types or methods.
-5. When the cyclomatic complexity is too high, use extract method refactoring.
-6. APIs (not implementation) are documented with JavaDoc: interfaces, abstract classes, methods, parameters, return values, side effects (if any), purpose
-7. All objects that can be, are immutable.
-8. The implementation prefers static object allocation over dynamic allocation where possible.
-9. All method parameters are final. Output parameters are only allowed when they are used in external libraries.
+4. Methods avoid side effects where possible.
+5. Methods stay short and keep cyclomatic complexity low. When behavior grows beyond a small, readable unit, the design is refactored into smaller collaborating types or methods.
+6. When the cyclomatic complexity is too high, use extract method refactoring.
+7. APIs (not implementation) are documented with JavaDoc: interfaces, abstract classes, methods, parameters, return values, side effects (if any), purpose
+8. All objects that can be, are immutable.
+9. The implementation prefers static object allocation over dynamic allocation where possible.
+10. All method parameters are final. Output parameters are only allowed when they are used in external libraries.
 
 ### Test Code Guideline
 

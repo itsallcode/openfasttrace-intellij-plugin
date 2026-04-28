@@ -192,6 +192,8 @@ Needs: impl
 
 The plugin provides a trace-execution service that resolves the current project root as the default OpenFastTrace input, validates that path before starting work, invokes the OpenFastTrace library in a background task, supports cancellation through IntelliJ progress infrastructure, and captures the textual trace output together with the final success or failure status.
 
+Because OpenFastTrace discovers importers and reporters through Java `ServiceLoader`, this service executes OFT import and report-rendering calls with the plugin class loader as the thread context class loader and restores the previous context loader afterward.
+
 Covers:
 - `scn~run-trace-project-in-background~1`
 - `scn~reject-trace-project-without-valid-project-path~1`

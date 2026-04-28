@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.net.URLClassLoader;
 import java.util.regex.Pattern;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,6 +40,32 @@ class OftTraceServiceTest {
                 () -> assertThat(renderedOutput, Matchers.containsString("ok -")),
                 () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("not ok")))
         );
+    }
+
+    @Test
+    void testGivenForeignThreadContextClassLoaderWhenTracingThenItStillImportsProjectItems(
+            @TempDir final Path temporaryDirectory
+    )
+            throws IOException {
+        writeSuccessfulTraceProject(temporaryDirectory);
+        final Thread currentThread = Thread.currentThread();
+        final ClassLoader previousClassLoader = currentThread.getContextClassLoader();
+
+        try (URLClassLoader foreignClassLoader = new URLClassLoader(new java.net.URL[0], null)) {
+            currentThread.setContextClassLoader(foreignClassLoader);
+
+            final OftTraceResult result = new OftTraceService().traceProject(temporaryDirectory, OftTraceProgress.NONE);
+            final String renderedOutput = stripAnsi(result.output());
+
+            Assertions.assertAll(
+                    () -> assertThat(result.isSuccessful(), is(true)),
+                    () -> assertThat(renderedOutput, Matchers.containsString("ok - 3 total")),
+                    () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("ok - 0 total"))),
+                    () -> assertThat(currentThread.getContextClassLoader(), is(foreignClassLoader))
+            );
+        } finally {
+            currentThread.setContextClassLoader(previousClassLoader);
+        }
     }
 
     // [itest->dsn~show-failing-trace-output-in-ide-output-window~1]

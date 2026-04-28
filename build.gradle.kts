@@ -31,7 +31,6 @@ jacoco {
 
 sonar {
     properties {
-        property("sonar.projectKey", "org.itsallcode.openfasttrace:openfasttrace-intellij-plugin")
         property("sonar.organization", "itsallcode")
         property("sonar.host.url", "https://sonarcloud.io")
         property(
@@ -133,6 +132,8 @@ intellijPlatformTesting {
     }
 }
 
+val instrumentedMainClasses = layout.buildDirectory.dir("instrumented/instrumentCode")
+
 tasks {
     withType<JavaCompile>().configureEach {
         options.release = 21
@@ -157,6 +158,7 @@ tasks {
 
     jacocoTestReport {
         dependsOn(test)
+        classDirectories.setFrom(instrumentedMainClasses)
         reports {
             xml.required = true
             html.required = true
@@ -165,6 +167,7 @@ tasks {
 
     jacocoTestCoverageVerification {
         dependsOn(test)
+        classDirectories.setFrom(instrumentedMainClasses)
         violationRules {
             rule {
                 limit {

@@ -2,6 +2,8 @@ package org.itsallcode.openfasttrace.intellijplugin.trace;
 
 import com.intellij.testFramework.LightVirtualFile;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.lang.reflect.Method;
 
@@ -38,14 +40,17 @@ class OftTraceNavigationResolverParserTest {
         assertThat(recordComponent(tag, "sourceRevision"), is(7));
     }
 
-    @Test
-    void testGivenInvalidCoverageTagsWhenParsingThenItReturnsNull() throws ReflectiveOperationException {
-        assertThat(parseCoverageTag(coverageTag("1->dsn~target~1")), nullValue());
-        assertThat(parseCoverageTag(coverageTag("tst dsn~target~1")), nullValue());
-        assertThat(parseCoverageTag(coverageTag("tst->1")), nullValue());
-        assertThat(parseCoverageTag(coverageTag("tst->dsn~target~1 >> ")), nullValue());
-        assertThat(parseCoverageTag(coverageTag("tst->dsn~target~1 trailing")), nullValue());
-        assertThat(parseCoverageTag(coverageTag("tst~")), nullValue());
+    @ValueSource(strings = {
+            "1->dsn~target~1",
+            "tst dsn~target~1",
+            "tst->1",
+            "tst->dsn~target~1 >> ",
+            "tst->dsn~target~1 trailing",
+            "tst~"
+    })
+    @ParameterizedTest
+    void testGivenInvalidCoverageTagsWhenParsingThenItReturnsNull(final String tag) throws ReflectiveOperationException {
+        assertThat(parseCoverageTag(coverageTag(tag)), nullValue());
     }
 
     @Test
