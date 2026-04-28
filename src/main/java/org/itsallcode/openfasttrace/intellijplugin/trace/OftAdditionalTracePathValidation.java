@@ -70,7 +70,8 @@ final class OftAdditionalTracePathValidation {
         }
     }
 
-    private static void addValidationErrorMessage(final List<String> messages, final String line, final int lineNumber, final String validationError) {
+    private static void addValidationErrorMessage(final List<String> messages, final String line, final int lineNumber,
+                                                  final String validationError) {
         messages.add("Line " + lineNumber + ": '" + line + validationError);
     }
 }
