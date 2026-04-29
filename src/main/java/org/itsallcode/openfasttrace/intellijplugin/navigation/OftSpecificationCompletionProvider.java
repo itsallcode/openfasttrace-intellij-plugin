@@ -11,7 +11,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ProcessingContext;
 import org.itsallcode.openfasttrace.intellijplugin.OftSupportedFiles;
@@ -32,7 +31,6 @@ public final class OftSpecificationCompletionProvider extends CompletionContribu
                 @NotNull final ProcessingContext context,
                 @NotNull final CompletionResultSet result
         ) {
-            final PsiElement position = parameters.getPosition();
             final PsiFile originalFile = parameters.getOriginalFile();
             if (!OftSupportedFiles.isSpecificationFile(originalFile.getVirtualFile())) {
                 return;
@@ -43,14 +41,16 @@ public final class OftSpecificationCompletionProvider extends CompletionContribu
                 return;
             }
             final String prefix = specificationPrefixAt(fileText, offset);
-            final Project project = position.getProject();
+            final Project project = parameters.getPosition().getProject();
             final CompletionResultSet unrestrictedResult = result.withPrefixMatcher(new PlainPrefixMatcher(""));
             for (OftIndexedSpecification specification :
                     OftSpecificationCompletionSupport.findMatchingSpecifications(project, prefix)) {
                 final OftSpecificationCompletionSupport.MatchKind matchKind =
                         OftSpecificationCompletionSupport.matchKind(specification, prefix);
+                final LookupElementBuilder lookupElement = LookupElementBuilder.create(specification.id())
+                        .withTypeText(specification.artifactType(), true);
                 unrestrictedResult.addElement(PrioritizedLookupElement.withPriority(
-                        LookupElementBuilder.create(specification.id()).withTypeText(specification.artifactType(), true),
+                        lookupElement,
                         priorityOf(matchKind)
                 ));
             }
@@ -78,10 +78,14 @@ public final class OftSpecificationCompletionProvider extends CompletionContribu
 
         private static boolean isSpecificationCharacter(final char character) {
             return Character.isLetterOrDigit(character)
-                    || character == '~'
-                    || character == '.'
-                    || character == '_'
-                    || character == '-';
+                    || isSpecificationSeparator(character);
+        }
+
+        private static boolean isSpecificationSeparator(final char character) {
+            return switch (character) {
+                case '~', '.', '_', '-' -> true;
+                default -> false;
+            };
         }
     }
 }

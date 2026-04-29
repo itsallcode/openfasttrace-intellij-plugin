@@ -32,17 +32,17 @@ final class OftSpecificationCompletionSupport {
     static MatchKind matchKind(final OftIndexedSpecification specification, final String query) {
         final String normalizedQuery = query.toLowerCase(Locale.ROOT);
         final String normalizedId = specification.id().toLowerCase(Locale.ROOT);
-        final String normalizedName = specification.name().toLowerCase(Locale.ROOT);
-        final String normalizedArtifactType = specification.artifactType().toLowerCase(Locale.ROOT);
         if (normalizedId.startsWith(normalizedQuery)) {
             return MatchKind.FULL_ID_PREFIX;
         }
+        final String normalizedName = specification.name().toLowerCase(Locale.ROOT);
         if (normalizedName.startsWith(normalizedQuery)) {
             return MatchKind.NAME_PREFIX;
         }
         if (normalizedName.contains(normalizedQuery)) {
             return MatchKind.NAME_SUBSTRING;
         }
+        final String normalizedArtifactType = specification.artifactType().toLowerCase(Locale.ROOT);
         if (normalizedArtifactType.startsWith(normalizedQuery)) {
             return MatchKind.ARTIFACT_TYPE_PREFIX;
         }
