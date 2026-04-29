@@ -157,10 +157,14 @@ Out of scope:
 
 ## Task List
 
+- [ ] Create and checkout a new Git branch `<issue-type>/<issue-number>-<issue-title-lower-kebab-case>`
+
 ### Requirements And Design
 
-- [ ] <requirements update>
+- [ ] <system requirements update>
+- [ ] Stop and ask user for a review of the system requirements
 - [ ] <design update>
+- [ ] Stop and ask user for a review of the design
 
 ### Implementation
 
