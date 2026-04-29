@@ -22,6 +22,8 @@ Parsing and syntax-aware editor behavior use the IntelliJ parsing, PSI, lexer, a
 
 Authoring shortcuts use IntelliJ's live-template infrastructure instead of custom OpenFastTrace-specific insertion dialogs or wizards. The plugin bundles a repository-owned OFT live-template XML file, registers it through the standard live-template extension point, and keeps template behavior within the declarative capabilities that IntelliJ already provides by default.
 
+Reference authoring assistance for `Covers:` entries likewise reuses IntelliJ's standard completion infrastructure. The plugin activates completion only in supported specification documents and only for `Covers:` references, then fills the suggestion list from the existing declaration index instead of maintaining a second source of specification-item identities.
+
 This strategy reduces custom code, lowers maintenance effort, and improves cross-IDE compatibility because the implementation stays aligned with the platform abstractions that JetBrains supports across products.
 
 ## OFT Specification Item Index
@@ -47,7 +49,7 @@ This mapping also clarifies what the index stores. The symbol-facing index store
 
 For IntelliJ's search and navigation facilities, the declaration index is the source of truth for `Go to Symbol` and `Search Everywhere`. JetBrains documents [Go to Symbol](https://plugins.jetbrains.com/docs/intellij/go-to-class-and-go-to-symbol.html) as a contributor that feeds the IDE with names and matching `NavigationItem` instances, typically PSI elements. The plugin contributes declaration elements, not synthetic wrappers around arbitrary text matches and not coverage occurrences. This keeps symbol search aligned with the IDE expectation that a search result names something that is actually declared somewhere in the project.
 
-Coverage locations are still first-class data, but they belong in reference resolution and usage-style navigation. They are the places where the IDE should resolve from a usage to a declaration, and they are also the basis for `Go To Implementations` on a declared specification item.
+Coverage locations are still first-class data, but they belong in reference resolution and usage-style navigation. They are the places where the IDE should resolve from a usage to a declaration, and they are also the basis for `Go To Implementations` on a declared specification item. The same declaration index also feeds completion in `Covers:` sections, where the plugin ranks declared IDs by full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches in that order.
 
 ## Phased OFT Integration
 

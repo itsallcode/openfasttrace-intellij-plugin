@@ -14,6 +14,14 @@ public record OftIndexedSpecification(String artifactType, String name, int revi
         return artifactType + "~" + name + "~" + revision;
     }
 
+    public static OftIndexedSpecification fromId(final String id) {
+        final String[] parts = id.split("~", 3);
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Invalid specification ID: " + id);
+        }
+        return new OftIndexedSpecification(parts[0], parts[1], Integer.parseInt(parts[2]), 0);
+    }
+
     public boolean matches(final OftSpecificationItem item) {
         return artifactType.equals(item.artifactType())
                 && name.equals(item.name())

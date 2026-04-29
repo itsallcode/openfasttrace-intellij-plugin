@@ -224,6 +224,20 @@ Covers:
 
 Needs: impl, itest
 
+## Completion
+
+### Complete Specification Item ID in Covers Section
+`dsn~complete-specification-item-id-in-covers-section~1`
+
+**Given** a supported specification document contains a `Covers:` entry and the opened project already indexes declared OpenFastTrace specification items
+**When** a user invokes IntelliJ basic completion while editing an OFT item ID in that `Covers:` entry
+**Then** the completion component confirms that the caret is inside a `Covers:` reference, loads declared specification item IDs from the declaration index, ranks them by full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches, and shows the ordered suggestions in the standard IDE completion popup.
+
+Covers:
+- `scn~complete-specification-item-id-in-covers-section~1`
+
+Needs: impl, itest
+
 ## Help Action
 
 ### Show OFT User Guide in Help Menu

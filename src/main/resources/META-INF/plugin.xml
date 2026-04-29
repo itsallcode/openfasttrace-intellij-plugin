@@ -13,6 +13,12 @@
         <gotoSymbolContributor implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftChooseByNameContributor"/>
         <gotoDeclarationHandler implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftGotoDeclarationHandler"/>
         <definitionsScopedSearch implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftDefinitionsScopedSearch"/>
+        <completion.contributor
+                language="Markdown"
+                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
+        <completion.contributor
+                language="TEXT"
+                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
         <psi.referenceContributor
                 implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationReferenceContributor"/>
         <psi.referenceContributor

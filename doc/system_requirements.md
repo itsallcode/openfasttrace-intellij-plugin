@@ -98,6 +98,13 @@ The plugin bundles OpenFastTrace live templates for common specification items. 
 
 Needs: req
 
+### OFT Reference Completion
+`feat~oft-reference-completion~1`
+
+The plugin suggests existing OpenFastTrace specification item IDs while users fill `Covers:` entries in supported specification documents. Users can complete references from indexed declarations instead of memorizing or manually searching for IDs.
+
+Needs: req
+
 ### Run OFT Trace
 `feat~run-oft-trace~1`
 
@@ -278,6 +285,20 @@ The bundled OpenFastTrace live-template group includes a scenario template for `
 
 Covers:
 - `feat~oft-live-templates~1`
+
+Needs: scn
+
+### OFT Reference Completion
+
+The following requirements refine the OFT reference-completion feature into user-visible capabilities.
+
+### Complete Specification Item IDs in Covers Section
+`req~complete-specification-item-ids-in-covers-section~1`
+
+The plugin suggests existing OpenFastTrace specification item IDs when a user invokes completion while editing an OFT item ID under `Covers:` in a supported specification document. The suggestion list is ranked first by exact prefix match against the full ID, then by prefix match against the item name, then by substring match against the item name, and finally by prefix match against the artifact type.
+
+Covers:
+- `feat~oft-reference-completion~1`
 
 Needs: scn
 
@@ -673,6 +694,22 @@ Needs: dsn
 
 Covers:
 - `req~show-covering-occurrences-from-specification-item-declaration~1`
+
+Needs: dsn
+
+### OFT Reference Completion
+
+The following scenarios describe completion support while editing OFT references in `Covers:` sections.
+
+### Complete Specification Item ID in Covers Section
+`scn~complete-specification-item-id-in-covers-section~1`
+
+**Given** a project contains declared OpenFastTrace specification items and a user edits a `Covers:` entry in a supported specification document
+**When** the user types a partial specification item ID and invokes completion
+**Then** the IDE suggests existing declared specification item IDs from the project index and orders the suggestion list by full-ID prefix match, then name-prefix match, then name-substring match, and finally artifact-type prefix match
+
+Covers:
+- `req~complete-specification-item-ids-in-covers-section~1`
 
 Needs: dsn
 
