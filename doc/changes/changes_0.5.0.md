@@ -7,3 +7,7 @@ This feature release adds indexed auto-completion for OpenFastTrace specificatio
 ## Features
 
 * #24: Suggest declared specification item IDs in `Covers:` sections and rank matches by full-ID prefix, name-prefix, name-substring, and artifact-type prefix
+
+## Build
+
+* #27: Continue local and CI builds with a warning when OSS Index returns HTTP 429 because the configured plan quota may be exceeded

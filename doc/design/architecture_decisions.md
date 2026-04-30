@@ -51,6 +51,47 @@ Needs: bld
 
 Tags: Build, Gradle
 
+### How Does the Build Handle OSS Index Quota Limits?
+
+The project uses OSS Index dependency security scanning as a build breaker so vulnerable dependencies block integration. In April 2026 Sonatype introduced quotas on the OSS Index free plan. When that quota is exceeded, OSS Index returns HTTP 429 instead of vulnerability data.
+
+This decision is architecture-relevant because it impacts:
+
+* reliability of local and CI builds
+* trust in the dependency security gate
+* clarity when a build cannot obtain an OSS Index result
+
+We considered the following alternatives:
+
+1. Keep every OSS Index task failure fatal.
+
+   This preserves a strict gate, but an exceeded external quota would block development without revealing anything about the project's dependency security state.
+
+1. Disable OSS Index or make all audit failures non-fatal.
+
+   This would keep builds moving, but it would also remove the build-breaking protection for known vulnerable dependencies and ordinary audit failures.
+
+1. Treat only HTTP 429 as a documented warning exception.
+
+   This keeps vulnerability detection and ordinary audit failures fatal while letting builds continue when OSS Index does not provide results because the external quota was exceeded.
+
+#### OSS Index Audit Continues on HTTP 429
+`dsn~oss-index-audit-continues-on-http-429~1`
+
+The Gradle build keeps OSS Index dependency auditing as a build breaker for detected vulnerabilities and non-429 audit failures. When the OSS Index audit fails because the OSS Index service returns HTTP 429, the build logs a warning that the quota or plan may need checking and continues.
+
+Rationale:
+
+An HTTP 429 response indicates rate limiting or quota exhaustion, not that the scanned dependency set contains known vulnerabilities. Continuing in that case prevents the external plan quota from blocking local and CI development while still making the missing security result visible in the build log.
+
+Comment:
+
+The HTTP 429 exception does not apply to vulnerability findings, authentication failures, ordinary connection failures, malformed responses, or other OSS Index service errors.
+
+Needs: bld
+
+Tags: Build, Security, OSS Index
+
 ## Test Framework Decisions
 
 ### Which JUnit Baseline Does the Plugin Use?

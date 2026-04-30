@@ -59,7 +59,7 @@ Additional libraries are not allowed by default. Any new third-party dependency 
 
 Static code analysis runs in SonarQube Cloud and acts as a build breaker. A failing quality gate blocks integration until the reported issues are resolved or an approved exception exists.
 
-Dependency security scanning runs with OSS Index and acts as a build breaker. The build stays free of known vulnerable dependencies.
+Dependency security scanning runs with OSS Index and acts as a build breaker for detected vulnerabilities and ordinary audit failures. If OSS Index returns HTTP 429, the build logs a quota warning and continues because the audit result is unavailable for reasons outside the dependency set. The build stays free of known vulnerable dependencies.
 
 OpenFastTrace tracing runs as a build breaker for the specification artifacts in scope. The trace stays clean for the requirement and design artifact types used by the project.
 

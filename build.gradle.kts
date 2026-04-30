@@ -1,9 +1,13 @@
+import org.gradle.api.Action
+import org.gradle.api.Task
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+import org.itsallcode.openfasttrace.intellijplugin.build.OssIndexHttp429Failure
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.sonatype.gradle.plugins.scan.ossindex.OssIndexAuditTask
 
 // [bld->dsn~plugin-build-uses-intellij-platform-gradle-plugin~1]
 plugins {
@@ -46,6 +50,24 @@ val ossIndexUsername = providers.gradleProperty("ossIndexUsername")
 val ossIndexToken = providers.gradleProperty("ossIndexToken")
     .orElse(providers.environmentVariable("OSSINDEX_TOKEN"))
     .orNull
+
+fun Task.continueOnOssIndexHttp429() {
+    val auditActions = actions.toList()
+    val warningLogger = project.logger
+    actions = listOf(object : Action<Task> {
+        override fun execute(task: Task) {
+            try {
+                auditActions.forEach { it.execute(task) }
+            } catch (failure: RuntimeException) {
+                if (OssIndexHttp429Failure.matches(failure)) {
+                    warningLogger.warn(OssIndexHttp429Failure.WARNING_MESSAGE)
+                } else {
+                    throw failure
+                }
+            }
+        }
+    })
+}
 
 ossIndexAudit {
     ossIndexUsername?.let { username = it }
@@ -135,6 +157,11 @@ intellijPlatformTesting {
 val instrumentedMainClasses = layout.buildDirectory.dir("instrumented/instrumentCode")
 
 tasks {
+    named<OssIndexAuditTask>("ossIndexAudit") {
+        // [bld->dsn~oss-index-audit-continues-on-http-429~1]
+        continueOnOssIndexHttp429()
+    }
+
     withType<JavaCompile>().configureEach {
         options.release = 21
         options.encoding = "UTF-8"
