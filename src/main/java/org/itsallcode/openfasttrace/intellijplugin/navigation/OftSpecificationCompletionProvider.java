@@ -15,10 +15,10 @@ import com.intellij.psi.PsiFile;
 import com.intellij.util.ProcessingContext;
 import org.itsallcode.openfasttrace.intellijplugin.OftSupportedFiles;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecification;
-import org.jetbrains.annotations.NotNull;
 
 // [impl->dsn~specification-item-completion~1]
 // [impl->dsn~complete-specification-item-id-in-covers-section~1]
+// [impl->dsn~complete-specification-item-id-in-active-live-template-covers-field~1]
 public final class OftSpecificationCompletionProvider extends CompletionContributor implements DumbAware {
     public OftSpecificationCompletionProvider() {
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new CoversCompletionProvider());
@@ -27,20 +27,20 @@ public final class OftSpecificationCompletionProvider extends CompletionContribu
     private static final class CoversCompletionProvider extends CompletionProvider<CompletionParameters> {
         @Override
         protected void addCompletions(
-                @NotNull final CompletionParameters parameters,
-                @NotNull final ProcessingContext context,
-                @NotNull final CompletionResultSet result
+                final CompletionParameters parameters,
+                final ProcessingContext context,
+                final CompletionResultSet result
         ) {
             final PsiFile originalFile = parameters.getOriginalFile();
-            if (!OftSupportedFiles.isSpecificationFile(originalFile.getVirtualFile())) {
+            if (!OftSupportedFiles.isSpecificationFileName(originalFile.getName())) {
                 return;
             }
-            final CharSequence fileText = originalFile.getViewProvider().getContents();
-            final int offset = parameters.getOffset();
+            final CharSequence fileText = parameters.getEditor().getDocument().getCharsSequence();
+            final int offset = parameters.getEditor().getCaretModel().getOffset();
             if (!OftDeclarationResolver.isInsideCoversSection(fileText, offset)) {
                 return;
             }
-            final String prefix = specificationPrefixAt(fileText, offset);
+            final String prefix = OftSpecificationCompletionSupport.specificationPrefixAt(fileText, offset);
             final Project project = parameters.getPosition().getProject();
             final CompletionResultSet unrestrictedResult = result.withPrefixMatcher(new PlainPrefixMatcher(""));
             for (OftIndexedSpecification specification :
@@ -51,41 +51,10 @@ public final class OftSpecificationCompletionProvider extends CompletionContribu
                         .withTypeText(specification.artifactType(), true);
                 unrestrictedResult.addElement(PrioritizedLookupElement.withPriority(
                         lookupElement,
-                        priorityOf(matchKind)
+                        OftSpecificationCompletionSupport.priorityOf(matchKind)
                 ));
             }
             result.stopHere();
-        }
-
-        private static double priorityOf(final OftSpecificationCompletionSupport.MatchKind matchKind) {
-            return switch (matchKind) {
-                case FULL_ID_PREFIX -> 400;
-                case NAME_PREFIX -> 300;
-                case NAME_SUBSTRING -> 200;
-                case ARTIFACT_TYPE_PREFIX -> 100;
-                case NONE -> 0;
-            };
-        }
-
-        private static String specificationPrefixAt(final CharSequence text, final int offset) {
-            final int boundedOffset = Math.clamp(offset, 0, text.length());
-            int start = boundedOffset;
-            while (start > 0 && isSpecificationCharacter(text.charAt(start - 1))) {
-                start--;
-            }
-            return text.subSequence(start, boundedOffset).toString();
-        }
-
-        private static boolean isSpecificationCharacter(final char character) {
-            return Character.isLetterOrDigit(character)
-                    || isSpecificationSeparator(character);
-        }
-
-        private static boolean isSpecificationSeparator(final char character) {
-            return switch (character) {
-                case '~', '.', '_', '-' -> true;
-                default -> false;
-            };
         }
     }
 }

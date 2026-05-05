@@ -65,6 +65,29 @@ class OftDeclarationResolverTest {
     }
 
     @Test
+    void givenBlankLineBetweenCoversKeywordAndEntryWhenCheckingOffsetThenItStaysInsideCoversSection() {
+        final String text = """
+                Covers:
+
+                - req~openfasttrace_navigation_target~1
+
+                Needs: dsn
+                """;
+
+        assertThat(
+                OftDeclarationResolver.isInsideCoversSection(
+                        text,
+                        text.indexOf("req~openfasttrace_navigation_target~1")
+                ),
+                is(true)
+        );
+        assertThat(
+                OftDeclarationResolver.isInsideCoversSection(text, text.indexOf("dsn")),
+                is(false)
+        );
+    }
+
+    @Test
     void givenNullElementWhenFindingDeclaredItemThenItReturnsEmpty() {
         assertThat(OftDeclarationResolver.findDeclaredItem(null).isEmpty(), is(true));
     }
@@ -77,6 +100,7 @@ class OftDeclarationResolverTest {
 
                 dsn~openfasttrace_navigation_design~1
                 Covers:
+
                 - req~openfasttrace_navigation_target~1
                 - `impl~openfasttrace_navigation_target~1`
                 Depends: req~ignored_outside_covers~1

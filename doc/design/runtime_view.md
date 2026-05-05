@@ -238,6 +238,18 @@ Covers:
 
 Needs: impl, itest
 
+### Complete Specification Item ID in Active Live Template Covers Field
+`dsn~complete-specification-item-id-in-active-live-template-covers-field~1`
+
+**Given** a bundled OFT live template is active at a `COVERED` placeholder under `Covers:` and the opened project already indexes declared OpenFastTrace specification items
+**When** a user invokes IntelliJ basic completion in that placeholder before the live-template session ends
+**Then** the completion component reads the active editor document, handles the request like any other `Covers:` reference by reading declared specification item IDs from the declaration index, and shows the matching suggestions in the standard IDE completion popup without ending the live-template session.
+
+Covers:
+- `scn~complete-specification-item-id-in-active-live-template-covers-field~1`
+
+Needs: impl, itest
+
 ## Help Action
 
 ### Show OFT User Guide in Help Menu

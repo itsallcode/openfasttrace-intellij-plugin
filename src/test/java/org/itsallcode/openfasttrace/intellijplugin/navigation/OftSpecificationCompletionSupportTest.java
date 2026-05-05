@@ -38,4 +38,38 @@ class OftSpecificationCompletionSupportTest {
                 is(OftSpecificationCompletionSupport.MatchKind.NAME_PREFIX)
         );
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "FULL_ID_PREFIX, 400.0",
+            "NAME_PREFIX, 300.0",
+            "NAME_SUBSTRING, 200.0",
+            "ARTIFACT_TYPE_PREFIX, 100.0",
+            "NONE, 0.0"
+    })
+    void givenMatchKindWhenGettingPriorityThenItReturnsExpectedPriority(
+            final OftSpecificationCompletionSupport.MatchKind matchKind,
+            final double expectedPriority
+    ) {
+        assertThat(OftSpecificationCompletionSupport.priorityOf(matchKind), is(expectedPriority));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "Covers:| - req~login.feature, 28, req~login.feature",
+            "Covers:| - req~login.feature!, 29, ''",
+            "req~bounded-offset~1, 999, req~bounded-offset~1",
+            "req~bounded-offset~1, -1, ''",
+            "prefix req~middle, 6, prefix"
+    })
+    void givenTextAndOffsetWhenExtractingPrefixThenItReturnsSpecificationPrefix(
+            final String text,
+            final int offset,
+            final String expectedPrefix
+    ) {
+        assertThat(
+                OftSpecificationCompletionSupport.specificationPrefixAt(text.replace('|', '\n'), offset),
+                is(expectedPrefix)
+        );
+    }
 }

@@ -49,6 +49,37 @@ final class OftSpecificationCompletionSupport {
         return MatchKind.NONE;
     }
 
+    static double priorityOf(final MatchKind matchKind) {
+        return switch (matchKind) {
+            case FULL_ID_PREFIX -> 400;
+            case NAME_PREFIX -> 300;
+            case NAME_SUBSTRING -> 200;
+            case ARTIFACT_TYPE_PREFIX -> 100;
+            case NONE -> 0;
+        };
+    }
+
+    static String specificationPrefixAt(final CharSequence text, final int offset) {
+        final int boundedOffset = Math.clamp(offset, 0, text.length());
+        int start = boundedOffset;
+        while (start > 0 && isSpecificationCharacter(text.charAt(start - 1))) {
+            start--;
+        }
+        return text.subSequence(start, boundedOffset).toString();
+    }
+
+    private static boolean isSpecificationCharacter(final char character) {
+        return Character.isLetterOrDigit(character)
+                || isSpecificationSeparator(character);
+    }
+
+    private static boolean isSpecificationSeparator(final char character) {
+        return switch (character) {
+            case '~', '.', '_', '-' -> true;
+            default -> false;
+        };
+    }
+
     enum MatchKind {
         FULL_ID_PREFIX,
         NAME_PREFIX,

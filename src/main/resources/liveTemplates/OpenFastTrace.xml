@@ -5,6 +5,7 @@
   GH-22 adds the missing scn template and keeps the rest close to the imported set.
 -->
 <!-- [impl->dsn~insert-oft-scenario-live-template~1] -->
+<!-- [impl->dsn~complete-specification-item-id-in-active-live-template-covers-field~1] -->
 <templateSet group="OpenFastTrace">
   <template
       name="arch"

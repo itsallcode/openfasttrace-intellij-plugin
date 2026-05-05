@@ -177,10 +177,11 @@ Needs: impl
 ### Specification Item Completion
 `dsn~specification-item-completion~1`
 
-The plugin provides a specification-item completion component that activates IntelliJ basic completion only for OFT item references under `Covers:` in supported specification documents, reads declared specification item IDs from the project-local declaration index, and presents those IDs in a deterministic order based on full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches.
+The plugin provides a specification-item completion component that activates IntelliJ basic completion only for OFT item references under `Covers:` in supported specification documents, reads declared specification item IDs from the project-local declaration index, and presents those IDs in a deterministic order based on full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches. This includes completion requests started from an active live-template placeholder when the placeholder expands inside a `Covers:` entry.
 
 Covers:
 - `scn~complete-specification-item-id-in-covers-section~1`
+- `scn~complete-specification-item-id-in-active-live-template-covers-field~1`
 
 Needs: impl, utest
 
@@ -198,11 +199,12 @@ Needs: impl
 ### Live Template Integration
 `dsn~live-template-integration~1`
 
-The plugin provides a live-template integration component that packages a repository-owned OpenFastTrace live-template XML resource, registers that resource with IntelliJ's default live-template extension point, and keeps the bundled template set aligned with the imported upstream OFT templates plus the plugin-local scenario template.
+The plugin provides a live-template integration component that packages a repository-owned OpenFastTrace live-template XML resource, registers that resource with IntelliJ's default live-template extension point, and keeps the bundled template set aligned with the imported upstream OFT templates plus the plugin-local scenario template. Template variables that represent covered specification item IDs stay editable while the template is active so the specification-item completion component can serve user-invoked completion in those fields.
 
 Covers:
 - `scn~show-oft-live-templates-in-live-template-settings~1`
 - `scn~insert-oft-scenario-live-template~1`
+- `scn~complete-specification-item-id-in-active-live-template-covers-field~1`
 
 Needs: impl
 

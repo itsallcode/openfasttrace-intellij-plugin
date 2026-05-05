@@ -6,6 +6,7 @@ package org.itsallcode.openfasttrace.intellijplugin.templates;
 public final class OftLiveTemplates {
     // [impl->dsn~live-template-integration~1]
     // [impl->dsn~show-oft-live-templates-in-live-template-settings~1]
+    // [impl->dsn~complete-specification-item-id-in-active-live-template-covers-field~1]
     public static final String GROUP_NAME = "OpenFastTrace";
     public static final String RESOURCE_PATH = "liveTemplates/OpenFastTrace.xml";
 
