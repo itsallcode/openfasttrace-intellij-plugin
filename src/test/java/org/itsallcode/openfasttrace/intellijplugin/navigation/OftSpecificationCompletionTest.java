@@ -120,6 +120,21 @@ public class OftSpecificationCompletionTest extends AbstractOftPlatformTestCase 
         assertThat(lookupStrings(), is(empty()));
     }
 
+    public void testGivenUnsupportedFileWhenBasicCompletionInvokesThenItDoesNotSuggestSpecificationIds() {
+        myFixture.addFileToProject("doc/spec.md", """
+                req~unsupported-file-completion.feature~1
+                Needs: scn
+                """);
+        myFixture.configureByText("notes.txt", """
+                Covers:
+                - req~unsupported-file<caret>
+                """);
+
+        myFixture.completeBasic();
+
+        assertThat(lookupStrings(), is(empty()));
+    }
+
     private List<String> lookupStrings() {
         final List<String> lookupElementStrings = myFixture.getLookupElementStrings();
         return lookupElementStrings == null ? List.of() : lookupElementStrings;
