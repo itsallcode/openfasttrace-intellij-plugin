@@ -1,5 +1,7 @@
 # OpenFastTrace IntelliJ Plugin 0.3.0, released 2026-04-28
 
+Code name: Configurable trace scope
+
 ## Summary
 
 This feature release adds project-level trace scope configuration so users can keep one-click tracing while limiting OpenFastTrace runs to the relevant project resources.

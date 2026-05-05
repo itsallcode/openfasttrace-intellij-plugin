@@ -1,5 +1,7 @@
 # OpenFastTrace IntelliJ Plugin 0.4.0, released 2026-04-28
 
+Code name: Live templates
+
 ## Summary
 
 This feature release bundles OpenFastTrace live templates with the plugin so users can insert common OFT specification-item skeletons directly from the IDE.
