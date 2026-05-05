@@ -18,7 +18,7 @@
     <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
     <variable name="DESCRIPTION" expression="" defaultValue="" alwaysStopAt="true"/>
     <variable name="COMMENT" expression="" defaultValue="" alwaysStopAt="true"/>
-    <variable name="COVERED" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+    <variable name="COVERED" expression="" defaultValue="" alwaysStopAt="true"/>
     <context>
       <option name="OTHER" value="true"/>
     </context>
@@ -63,7 +63,7 @@
     <variable name="TITLE" expression="" defaultValue="" alwaysStopAt="true"/>
     <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
     <variable name="DESCRIPTION" expression="" defaultValue="" alwaysStopAt="true"/>
-    <variable name="COVERED" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+    <variable name="COVERED" expression="" defaultValue="" alwaysStopAt="true"/>
     <variable name="TEST_TYPE" expression="enum(&quot;utest&quot;, &quot;itest&quot;, &quot;stest&quot;)" defaultValue="" alwaysStopAt="true"/>
     <context>
       <option name="OTHER" value="true"/>
@@ -109,7 +109,7 @@
     <variable name="TITLE" expression="" defaultValue="" alwaysStopAt="true"/>
     <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
     <variable name="DESCRIPTION" expression="" defaultValue="" alwaysStopAt="true"/>
-    <variable name="COVERED" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+    <variable name="COVERED" expression="" defaultValue="" alwaysStopAt="true"/>
     <variable name="TEST_TYPE" expression="enum(&quot;utest&quot;, &quot;itest&quot;, &quot;stest&quot;)" defaultValue="" alwaysStopAt="true"/>
     <context>
       <option name="OTHER" value="true"/>
@@ -125,7 +125,7 @@
     <variable name="TITLE" expression="" defaultValue="" alwaysStopAt="true"/>
     <variable name="NAME" expression="lowercaseAndDash(TITLE)" defaultValue="" alwaysStopAt="true"/>
     <variable name="DESCRIPTION" expression="" defaultValue="" alwaysStopAt="true"/>
-    <variable name="COVERED" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+    <variable name="COVERED" expression="" defaultValue="" alwaysStopAt="true"/>
     <variable name="MARKDOWN_LINK" expression="" defaultValue="" alwaysStopAt="true"/>
     <context>
       <option name="OTHER" value="true"/>
@@ -143,7 +143,7 @@
     <variable name="GIVEN" expression="" defaultValue="" alwaysStopAt="true"/>
     <variable name="WHEN" expression="" defaultValue="" alwaysStopAt="true"/>
     <variable name="THEN" expression="" defaultValue="" alwaysStopAt="true"/>
-    <variable name="COVERED" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+    <variable name="COVERED" expression="" defaultValue="" alwaysStopAt="true"/>
     <context>
       <option name="OTHER" value="true"/>
     </context>

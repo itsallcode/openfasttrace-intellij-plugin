@@ -7,7 +7,6 @@ import com.intellij.codeInsight.template.impl.TemplateImpl;
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
 import com.intellij.codeInsight.template.impl.TemplateSettings;
 import com.intellij.codeInsight.template.impl.TemplateState;
-import com.intellij.codeInsight.template.macro.BaseCompleteMacro;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import org.hamcrest.Matchers;
@@ -93,7 +92,7 @@ public class OftLiveTemplatesTest extends AbstractOftPlatformTestCase {
         );
     }
 
-    public void testGivenCoversTemplatesWhenQueryingTemplateSettingsThenCoveredVariablesInvokeCompletion() {
+    public void testGivenCoversTemplatesWhenQueryingTemplateSettingsThenCoveredVariablesDoNotForceCompletion() {
         final TemplateSettings templateSettings = TemplateSettings.getInstance();
         final List<String> templateKeysWithCoveredVariable = List.of("arch", "dsn", "qs", "req", "scn");
 
@@ -102,7 +101,7 @@ public class OftLiveTemplatesTest extends AbstractOftPlatformTestCase {
                 .map(template -> template.getExpressionStringAt(indexOfVariable(template, "COVERED")))
                 .toList();
 
-        assertThat(coveredVariableExpressions, Matchers.everyItem(is("complete()")));
+        assertThat(coveredVariableExpressions, Matchers.everyItem(is("")));
     }
 
     // [itest->dsn~complete-specification-item-id-in-active-live-template-covers-field~1]
@@ -138,31 +137,6 @@ public class OftLiveTemplatesTest extends AbstractOftPlatformTestCase {
                         TemplateManager.getInstance(getProject()).getActiveTemplate(myFixture.getEditor()),
                         notNullValue(Template.class)
                 )
-        );
-    }
-
-    public void testGivenActiveLiveTemplateCoveredFieldWhenFieldReceivesFocusThenCompleteMacroSuggestsDeclaredSpecificationIds() {
-        myFixture.addFileToProject("doc/spec.md", """
-                req~macro-alpha.feature~1
-                Needs: scn
-
-                req~macro-beta.feature~1
-                Needs: scn
-                """);
-        myFixture.configureByText("current.md", "<caret>");
-
-        final TemplateImpl designTemplate = TemplateSettings.getInstance()
-                .getTemplate(DESIGN_TEMPLATE_KEY, OftLiveTemplates.GROUP_NAME);
-        TemplateManagerImpl.setTemplateTesting(getTestRootDisposable());
-        TemplateManager.getInstance(getProject()).startTemplate(myFixture.getEditor(), designTemplate);
-
-        final TemplateState templateState = Objects.requireNonNull(TemplateManagerImpl.getTemplateState(myFixture.getEditor()));
-        advanceTemplateToVariable(getProject(), templateState, "COVERED");
-        BaseCompleteMacro.waitForNextTab();
-
-        assertThat(
-                myFixture.getLookupElementStrings(),
-                hasItems("req~macro-alpha.feature~1", "req~macro-beta.feature~1")
         );
     }
 

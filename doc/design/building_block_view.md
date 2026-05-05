@@ -199,7 +199,7 @@ Needs: impl
 ### Live Template Integration
 `dsn~live-template-integration~1`
 
-The plugin provides a live-template integration component that packages a repository-owned OpenFastTrace live-template XML resource, registers that resource with IntelliJ's default live-template extension point, and keeps the bundled template set aligned with the imported upstream OFT templates plus the plugin-local scenario template. Template variables that represent covered specification item IDs use IntelliJ's live-template completion expression so the specification-item completion component can serve those fields while the template is active.
+The plugin provides a live-template integration component that packages a repository-owned OpenFastTrace live-template XML resource, registers that resource with IntelliJ's default live-template extension point, and keeps the bundled template set aligned with the imported upstream OFT templates plus the plugin-local scenario template. Template variables that represent covered specification item IDs stay editable while the template is active so the specification-item completion component can serve user-invoked completion in those fields.
 
 Covers:
 - `scn~show-oft-live-templates-in-live-template-settings~1`
