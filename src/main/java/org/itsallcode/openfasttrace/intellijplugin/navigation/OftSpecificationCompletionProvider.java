@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 // [impl->dsn~specification-item-completion~1]
 // [impl->dsn~complete-specification-item-id-in-covers-section~1]
+// [impl->dsn~complete-specification-item-id-in-active-live-template-covers-field~1]
 public final class OftSpecificationCompletionProvider extends CompletionContributor implements DumbAware {
     public OftSpecificationCompletionProvider() {
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new CoversCompletionProvider());
@@ -32,11 +33,11 @@ public final class OftSpecificationCompletionProvider extends CompletionContribu
                 @NotNull final CompletionResultSet result
         ) {
             final PsiFile originalFile = parameters.getOriginalFile();
-            if (!OftSupportedFiles.isSpecificationFile(originalFile.getVirtualFile())) {
+            if (!isSupportedSpecificationFile(originalFile)) {
                 return;
             }
-            final CharSequence fileText = originalFile.getViewProvider().getContents();
-            final int offset = parameters.getOffset();
+            final CharSequence fileText = parameters.getEditor().getDocument().getCharsSequence();
+            final int offset = parameters.getEditor().getCaretModel().getOffset();
             if (!OftDeclarationResolver.isInsideCoversSection(fileText, offset)) {
                 return;
             }
@@ -65,6 +66,11 @@ public final class OftSpecificationCompletionProvider extends CompletionContribu
                 case ARTIFACT_TYPE_PREFIX -> 100;
                 case NONE -> 0;
             };
+        }
+
+        private static boolean isSupportedSpecificationFile(final PsiFile file) {
+            return OftSupportedFiles.isSpecificationFile(file.getVirtualFile())
+                    || OftSupportedFiles.isSpecificationFileName(file.getName());
         }
 
         private static String specificationPrefixAt(final CharSequence text, final int offset) {

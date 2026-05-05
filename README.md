@@ -75,7 +75,7 @@ After the sandbox IDE opens a project, configure trace scope under `Settings | T
 
 Run an OFT trace from `Tools | OpenFastTrace | Trace Project` or use the default shortcut `Ctrl+Alt+Shift+O`. The plugin traces the configured inputs in the background and shows the plain text result in an IDE output tab with ANSI colors preserved. You can click specification item IDs in the report to jump to their declarations, including source-side items generated from coverage tags.
 
-The plugin also bundles an `OpenFastTrace` live-template group under `Settings | Editor | Live Templates`. Use abbreviations such as `feat`, `req`, `dsn`, and `scn` in a supported editing context, then press `Tab` to insert an OFT item skeleton. The `scn` template inserts a scenario stub with placeholders for `Given`, `When`, `Then`, and the covered requirement.
+The plugin also bundles an `OpenFastTrace` live-template group under `Settings | Editor | Live Templates`. Use abbreviations such as `feat`, `req`, `dsn`, and `scn` in a supported editing context, then press `Tab` to insert an OFT item skeleton. The `scn` template inserts a scenario stub with placeholders for `Given`, `When`, `Then`, and the covered requirement. While the caret is still in a template's covered-item field, use basic completion to select an existing specification item ID from the project index.
 
 When editing a `Covers:` section in a supported specification document, invoke basic completion on a partial specification item ID to get existing declarations from the project index. Suggestions prefer full-ID prefix matches first, then name-prefix matches, then name-substring matches, and finally artifact-type prefix matches.
 

@@ -13,6 +13,19 @@ Needs: req
 
 <!-- Demo step 4: add the Homework Excuse feature here. -->
 
+### Foo
+`req~foo~1`
+
+Bar
+
+Covers:
+
+* [``](#)
+
+Needs: req
+
+
+
 ## User Requirements
 
 ### Tell a Late-Work Excuse

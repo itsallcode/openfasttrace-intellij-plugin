@@ -713,6 +713,18 @@ Covers:
 
 Needs: dsn
 
+### Complete Specification Item ID in Active Live Template Covers Field
+`scn~complete-specification-item-id-in-active-live-template-covers-field~1`
+
+**Given** a project contains declared OpenFastTrace specification items and a user expands a bundled OFT live template whose active `COVERED` placeholder is under `Covers:`
+**When** the user types a partial specification item ID in that placeholder and invokes completion before leaving live-template mode
+**Then** the IDE suggests existing declared specification item IDs from the project index in the standard completion popup.
+
+Covers:
+- `req~complete-specification-item-ids-in-covers-section~1`
+
+Needs: dsn
+
 ### Open OFT User Guide
 
 The following scenarios describe the happy path for opening the OpenFastTrace user guide from the IDE.

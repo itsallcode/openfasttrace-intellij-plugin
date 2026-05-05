@@ -326,7 +326,7 @@ final class OftDeclarationResolver {
 
     private static boolean updateSectionState(final CharSequence line, final boolean insideCoversSection) {
         if (line.toString().trim().isEmpty()) {
-            return false;
+            return insideCoversSection;
         }
         if (!OftSyntaxCore.findDefinitionSpecificationItems(line).isEmpty()) {
             return false;

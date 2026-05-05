@@ -35,6 +35,29 @@ public class OftSpecificationCompletionTest extends AbstractOftPlatformTestCase 
         );
     }
 
+    public void testGivenCoversSectionWithBlankLineBeforeEntryWhenBasicCompletionInvokesThenItSuggestsDeclaredSpecificationIds() {
+        myFixture.addFileToProject("doc/spec.md", """
+                req~covers-completion-blank-line.feature~1
+                Needs: scn
+                """);
+        myFixture.configureByText("impl.md", """
+                impl~implementation.feature~1
+                Covers:
+
+                - req~covers-completion-blank<caret>
+                """);
+
+        final LookupElement[] elements = myFixture.completeBasic();
+
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> assertThat(elements.length, is(1)),
+                () -> assertThat(
+                        myFixture.getLookupElementStrings(),
+                        contains("req~covers-completion-blank-line.feature~1")
+                )
+        );
+    }
+
     public void testGivenNamePrefixAndSubstringMatchesWhenBasicCompletionInvokesThenItRanksPrefixBeforeSubstring() {
         myFixture.addFileToProject("doc/spec.md", """
                 req~ranking-priority.feature~1

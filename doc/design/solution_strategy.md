@@ -20,7 +20,7 @@ Specification item declarations are exposed through the IDE symbol and navigatio
 
 Parsing and syntax-aware editor behavior use the IntelliJ parsing, PSI, lexer, and highlighting infrastructure. The plugin builds only the OpenFastTrace-specific parts that are missing and reuses the existing editor, indexing, and navigation services for the rest.
 
-Authoring shortcuts use IntelliJ's live-template infrastructure instead of custom OpenFastTrace-specific insertion dialogs or wizards. The plugin bundles a repository-owned OFT live-template XML file, registers it through the standard live-template extension point, and keeps template behavior within the declarative capabilities that IntelliJ already provides by default.
+Authoring shortcuts use IntelliJ's live-template infrastructure instead of custom OpenFastTrace-specific insertion dialogs or wizards. The plugin bundles a repository-owned OFT live-template XML file, registers it through the standard live-template extension point, and keeps template behavior within the declarative capabilities that IntelliJ already provides by default. Template placeholders that create `Covers:` entries delegate to IntelliJ's standard completion expression so users can use the same reference completion while a live-template session is still active.
 
 Reference authoring assistance for `Covers:` entries likewise reuses IntelliJ's standard completion infrastructure. The plugin activates completion only in supported specification documents and only for `Covers:` references, then fills the suggestion list from the existing declaration index instead of maintaining a second source of specification-item identities.
 
