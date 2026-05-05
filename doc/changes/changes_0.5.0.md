@@ -1,5 +1,7 @@
 # OpenFastTrace IntelliJ Plugin 0.5.0, released 2026-04-30
 
+Code name: Auto-completion for covered items in specification docs
+
 ## Summary
 
 This feature release adds indexed auto-completion for OpenFastTrace specification item IDs while users edit `Covers:` entries in supported specification documents.

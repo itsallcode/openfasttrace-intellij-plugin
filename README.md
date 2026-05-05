@@ -29,6 +29,7 @@ SonarCloud status:
 **User Guides**
 * [OpenFastTrace User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md)
 * [OpenFastTrace in IDE Help Action](src/main/java/org/itsallcode/openfasttrace/intellijplugin/help/OpenFastTraceUserGuide.java)
+* [OpenFastTrace IntelliJ Plugin Demo](doc/demo/plugin-demo.md)
 
 **News and Discussions**
 * [Changelog](doc/changes/changelog.md)
@@ -55,6 +56,7 @@ The plugin currently focuses on:
 For expected behavior and scope details, see:
 * [System Requirements](doc/system_requirements.md)
 * [Runtime View](doc/design/runtime_view.md)
+* [Plugin Demo Script](doc/demo/plugin-demo.md)
 
 ## Getting the Project
 Clone this repository and build the plugin with Gradle:
@@ -96,7 +98,8 @@ To run the automated checks for the trace action and the project trace itself:
 ./gradlew check verifyPlugin
 ```
 
-Example OFT files for manual testing are available under `examples\` in this project.
+Example OFT files for manual testing are available under `examples/` in this project.
+For a guided live demonstration, use the script in [doc/demo/plugin-demo.md](doc/demo/plugin-demo.md) with the isolated example project in [doc/demo/example](doc/demo/example).
 
 ## License
 This project is licensed under the [Apache 2.0 license](LICENSE).
