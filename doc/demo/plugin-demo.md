@@ -98,7 +98,7 @@ Run `Tools | OpenFastTrace | Trace Project`. The trace should be red because `ds
 
 ### 10. Add the Coverage Tag
 
-In `excuse-of-the-day.sh`, add the coverage tag `# [impl->dsn~homework-excuse~1]` and point out the highlighted tag.
+In `excuse-of-the-day.sh`, add the coverage tag `# [impl->dsn~homework-excuse~1]`. Type the target side partially and invoke completion after `impl->` to select `dsn~homework-excuse~1`, then point out the highlighted tag.
 
 > The script stays ordinary shell. The OFT tag is a comment for Bash and evidence for the trace.
 

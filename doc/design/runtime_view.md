@@ -250,6 +250,54 @@ Covers:
 
 Needs: impl, itest
 
+### Complete Specification Item ID in Coverage Tag Target
+`dsn~complete-specification-item-id-in-coverage-tag-target~1`
+
+**Given** a source, configuration, or markup file with a default extension supported by the upstream OpenFastTrace Tag Importer contains a comment with an OFT coverage-tag candidate whose left-hand side contains an artifact type and whose right-hand side contains the caret after `->`
+**When** a user invokes IntelliJ basic completion on the right-hand side
+**Then** the completion component confirms the supported file and comment context, extracts the target-side prefix under the caret, loads declared specification item IDs from the declaration index, ranks them by full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches, and shows the ordered suggestions in the standard IDE completion popup.
+
+Covers:
+- `scn~complete-specification-item-id-in-coverage-tag-target~1`
+
+Needs: impl, itest
+
+### Complete Specification Item ID in Spaced Coverage Tag Target
+`dsn~complete-specification-item-id-in-spaced-coverage-tag-target~1`
+
+**Given** a source, configuration, or markup file with a default extension supported by the upstream OpenFastTrace Tag Importer contains a comment with an OFT coverage-tag candidate whose arrow has optional spaces around it
+**When** a user invokes IntelliJ basic completion on the right-hand side of that arrow
+**Then** the completion component accepts the spaced arrow as the same coverage-tag target context and uses the shared indexed specification item suggestions.
+
+Covers:
+- `scn~complete-specification-item-id-in-spaced-coverage-tag-target~1`
+
+Needs: impl, itest
+
+### Complete Specification Item ID in Incomplete Coverage Tag Target
+`dsn~complete-specification-item-id-in-incomplete-coverage-tag-target~1`
+
+**Given** a source, configuration, or markup file with a default extension supported by the upstream OpenFastTrace Tag Importer contains a comment with an incomplete OFT coverage-tag candidate that has an opening bracket, a left-hand artifact type, and an arrow before the caret but no closing bracket yet
+**When** a user invokes IntelliJ basic completion on the right-hand target side
+**Then** the completion component accepts the incomplete tag as an editable coverage-tag target context and uses the shared indexed specification item suggestions without requiring the strict valid-tag parser to recognize a complete coverage tag.
+
+Covers:
+- `scn~complete-specification-item-id-in-incomplete-coverage-tag-target~1`
+
+Needs: impl, itest
+
+### Suppress Coverage Tag Target Completion Outside Target Context
+`dsn~suppress-coverage-tag-target-completion-outside-target-context~1`
+
+**Given** a completion request occurs before the coverage-tag arrow, after an already closed coverage tag, outside a comment, inside a string literal, or in an unsupported file type
+**When** the completion component evaluates the coverage-tag target context
+**Then** it does not add OpenFastTrace specification item ID suggestions for coverage-tag target completion.
+
+Covers:
+- `scn~suppress-coverage-tag-target-completion-outside-target-context~1`
+
+Needs: impl, itest
+
 ## Help Action
 
 ### Show OFT User Guide in Help Menu

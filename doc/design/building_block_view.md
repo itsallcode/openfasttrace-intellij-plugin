@@ -177,11 +177,15 @@ Needs: impl
 ### Specification Item Completion
 `dsn~specification-item-completion~1`
 
-The plugin provides a specification-item completion component that activates IntelliJ basic completion only for OFT item references under `Covers:` in supported specification documents, reads declared specification item IDs from the project-local declaration index, and presents those IDs in a deterministic order based on full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches. This includes completion requests started from an active live-template placeholder when the placeholder expands inside a `Covers:` entry.
+The plugin provides a specification-item completion component that activates IntelliJ basic completion for supported OFT reference authoring contexts, reads declared specification item IDs from the project-local declaration index, and presents those IDs in a deterministic order based on full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches. Supported contexts include OFT item references under `Covers:` in supported specification documents, completion requests started from an active live-template placeholder when the placeholder expands inside a `Covers:` entry, and the target side of likely OFT coverage tags in source-code comments for the default file extensions supported by the upstream OpenFastTrace Tag Importer after a left-hand artifact type and arrow.
 
 Covers:
 - `scn~complete-specification-item-id-in-covers-section~1`
 - `scn~complete-specification-item-id-in-active-live-template-covers-field~1`
+- `scn~complete-specification-item-id-in-coverage-tag-target~1`
+- `scn~complete-specification-item-id-in-spaced-coverage-tag-target~1`
+- `scn~complete-specification-item-id-in-incomplete-coverage-tag-target~1`
+- `scn~suppress-coverage-tag-target-completion-outside-target-context~1`
 
 Needs: impl, utest
 

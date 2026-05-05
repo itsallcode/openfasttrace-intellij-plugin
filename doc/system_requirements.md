@@ -101,7 +101,7 @@ Needs: req
 ### OFT Reference Completion
 `feat~oft-reference-completion~1`
 
-The plugin suggests existing OpenFastTrace specification item IDs while users fill `Covers:` entries in supported specification documents. Users can complete references from indexed declarations instead of memorizing or manually searching for IDs.
+The plugin suggests existing OpenFastTrace specification item IDs while users fill `Covers:` entries in supported specification documents and coverage-tag targets in supported source comments. Users can complete references from indexed declarations instead of memorizing or manually searching for IDs.
 
 Needs: req
 
@@ -296,6 +296,16 @@ The following requirements refine the OFT reference-completion feature into user
 `req~complete-specification-item-ids-in-covers-section~1`
 
 The plugin suggests existing OpenFastTrace specification item IDs when a user invokes completion while editing an OFT item ID under `Covers:` in a supported specification document. The suggestion list is ranked first by exact prefix match against the full ID, then by prefix match against the item name, then by substring match against the item name, and finally by prefix match against the artifact type.
+
+Covers:
+- `feat~oft-reference-completion~1`
+
+Needs: scn
+
+### Complete Specification Item IDs in Coverage Tag Target
+`req~complete-specification-item-ids-in-coverage-tag-target~1`
+
+The plugin suggests existing OpenFastTrace specification item IDs when a user invokes completion while editing the target side of a likely OFT coverage tag in a supported source-code comment. Coverage-tag target completion is available for the default file extensions supported by the upstream OpenFastTrace Tag Importer. The completion context requires a left-hand artifact type and an arrow before the caret so suggestions appear for coverage-tag targets instead of ordinary comment text. The suggestion list is ranked first by exact prefix match against the full ID, then by prefix match against the item name, then by substring match against the item name, and finally by prefix match against the artifact type.
 
 Covers:
 - `feat~oft-reference-completion~1`
@@ -699,7 +709,7 @@ Needs: dsn
 
 ### OFT Reference Completion
 
-The following scenarios describe completion support while editing OFT references in `Covers:` sections.
+The following scenarios describe completion support while editing OFT references in `Covers:` sections and coverage-tag targets.
 
 ### Complete Specification Item ID in Covers Section
 `scn~complete-specification-item-id-in-covers-section~1`
@@ -710,6 +720,54 @@ The following scenarios describe completion support while editing OFT references
 
 Covers:
 - `req~complete-specification-item-ids-in-covers-section~1`
+
+Needs: dsn
+
+### Complete Specification Item ID in Coverage Tag Target
+`scn~complete-specification-item-id-in-coverage-tag-target~1`
+
+**Given** a project contains declared OpenFastTrace specification items and a user edits the target side of an OFT coverage tag candidate such as `[impl->dsn~openfasttrace<caret>]` in a comment of a file whose extension is supported by the upstream OpenFastTrace Tag Importer
+**When** the user invokes completion
+**Then** the IDE suggests existing declared specification item IDs from the project index and orders the suggestion list by full-ID prefix match, then name-prefix match, then name-substring match, and finally artifact-type prefix match
+
+Covers:
+- `req~complete-specification-item-ids-in-coverage-tag-target~1`
+
+Needs: dsn
+
+### Complete Specification Item ID in Spaced Coverage Tag Target
+`scn~complete-specification-item-id-in-spaced-coverage-tag-target~1`
+
+**Given** a project contains declared OpenFastTrace specification items and a user edits the target side of an OFT coverage tag candidate with optional spaces around the arrow such as `[impl -> dsn~openfasttrace<caret>]` in a comment of a file whose extension is supported by the upstream OpenFastTrace Tag Importer
+**When** the user invokes completion
+**Then** the IDE suggests existing declared specification item IDs from the project index as it does for the compact arrow spelling
+
+Covers:
+- `req~complete-specification-item-ids-in-coverage-tag-target~1`
+
+Needs: dsn
+
+### Complete Specification Item ID in Incomplete Coverage Tag Target
+`scn~complete-specification-item-id-in-incomplete-coverage-tag-target~1`
+
+**Given** a project contains declared OpenFastTrace specification items and a user edits the target side of an incomplete OFT coverage tag candidate such as `[impl->dsn~openfasttrace<caret>` in a comment of a file whose extension is supported by the upstream OpenFastTrace Tag Importer
+**When** the user invokes completion before typing the closing bracket
+**Then** the IDE suggests existing declared specification item IDs from the project index while leaving the incomplete tag editable
+
+Covers:
+- `req~complete-specification-item-ids-in-coverage-tag-target~1`
+
+Needs: dsn
+
+### Suppress Coverage Tag Target Completion Outside Target Context
+`scn~suppress-coverage-tag-target-completion-outside-target-context~1`
+
+**Given** a user invokes completion before the coverage-tag arrow, after an already closed coverage tag, outside a comment, inside a string literal, or in an unsupported file type
+**When** the completion context is evaluated
+**Then** the plugin does not add OpenFastTrace specification item ID suggestions for coverage-tag target completion
+
+Covers:
+- `req~complete-specification-item-ids-in-coverage-tag-target~1`
 
 Needs: dsn
 
