@@ -46,7 +46,8 @@ class OftCoverageTagCompletionContextTest {
                 Arguments.of(spacedTag("impl", "dsn~partial<caret>"), "dsn~partial"),
                 Arguments.of(spacedTag("impl", "<caret>"), ""),
                 Arguments.of(tag("impl~target~1", "dsn~partial<caret>"), "dsn~partial"),
-                Arguments.of(incompleteTag("impl~~1", "dsn~partial<caret>"), "dsn~partial")
+                Arguments.of(incompleteTag("impl~~1", "dsn~partial<caret>"), "dsn~partial"),
+                Arguments.of(tag("impl~target-name_1.2~3", "dsn~partial<caret>"), "dsn~partial")
         );
     }
 
@@ -56,7 +57,10 @@ class OftCoverageTagCompletionContextTest {
                 tag("impl", "dsn~partial~1") + " <caret>",
                 "// impl" + ARROW + "dsn~partial<caret>",
                 "// [" + ARROW + "dsn~partial<caret>]",
-                "// [impl dsn~partial<caret>]"
+                "// [impl dsn~partial<caret>]",
+                tag("impl~1target~1", "dsn~partial<caret>"),
+                tag("impl~target-~1", "dsn~partial<caret>"),
+                tag("impl~~x", "dsn~partial<caret>")
         );
     }
 

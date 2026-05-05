@@ -1,7 +1,6 @@
 package org.itsallcode.openfasttrace.intellijplugin.navigation;
 
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 // [impl->dsn~complete-specification-item-id-in-coverage-tag-target~1]
 // [impl->dsn~complete-specification-item-id-in-spaced-coverage-tag-target~1]
@@ -9,10 +8,6 @@ import java.util.regex.Pattern;
 // [impl->dsn~suppress-coverage-tag-target-completion-outside-target-context~1]
 record OftCoverageTagCompletionContext(String prefix, int bracketStart) {
     private static final int NOT_FOUND = -1;
-    private static final Pattern SOURCE_SIDE_PATTERN = Pattern.compile(
-            "^\\s*\\p{L}++(?:~~\\d++|~[\\p{L}][\\p{L}\\p{N}]*+(?:[._-][\\p{L}\\p{N}]++)*+~\\d++)?\\s*$",
-            Pattern.UNICODE_CHARACTER_CLASS
-    );
 
     static Optional<OftCoverageTagCompletionContext> findAt(final CharSequence text, final int offset) {
         final int boundedOffset = Math.clamp(offset, 0, text.length());
@@ -85,6 +80,63 @@ record OftCoverageTagCompletionContext(String prefix, int bracketStart) {
             final int startOffset,
             final int endOffset
     ) {
-        return SOURCE_SIDE_PATTERN.matcher(text.subSequence(startOffset, endOffset)).matches();
+        final String token = text.subSequence(startOffset, endOffset).toString().trim();
+        if (token.isEmpty()) {
+            return false;
+        }
+        final int separatorIndex = token.indexOf('~');
+        if (separatorIndex == NOT_FOUND) {
+            return isArtifactType(token);
+        }
+        if (!isArtifactType(token.substring(0, separatorIndex))) {
+            return false;
+        }
+        final String remainder = token.substring(separatorIndex);
+        return isRevisionOnlyArtifact(remainder) || isFullyQualifiedArtifact(remainder);
+    }
+
+    private static boolean isArtifactType(final String token) {
+        return token.chars().allMatch(Character::isLetter);
+    }
+
+    private static boolean isRevisionOnlyArtifact(final String token) {
+        return token.startsWith("~~")
+                && token.length() > 2
+                && token.substring(2).chars().allMatch(Character::isDigit);
+    }
+
+    private static boolean isFullyQualifiedArtifact(final String token) {
+        if (!token.startsWith("~")) {
+            return false;
+        }
+        final int revisionSeparator = token.lastIndexOf('~');
+        if (revisionSeparator <= 1 || revisionSeparator == token.length() - 1) {
+            return false;
+        }
+        return isArtifactName(token.substring(1, revisionSeparator))
+                && token.substring(revisionSeparator + 1).chars().allMatch(Character::isDigit);
+    }
+
+    private static boolean isArtifactName(final String token) {
+        if (token.isEmpty() || !Character.isLetter(token.charAt(0))) {
+            return false;
+        }
+        boolean previousWasSeparator = false;
+        for (int index = 0; index < token.length(); index++) {
+            final char character = token.charAt(index);
+            if (Character.isLetterOrDigit(character)) {
+                previousWasSeparator = false;
+                continue;
+            }
+            if (!isNameSeparator(character) || previousWasSeparator || index == token.length() - 1) {
+                return false;
+            }
+            previousWasSeparator = true;
+        }
+        return true;
+    }
+
+    private static boolean isNameSeparator(final char character) {
+        return character == '.' || character == '_' || character == '-';
     }
 }
