@@ -55,6 +55,8 @@ The plugin uses the minimum set of dependencies required for:
 
 Additional libraries are not allowed by default. Any new third-party dependency requires an explicit design decision and approval before it is added to the build.
 
+The Gradle dependency verification metadata in `gradle/verification-metadata.xml` is committed to source control. Maintainers update and review this metadata whenever dependency declarations, Gradle plugin versions, the IntelliJ Platform version, or other build inputs change the resolved dependency artifacts. The standard update command is `./gradlew --write-verification-metadata sha256 help`.
+
 ## Static Analysis And Security Gates
 
 Static code analysis runs in SonarQube Cloud and acts as a build breaker. A failing quality gate blocks integration until the reported issues are resolved or an approved exception exists.

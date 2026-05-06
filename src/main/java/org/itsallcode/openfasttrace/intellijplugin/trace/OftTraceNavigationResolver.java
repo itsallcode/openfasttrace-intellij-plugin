@@ -73,7 +73,7 @@ final class OftTraceNavigationResolver {
         return true;
     }
 
-    private @Nullable OftTraceNavigationTarget findCoverageTagTargetInFile(
+    private static @Nullable OftTraceNavigationTarget findCoverageTagTargetInFile(
             final VirtualFile file,
             final String specificationId
     ) {

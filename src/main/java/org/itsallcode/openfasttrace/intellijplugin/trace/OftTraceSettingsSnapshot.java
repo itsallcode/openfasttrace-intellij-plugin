@@ -1,7 +1,7 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 record OftTraceSettingsSnapshot(
         OftTraceScopeMode scopeMode,
@@ -9,8 +9,10 @@ record OftTraceSettingsSnapshot(
         boolean includeTestRoots,
         String additionalPathsText
 ) {
+    private static final Pattern LINE_SEPARATOR = Pattern.compile("\\R");
+
     List<String> additionalPaths() {
-        return Arrays.stream(additionalPathsText.split("\\R", -1))
+        return LINE_SEPARATOR.splitAsStream(additionalPathsText)
                 .map(String::trim)
                 .filter(line -> !line.isEmpty())
                 .toList();

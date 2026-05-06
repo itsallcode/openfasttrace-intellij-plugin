@@ -13,13 +13,9 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import javax.swing.Icon;
-import java.io.Serial;
 import java.util.Objects;
 
 final class OftDeclarationNavigationElement extends FakePsiElement {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
     private final transient PsiElement delegate;
     private final OftIndexedSpecification specification;
 

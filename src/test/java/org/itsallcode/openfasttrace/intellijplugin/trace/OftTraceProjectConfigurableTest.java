@@ -21,8 +21,8 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
 
         final OftTraceSettingsSnapshot settings = configurableSettings(configurable);
         assertEquals(OftTraceScopeMode.WHOLE_PROJECT, settings.scopeMode());
-        assertEquals(true, settings.includeSourceRoots());
-        assertEquals(true, settings.includeTestRoots());
+        assertTrue(settings.includeSourceRoots());
+        assertTrue(settings.includeTestRoots());
         assertEquals("doc/", settings.additionalPathsText());
     }
 
@@ -51,8 +51,8 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
 
         final OftTraceSettingsSnapshot snapshot = OftTraceProjectSettings.getInstance(getProject()).snapshot();
         assertEquals(OftTraceScopeMode.SELECTED_RESOURCES, snapshot.scopeMode());
-        assertEquals(true, snapshot.includeSourceRoots());
-        assertEquals(false, snapshot.includeTestRoots());
+        assertTrue(snapshot.includeSourceRoots());
+        assertFalse(snapshot.includeTestRoots());
         assertEquals("doc/\nspec/", snapshot.additionalPathsText());
     }
 
