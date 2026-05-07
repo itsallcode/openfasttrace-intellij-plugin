@@ -55,11 +55,15 @@ The plugin uses the minimum set of dependencies required for:
 
 Additional libraries are not allowed by default. Any new third-party dependency requires an explicit design decision and approval before it is added to the build.
 
+The Gradle dependency verification metadata in `gradle/verification-metadata.xml` is committed to source control. Maintainers update and review this metadata whenever dependency declarations, Gradle plugin versions, the IntelliJ Platform version, or other build inputs change the resolved dependency artifacts. The standard update command is `./gradlew --write-verification-metadata sha256 help`.
+
+Generated local IntelliJ Platform Ivy metadata for bundled plugin and module artifacts is trusted without checksum verification because the IntelliJ Platform Gradle Plugin can generate environment-specific Ivy descriptors for the local IntelliJ Platform artifact repository. This exception applies only to `ivy-*.xml` descriptors in the `bundledPlugin` and `bundledModule` groups. Resolved JAR artifacts remain checksum verified.
+
 ## Static Analysis And Security Gates
 
 Static code analysis runs in SonarQube Cloud and acts as a build breaker. A failing quality gate blocks integration until the reported issues are resolved or an approved exception exists.
 
-Dependency security scanning runs with OSS Index and acts as a build breaker for detected vulnerabilities and ordinary audit failures. If OSS Index returns HTTP 429, the build logs a quota warning and continues because the audit result is unavailable for reasons outside the dependency set. The build stays free of known vulnerable dependencies.
+Dependency vulnerability monitoring runs through GitHub Dependabot instead of the Gradle build. Dependabot alerts provide the repository's vulnerability check for known vulnerable dependencies, while local and CI builds no longer run OSS Index as an immediate build-breaking gate.
 
 OpenFastTrace tracing runs as a build breaker for the specification artifacts in scope. The trace stays clean for the requirement and design artifact types used by the project.
 

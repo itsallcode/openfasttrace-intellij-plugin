@@ -1,6 +1,7 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
 import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
@@ -11,6 +12,7 @@ import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -32,8 +34,8 @@ public class OftTraceInputResolverPlatformTest extends AbstractOftPlatformTestCa
                     getProject(),
                     contentRoot,
                     new OftTraceSettingsSnapshot(
-                        OftTraceScopeMode.SELECTED_RESOURCES,
-                        true,
+                            OftTraceScopeMode.SELECTED_RESOURCES,
+                            true,
                             true,
                             "doc/"
                     )
@@ -49,9 +51,28 @@ public class OftTraceInputResolverPlatformTest extends AbstractOftPlatformTestCa
         }
     }
 
+    public void testWhenResolvingFromGuessedProjectDirectoryThenItReturnsAResolutionOptional() throws Exception {
+        final Optional<OftTraceInputResolution> resolution = resolveFromGuessedProjectDirectory(
+                getProject(),
+                new OftTraceSettingsSnapshot(OftTraceScopeMode.WHOLE_PROJECT, true, true, "doc/")
+        );
+
+        assertThat(resolution.map(OftTraceInputResolution::isValid).orElse(true), is(true));
+    }
+
+    public void testWhenResolvingProjectThenItUsesProjectSettings() {
+        OftTraceProjectSettings.getInstance(getProject()).loadState(new OftTraceProjectSettings.State());
+
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(getProject());
+
+        assertNotNull(resolution);
+    }
+
     private void configureModuleRoots(final Path contentRoot, final Path sourceDirectory, final Path testDirectory) {
         final VirtualFile contentRootFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(contentRoot);
-        final VirtualFile sourceDirectoryFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourceDirectory);
+        final VirtualFile sourceDirectoryFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(
+                sourceDirectory
+        );
         final VirtualFile testDirectoryFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(testDirectory);
         assertNotNull(contentRootFile);
         assertNotNull(sourceDirectoryFile);
@@ -82,17 +103,31 @@ public class OftTraceInputResolverPlatformTest extends AbstractOftPlatformTestCa
     }
 
     private static OftTraceInputResolution resolveFromProjectRoot(
-            final com.intellij.openapi.project.Project project,
+            final Project project,
             final Path projectRoot,
             final OftTraceSettingsSnapshot settings
     ) throws ReflectiveOperationException {
         final Method method = OftTraceInputResolver.class.getDeclaredMethod(
                 "resolveFromProjectRoot",
-                com.intellij.openapi.project.Project.class,
+                Project.class,
                 Path.class,
                 OftTraceSettingsSnapshot.class
         );
         method.setAccessible(true);
         return (OftTraceInputResolution) method.invoke(null, project, projectRoot, settings);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Optional<OftTraceInputResolution> resolveFromGuessedProjectDirectory(
+            final Project project,
+            final OftTraceSettingsSnapshot settings
+    ) throws ReflectiveOperationException {
+        final Method method = OftTraceInputResolver.class.getDeclaredMethod(
+                "resolveFromGuessedProjectDirectory",
+                Project.class,
+                OftTraceSettingsSnapshot.class
+        );
+        method.setAccessible(true);
+        return (Optional<OftTraceInputResolution>) method.invoke(null, project, settings);
     }
 }

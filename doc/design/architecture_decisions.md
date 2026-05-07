@@ -51,46 +51,46 @@ Needs: bld
 
 Tags: Build, Gradle
 
-### How Does the Build Handle OSS Index Quota Limits?
+### How Does the Project Monitor Dependency Vulnerabilities?
 
-The project uses OSS Index dependency security scanning as a build breaker so vulnerable dependencies block integration. In April 2026 Sonatype introduced quotas on the OSS Index free plan. When that quota is exceeded, OSS Index returns HTTP 429 instead of vulnerability data.
+The project needs vulnerability monitoring for Gradle dependencies without making local and CI builds depend on an external vulnerability-audit service during every run.
 
 This decision is architecture-relevant because it impacts:
 
 * reliability of local and CI builds
-* trust in the dependency security gate
-* clarity when a build cannot obtain an OSS Index result
+* trust in dependency vulnerability monitoring
+* time-to-feedback for vulnerable dependency findings
 
 We considered the following alternatives:
 
-1. Keep every OSS Index task failure fatal.
+1. Keep OSS Index in the Gradle build.
 
-   This preserves a strict gate, but an exceeded external quota would block development without revealing anything about the project's dependency security state.
+   This preserves immediate feedback, but OSS Index quota, authentication, and service availability issues can block development without revealing anything about the project's dependency security state.
 
-1. Disable OSS Index or make all audit failures non-fatal.
+1. Keep OSS Index in the build but make audit failures non-fatal.
 
-   This would keep builds moving, but it would also remove the build-breaking protection for known vulnerable dependencies and ordinary audit failures.
+   This avoids blocked builds, but it keeps a fragile build integration without a strict enforcement benefit.
 
-1. Treat only HTTP 429 as a documented warning exception.
+1. Remove OSS Index from the Gradle build and rely on GitHub Dependabot alerts.
 
-   This keeps vulnerability detection and ordinary audit failures fatal while letting builds continue when OSS Index does not provide results because the external quota was exceeded.
+   This removes the immediate build-time vulnerability gate, but it keeps vulnerability monitoring in GitHub without making every build depend on OSS Index availability.
 
-#### OSS Index Audit Continues on HTTP 429
-`dsn~oss-index-audit-continues-on-http-429~1`
+#### Dependency Vulnerability Monitoring Uses Dependabot
+`dsn~dependency-vulnerability-monitoring-uses-dependabot~1`
 
-The Gradle build keeps OSS Index dependency auditing as a build breaker for detected vulnerabilities and non-429 audit failures. When the OSS Index audit fails because the OSS Index service returns HTTP 429, the build logs a warning that the quota or plan may need checking and continues.
+The Gradle build does not run OSS Index dependency auditing. Dependency vulnerability monitoring happens through GitHub Dependabot alerts.
 
 Rationale:
 
-An HTTP 429 response indicates rate limiting or quota exhaustion, not that the scanned dependency set contains known vulnerabilities. Continuing in that case prevents the external plan quota from blocking local and CI development while still making the missing security result visible in the build log.
+Dependabot lacks the immediate local build feedback that OSS Index provided, but it gives the project a vulnerability check without blocking local and CI builds on OSS Index quotas, credentials, or service availability.
 
 Comment:
 
-The HTTP 429 exception does not apply to vulnerability findings, authentication failures, ordinary connection failures, malformed responses, or other OSS Index service errors.
+Builds remain responsible for ordinary compilation, tests, tracing, plugin verification, and static analysis. Dependency verification metadata still protects artifact integrity, but it is not a vulnerability scanner.
 
 Needs: bld
 
-Tags: Build, Security, OSS Index
+Tags: Build, Security, Dependabot
 
 ## Test Framework Decisions
 

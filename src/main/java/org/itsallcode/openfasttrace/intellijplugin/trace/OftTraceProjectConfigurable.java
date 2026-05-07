@@ -1,9 +1,11 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
+import org.jspecify.annotations.NonNull;
 
 import javax.swing.JComponent;
 import java.nio.file.InvalidPathException;
@@ -12,6 +14,7 @@ import java.util.Objects;
 
 // [impl->dsn~configure-trace-scope-in-project-settings~1]
 public final class OftTraceProjectConfigurable implements SearchableConfigurable, Configurable.NoScroll {
+    private static final Logger LOG = Logger.getInstance(OftTraceProjectConfigurable.class);
     static final String ID = "org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceProjectConfigurable";
 
     private final Project project;
@@ -22,7 +25,7 @@ public final class OftTraceProjectConfigurable implements SearchableConfigurable
     }
 
     @Override
-    public String getId() {
+    public @NonNull String getId() {
         return ID;
     }
 
@@ -45,6 +48,7 @@ public final class OftTraceProjectConfigurable implements SearchableConfigurable
     }
 
     @Override
+    @SuppressWarnings("java:S1162") // IntelliJ settings validation reports rejected values through this API type.
     public void apply() throws ConfigurationException {
         validate(component.getSettings());
         OftTraceProjectSettings.getInstance(project).updateFrom(component.getSettings());
@@ -60,12 +64,15 @@ public final class OftTraceProjectConfigurable implements SearchableConfigurable
         component = null;
     }
 
+    // IntelliJ Configurable callers expect ConfigurationException for validation errors.
+    @SuppressWarnings("java:S1162")
     private static void validate(final OftTraceSettingsSnapshot settings) throws ConfigurationException {
         for (final String additionalPath : settings.additionalPaths()) {
             final Path path;
             try {
                 path = Path.of(additionalPath);
             } catch (final InvalidPathException exception) {
+                LOG.debug("Rejecting invalid OpenFastTrace additional trace path: " + additionalPath, exception);
                 throw new ConfigurationException(
                         "Additional trace path is invalid: " + exception.getInput()
                 );
@@ -86,6 +93,7 @@ public final class OftTraceProjectConfigurable implements SearchableConfigurable
         try {
             return Path.of(basePath);
         } catch (final InvalidPathException exception) {
+            LOG.debug("Ignoring invalid OpenFastTrace project base path: " + basePath, exception);
             return null;
         }
     }

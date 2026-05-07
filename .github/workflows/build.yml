@@ -50,12 +50,6 @@ jobs:
       - name: Build and verify plugin
         run: ./gradlew --stacktrace --warning-mode=all check buildPlugin -x traceRequirements
 
-      - name: OSSIndex audit
-        run: ./gradlew --stacktrace --warning-mode=all ossIndexAudit --info
-        env:
-          OSSINDEX_USERNAME: ${{ secrets.OSSINDEX_USERNAME }}
-          OSSINDEX_TOKEN: ${{ secrets.OSSINDEX_TOKEN }}
-
       - name: Sonar analysis
         if: ${{ env.SONAR_TOKEN != null }}
         run: ./gradlew --stacktrace --warning-mode=all jacocoTestReport sonar -Dsonar.token=$SONAR_TOKEN

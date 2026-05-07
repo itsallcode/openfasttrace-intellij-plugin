@@ -20,6 +20,7 @@ import org.itsallcode.openfasttrace.intellijplugin.OftSupportedFiles;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecification;
 
 import java.util.Optional;
+import java.util.Set;
 
 // [impl->dsn~specification-item-completion~1]
 // [impl->dsn~complete-specification-item-id-in-covers-section~1]
@@ -29,6 +30,9 @@ import java.util.Optional;
 // [impl->dsn~complete-specification-item-id-in-incomplete-coverage-tag-target~1]
 // [impl->dsn~suppress-coverage-tag-target-completion-outside-target-context~1]
 public final class OftSpecificationCompletionProvider extends CompletionContributor implements DumbAware {
+    private static final Set<String> FALLBACK_TEXT_COMMENT_MARKERS =
+            Set.of("//", "#", "--", ";", "'", "/*", "<!--", "*");
+
     public OftSpecificationCompletionProvider() {
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new SpecificationItemCompletionProvider());
     }
@@ -109,15 +113,11 @@ public final class OftSpecificationCompletionProvider extends CompletionContribu
         private static boolean hasTextCommentMarkerBeforeTag(final CharSequence text, final int bracketStart) {
             final int lineStart = findLineStart(text, bracketStart);
             final String beforeTag = text.subSequence(lineStart, bracketStart).toString().trim();
-            return !isInsideQuotedText(text, lineStart, bracketStart)
-                    && (beforeTag.endsWith("//")
-                    || beforeTag.endsWith("#")
-                    || beforeTag.endsWith("--")
-                    || beforeTag.endsWith(";")
-                    || beforeTag.endsWith("'")
-                    || beforeTag.endsWith("/*")
-                    || beforeTag.endsWith("<!--")
-                    || beforeTag.endsWith("*"));
+            return !isInsideQuotedText(text, lineStart, bracketStart) && endsWithFallbackTextCommentMarker(beforeTag);
+        }
+
+        private static boolean endsWithFallbackTextCommentMarker(final String text) {
+            return FALLBACK_TEXT_COMMENT_MARKERS.stream().anyMatch(text::endsWith);
         }
 
         private static int findLineStart(final CharSequence text, final int offset) {

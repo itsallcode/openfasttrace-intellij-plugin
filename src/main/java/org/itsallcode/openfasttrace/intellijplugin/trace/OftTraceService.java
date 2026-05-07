@@ -19,6 +19,8 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 final class OftTraceService {
+    @SuppressWarnings("java:S3032")
+    // OFT ServiceLoader discovery must use the plugin class loader, not an arbitrary caller context loader.
     private static final ClassLoader PLUGIN_CLASS_LOADER = OftTraceService.class.getClassLoader();
 
     private final Oft oft;
@@ -75,7 +77,7 @@ final class OftTraceService {
         return buildInputHeader(inputs) + renderTrace(trace);
     }
 
-    private String buildInputHeader(final OftTraceInputs inputs) {
+    private static String buildInputHeader(final OftTraceInputs inputs) {
         if (inputs.isWholeProject()) {
             return "Scanning base directory: " + inputs.inputPaths().getFirst().toAbsolutePath().normalize()
                     + System.lineSeparator()
