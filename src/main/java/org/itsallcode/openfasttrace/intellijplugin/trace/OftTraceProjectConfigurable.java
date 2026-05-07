@@ -5,6 +5,7 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
+import org.jspecify.annotations.NonNull;
 
 import javax.swing.JComponent;
 import java.nio.file.InvalidPathException;
@@ -24,7 +25,7 @@ public final class OftTraceProjectConfigurable implements SearchableConfigurable
     }
 
     @Override
-    public String getId() {
+    public @NonNull String getId() {
         return ID;
     }
 
@@ -63,7 +64,8 @@ public final class OftTraceProjectConfigurable implements SearchableConfigurable
         component = null;
     }
 
-    @SuppressWarnings("java:S1162") // IntelliJ Configurable callers expect ConfigurationException for validation errors.
+    // IntelliJ Configurable callers expect ConfigurationException for validation errors.
+    @SuppressWarnings("java:S1162")
     private static void validate(final OftTraceSettingsSnapshot settings) throws ConfigurationException {
         for (final String additionalPath : settings.additionalPaths()) {
             final Path path;

@@ -57,7 +57,7 @@ final class OftTraceNavigationResolver {
         return Optional.ofNullable(target[0]);
     }
 
-    private boolean processCoverageTagFile(
+    private static boolean processCoverageTagFile(
             final String specificationId,
             final OftTraceNavigationTarget[] target,
             final VirtualFile file

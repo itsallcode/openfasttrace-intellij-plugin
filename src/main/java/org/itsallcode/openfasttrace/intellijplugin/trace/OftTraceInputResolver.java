@@ -56,7 +56,15 @@ final class OftTraceInputResolver {
             final Project project,
             final OftTraceSettingsSnapshot settings
     ) {
-        return Optional.ofNullable(ProjectUtil.guessProjectDir(project))
+        return resolveFromGuessedProjectDirectory(project, ProjectUtil.guessProjectDir(project), settings);
+    }
+
+    private static Optional<OftTraceInputResolution> resolveFromGuessedProjectDirectory(
+            final Project project,
+            final VirtualFile guessedProjectDirectory,
+            final OftTraceSettingsSnapshot settings
+    ) {
+        return Optional.ofNullable(guessedProjectDirectory)
                 .map(VirtualFile::getPath)
                 .map(OftTraceInputResolver::normalizeProjectPath)
                 .map(OftTraceInputResolver::resolveProjectRoot)
