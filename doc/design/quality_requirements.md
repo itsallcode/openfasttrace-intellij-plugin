@@ -57,6 +57,8 @@ Additional libraries are not allowed by default. Any new third-party dependency 
 
 The Gradle dependency verification metadata in `gradle/verification-metadata.xml` is committed to source control. Maintainers update and review this metadata whenever dependency declarations, Gradle plugin versions, the IntelliJ Platform version, or other build inputs change the resolved dependency artifacts. The standard update command is `./gradlew --write-verification-metadata sha256 help`.
 
+Generated local IntelliJ Platform Ivy metadata for bundled plugin and module artifacts is trusted without checksum verification because the IntelliJ Platform Gradle Plugin can generate environment-specific Ivy descriptors for the local IntelliJ Platform artifact repository. This exception applies only to `ivy-*.xml` descriptors in the `bundledPlugin` and `bundledModule` groups. Resolved JAR artifacts remain checksum verified.
+
 ## Static Analysis And Security Gates
 
 Static code analysis runs in SonarQube Cloud and acts as a build breaker. A failing quality gate blocks integration until the reported issues are resolved or an approved exception exists.
