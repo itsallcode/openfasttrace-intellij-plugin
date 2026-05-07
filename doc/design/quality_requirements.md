@@ -61,7 +61,7 @@ The Gradle dependency verification metadata in `gradle/verification-metadata.xml
 
 Static code analysis runs in SonarQube Cloud and acts as a build breaker. A failing quality gate blocks integration until the reported issues are resolved or an approved exception exists.
 
-Dependency security scanning runs with OSS Index and acts as a build breaker for detected vulnerabilities and ordinary audit failures. If OSS Index returns HTTP 429, the build logs a quota warning and continues because the audit result is unavailable for reasons outside the dependency set. The build stays free of known vulnerable dependencies.
+Dependency vulnerability monitoring runs through GitHub Dependabot instead of the Gradle build. Dependabot alerts provide the repository's vulnerability check for known vulnerable dependencies, while local and CI builds no longer run OSS Index as an immediate build-breaking gate.
 
 OpenFastTrace tracing runs as a build breaker for the specification artifacts in scope. The trace stays clean for the requirement and design artifact types used by the project.
 
