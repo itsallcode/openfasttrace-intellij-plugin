@@ -108,7 +108,14 @@ Needs: req
 ### Run OFT Trace
 `feat~run-oft-trace~1`
 
-The plugin lets users run an OpenFastTrace trace for the currently opened IntelliJ project and inspect the textual result inside the IDE.
+The plugin lets users run an OpenFastTrace trace for the currently opened IntelliJ project and inspect the textual result inside the IDE using a global action for the default project trace.
+
+Needs: req
+
+### OFT Run Configurations
+`feat~oft-run-configurations~1`
+
+The plugin lets users define multiple OpenFastTrace run configurations with different scan parameters and filters.
 
 Needs: req
 
@@ -427,6 +434,36 @@ The plugin makes OpenFastTrace specification item IDs in the trace output window
 
 Covers:
 - `feat~run-oft-trace~1`
+
+Needs: scn
+
+### OpenFastTrace Run Configurations
+`req~openfasttrace-run-configurations~1`
+
+The plugin provides a dedicated run configuration type for OpenFastTrace. Users can create, name, and save multiple trace configurations to switch quickly between different scan scopes and filters.
+
+Covers:
+- `feat~oft-run-configurations~1`
+
+Needs: scn
+
+### Filter Trace by Artifact Types
+`req~filter-trace-by-artifact-types~1`
+
+When using an OpenFastTrace run configuration, the plugin lets users filter the trace results by artifact types. Users can specify a comma-separated list of types (e.g., `req, dsn`) to focus the trace on specific document layers.
+
+Covers:
+- `feat~oft-run-configurations~1`
+
+Needs: scn
+
+### Filter Trace by Tags
+`req~filter-trace-by-tags~1`
+
+When using an OpenFastTrace run configuration, the plugin lets users filter the trace results by tags. Users can specify a comma-separated list of tags to focus the trace on tagged specification items.
+
+Covers:
+- `feat~oft-run-configurations~1`
 
 Needs: scn
 
@@ -1034,5 +1071,41 @@ Needs: dsn
 
 Covers:
 - `req~show-defect-count-for-unclean-trace-chain-in-output-window~1`
+
+Needs: dsn
+
+### Create and Run OpenFastTrace Run Configuration
+`scn~create-and-run-openfasttrace-run-configuration~1`
+
+**Given** an IntelliJ project is open
+**When** a user creates a new `OpenFastTrace` run configuration, names it "Trace Design", selects "Selected resources", enables "Source roots", and enters "doc/spec/" as an additional path
+**Then** the IDE saves the configuration and, when the user runs it, the plugin executes the trace with the configured inputs and shows the result in the output window.
+
+Covers:
+- `req~openfasttrace-run-configurations~1`
+
+Needs: dsn
+
+### Filter Run Configuration by Artifact Types
+`scn~filter-run-configuration-by-artifact-types~1`
+
+**Given** an IntelliJ project is open and an `OpenFastTrace` run configuration is configured with artifact type filters "dsn, constr"
+**When** a user runs that configuration
+**Then** the plugin passes the artifact type filters to OpenFastTrace and the resulting trace output contains only the filtered item types.
+
+Covers:
+- `req~filter-trace-by-artifact-types~1`
+
+Needs: dsn
+
+### Filter Run Configuration by Tags
+`scn~filter-run-configuration-by-tags~1`
+
+**Given** an IntelliJ project is open and an `OpenFastTrace` run configuration is configured with tag filters "mvp"
+**When** a user runs that configuration
+**Then** the plugin passes the tag filter to OpenFastTrace and the resulting trace output contains only items matching that tag.
+
+Covers:
+- `req~filter-trace-by-tags~1`
 
 Needs: dsn

@@ -215,7 +215,64 @@ Needs: impl
 ### Trace Configuration Integration
 `dsn~trace-configuration-integration~1`
 
-The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project, exposes those settings through project configuration UI, and resolves the selected-resource options into a normalized OpenFastTrace input set assembled from IntelliJ source roots, IntelliJ test roots, and additional project-relative paths.
+The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project and through dedicated run configurations. It exposes those settings through project configuration UI and the run configuration editor, and resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria.
+
+#### Run Configuration Editor UI Mockup
+
+```plantuml
+@startsalt
+title OFT Trace — Run Configuration Editor
+scale 2
+{+
+  {T
+    + <&folder> OpenFastTrace
+    ++ <&media-skip-forward> Trace All
+    ++ <&media-skip-forward> Trace User Requirements
+    ++ <&media-skip-forward> <b>Trace Design
+  } |
+  {
+    {
+        .
+        Name: | "Trace Design                    "
+        .
+    }
+    {
+        .
+        <b>Trace Scope
+        .
+        ()  Whole project         |  (X) Selected resources
+        .                         | .
+        Include paths             | [X] Source roots
+        .                         | [X] Test roots
+        .                         | .
+        Additional paths          | {SI
+                                     doc/spec/
+
+                                     .
+                                     "                     "
+                                    }
+        .
+      }
+      ---
+      {
+        .
+        <b>Filters      | .
+        .               | .
+        Artifact types: | "dsn, constr               "
+        .               | <i>(comma-separated, empty = all)
+        .               | .
+        Tags:           | "mvp                       "
+        .               | <i>(comma-separated, empty = all)
+        .               | .
+    }
+
+    {
+      [Apply] | [Run]
+    }
+  }
+}
+@endsalt
+```
 
 Covers:
 - `scn~configure-trace-scope-in-project-settings~1`
@@ -224,6 +281,9 @@ Covers:
 - `scn~include-intellij-test-directories-in-selected-resource-trace~1`
 - `scn~add-project-relative-paths-to-selected-resource-trace~1`
 - `scn~show-per-line-validation-for-additional-trace-paths~1`
+- `scn~create-and-run-openfasttrace-run-configuration~1`
+- `scn~filter-run-configuration-by-artifact-types~1`
+- `scn~filter-run-configuration-by-tags~1`
 
 Needs: impl
 
