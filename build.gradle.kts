@@ -41,7 +41,14 @@ sonar {
 
 requirementTracing {
     failBuild = true
-    inputDirectories = files("doc", "src/main/java", "src/test/java", "build.gradle.kts")
+    inputDirectories = files("doc", "src/main/java", "src/test/java")
+    tags {
+        tag {
+            paths = fileTree("./").include("build.gradle.kts") as FileCollection?
+            tagArtifactType = "bld"
+            coveredItemArtifactType = "dsn"
+        }
+    }
 }
 
 repositories {

@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+// [itest->dsn~trace-execution-service~1]
 class OftTraceServiceTest {
     private static final Pattern ANSI_ESCAPE_SEQUENCE = Pattern.compile("\u001B\\[[;\\d]*m");
 

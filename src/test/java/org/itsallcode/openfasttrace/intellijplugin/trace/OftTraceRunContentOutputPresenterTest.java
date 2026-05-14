@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
+// [itest->dsn~trace-output-presentation~1]
 public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTestCase {
     private static final Pattern ANSI_ESCAPE_SEQUENCE = Pattern.compile("\u001B\\[[;\\d]*m");
     private static final String FIRST_ITEM_ID = "req~long_requirement_00000~1";

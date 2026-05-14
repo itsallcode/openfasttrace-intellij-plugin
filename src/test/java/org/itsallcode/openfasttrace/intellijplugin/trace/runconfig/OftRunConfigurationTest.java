@@ -7,6 +7,7 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
 import org.jdom.Element;
 
+// [itest->dsn~openfasttrace-run-configuration~1]
 public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
     public void testGivenRunConfigurationWhenUpdatingFromSnapshotThenItStoresTheSettings() {
         final OftRunConfiguration configuration = createConfiguration("Test");
