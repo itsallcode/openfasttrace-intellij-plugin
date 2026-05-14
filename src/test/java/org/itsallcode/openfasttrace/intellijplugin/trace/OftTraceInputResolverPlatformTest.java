@@ -35,9 +35,11 @@ public class OftTraceInputResolverPlatformTest extends AbstractOftPlatformTestCa
                     contentRoot,
                     new OftTraceSettingsSnapshot(
                             OftTraceScopeMode.SELECTED_RESOURCES,
-                            true,
-                            true,
-                            "doc/"
+                            OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots(),
+                            OftTraceSettingsSnapshot.DEFAULT.includeTestRoots(),
+                            OftTraceSettingsSnapshot.DEFAULT.additionalPathsText(),
+                            OftTraceSettingsSnapshot.DEFAULT.artifactTypesText(),
+                            OftTraceSettingsSnapshot.DEFAULT.tagsText()
                     )
             );
 
@@ -54,7 +56,7 @@ public class OftTraceInputResolverPlatformTest extends AbstractOftPlatformTestCa
     public void testWhenResolvingFromGuessedProjectDirectoryThenItReturnsAResolutionOptional() throws Exception {
         final Optional<OftTraceInputResolution> resolution = resolveFromGuessedProjectDirectory(
                 getProject(),
-                new OftTraceSettingsSnapshot(OftTraceScopeMode.WHOLE_PROJECT, true, true, "doc/")
+                OftTraceSettingsSnapshot.DEFAULT
         );
 
         assertThat(resolution.map(OftTraceInputResolution::isValid).orElse(true), is(true));

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.lang.reflect.Proxy;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -91,7 +92,7 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
         final Path projectRoot = createManagedTestArtifactDirectory("trace-project-action-input");
         final Project project = projectProxy(projectRoot.toString(), "valid-project");
         final OftTraceProjectAction action = new OftTraceProjectAction(
-                testProject -> OftTraceInputResolution.valid(OftTraceInputs.wholeProject(projectRoot)),
+                testProject -> OftTraceInputResolution.valid(OftTraceInputs.wholeProject(projectRoot, List.of(), List.of())),
                 (runnerProject, inputs, contentTitle) ->
                         runnerCall.set(new RunnerCall(runnerProject, inputs, contentTitle)),
                 (presentedProject, contentTitle, result) ->

@@ -46,24 +46,24 @@ The implementation will follow the standard IntelliJ Platform Run Configuration 
 
 ### Implementation
 
-- [ ] Implement `OftRunConfigurationType`, `OftRunConfigurationFactory`, and `OftRunConfiguration`.
-- [ ] Implement `OftRunConfigurationSettingsEditor` for the GUI (based on `doc/ui-mockups/ui_run_config.plantuml`).
-- [ ] Refactor `OftTraceRunner` and `OftTraceBackgroundRunner` to support parameterized execution.
-- [ ] Implement `OftRunProfileState` to handle the actual execution of the trace.
+- [x] Implement `OftRunConfigurationType`, `OftRunConfigurationFactory`, and `OftRunConfiguration`.
+- [x] Implement `OftRunConfigurationSettingsEditor` for the GUI (based on `doc/ui-mockups/ui_run_config.plantuml`).
+- [x] Refactor `OftTraceRunner` and `OftTraceBackgroundRunner` to support parameterized execution.
+- [x] Implement `OftRunProfileState` to handle the actual execution of the trace.
 
 ### Verification
 
-- [ ] Add unit tests for `OftRunConfiguration` persistence.
-- [ ] Add unit tests for input resolution with filters.
-- [ ] Add integration tests for running a trace via run configuration.
-- [ ] Keep the OpenFastTrace trace clean.
-- [ ] Keep required build and plugin verification tasks green.
+- [x] Add unit tests for `OftRunConfiguration` persistence.
+- [x] Add unit tests for input resolution with filters.
+- [x] Add integration tests for running a trace via run configuration.
+- [x] Keep the OpenFastTrace trace clean.
+- [x] Keep required build and plugin verification tasks green.
 
 ### Update user documentation
 
-- [ ] Update the end user documentation in `README.md`.
+- [x] Update the end user documentation in `README.md`.
 
 ## Version and Changelog Update
 
-- [ ] Raise the version to 0.6.0 (this is a feature release)
-- [ ] Write the changelog entry for 0.6.0
+- [x] Raise the version to 0.7.0 (this is a feature release)
+- [x] Write the changelog entry for 0.7.0

@@ -11,6 +11,7 @@ import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.net.URLClassLoader;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -26,7 +27,7 @@ class OftTraceServiceTest {
         writeSuccessfulTraceProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
@@ -58,7 +59,7 @@ class OftTraceServiceTest {
             currentThread.setContextClassLoader(foreignClassLoader);
 
             final OftTraceResult result = new OftTraceService().traceProject(
-                    OftTraceInputs.wholeProject(temporaryDirectory),
+                    OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
                     OftTraceProgress.NONE
             );
             final String renderedOutput = stripAnsi(result.output());
@@ -81,7 +82,7 @@ class OftTraceServiceTest {
         writeFailingTraceProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
@@ -109,7 +110,7 @@ class OftTraceServiceTest {
         writeSuccessfulTraceProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
@@ -136,7 +137,7 @@ class OftTraceServiceTest {
         writeUncleanTraceChainProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
@@ -169,7 +170,7 @@ class OftTraceServiceTest {
         };
 
         final OftTraceResult result = new OftTraceService(oft, renderer).traceProject(
-                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
                 OftTraceProgress.NONE
         );
 
@@ -178,6 +179,67 @@ class OftTraceServiceTest {
                 () -> assertThat(result.statusMessage(), is("OpenFastTrace trace failed unexpectedly.")),
                 () -> assertThat(result.output(), Matchers.containsString("OpenFastTrace trace failed for input path")),
                 () -> assertThat(result.output(), Matchers.containsString("IllegalStateException: boom"))
+        );
+    }
+
+    // [itest->dsn~filter-trace-by-artifact-types-and-tags~1]
+    @Test
+    void testGivenArtifactTypeFilterMatchingRequirementWhenTracingThenItIncludesTheRequirement(
+            @TempDir final Path temporaryDirectory
+    ) throws IOException {
+        writeSuccessfulTraceProject(temporaryDirectory);
+
+        final OftTraceResult result = new OftTraceService().traceProject(
+                OftTraceInputs.selectedResources(
+                        java.util.List.of(temporaryDirectory),
+                        java.util.List.of("req"),
+                        java.util.List.of()
+                ),
+                OftTraceProgress.NONE
+        );
+        final String renderedOutput = stripAnsi(result.output());
+
+        Assertions.assertAll(
+                () -> assertThat(renderedOutput, Matchers.containsString("ok - 1 total")),
+                () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("3 total")))
+        );
+    }
+
+    @Test
+    void testGivenTagFilterMatchingArtifactWhenTracingThenItIncludesTheArtifact(
+            @TempDir final Path temporaryDirectory
+    ) throws IOException {
+        final Path docDirectory = Files.createDirectories(temporaryDirectory.resolve("doc"));
+        Files.writeString(
+                docDirectory.resolve("tags.md"),
+                """
+                ### Requirement
+                `req~tagged_requirement~1`
+                
+                Tags: tagged
+                
+                Needs: impl
+                
+                ### Requirement
+                `req~untagged_requirement~1`
+                
+                Needs: impl
+                """
+        );
+
+        final OftTraceResult result = new OftTraceService().traceProject(
+                OftTraceInputs.selectedResources(
+                        java.util.List.of(temporaryDirectory),
+                        java.util.List.of(),
+                        java.util.List.of("tagged")
+                ),
+                OftTraceProgress.NONE
+        );
+        final String renderedOutput = stripAnsi(result.output());
+
+        Assertions.assertAll(
+                () -> assertThat(renderedOutput, Matchers.containsString("ok - 1 total")),
+                () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("2 total")))
         );
     }
 
@@ -197,7 +259,7 @@ class OftTraceServiceTest {
         final Path docDirectory = temporaryDirectory.resolve("doc");
         final Path sourceDirectory = temporaryDirectory.resolve("src");
         final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.selectedResources(java.util.List.of(docDirectory, sourceDirectory)),
+                OftTraceInputs.selectedResources(java.util.List.of(docDirectory, sourceDirectory), java.util.List.of(), java.util.List.of()),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());

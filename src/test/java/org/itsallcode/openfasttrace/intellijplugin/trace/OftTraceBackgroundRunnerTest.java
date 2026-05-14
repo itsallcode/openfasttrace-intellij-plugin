@@ -33,7 +33,7 @@ class OftTraceBackgroundRunnerTest {
                 new OftTraceService(),
                 (project, contentTitle, result) -> presenterCall.set(new PresenterCall(project, contentTitle, result))
         );
-        final Task.Backgroundable task = newTraceTask(runner, OftTraceInputs.wholeProject(temporaryDirectory), "Trace");
+        final Task.Backgroundable task = newTraceTask(runner, OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()), "Trace");
         final List<String> progressEvents = new ArrayList<>();
         final ProgressIndicator indicator = progressIndicator(progressEvents);
 
@@ -75,7 +75,7 @@ class OftTraceBackgroundRunnerTest {
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final Task.Backgroundable task = newTraceTask(
                 new OftTraceBackgroundRunner(new OftTraceService(), capturePresenter(presenterCall)),
-                OftTraceInputs.wholeProject(Path.of(".")),
+                OftTraceInputs.wholeProject(Path.of("."), List.of(), List.of()),
                 "Trace"
         );
 
@@ -94,7 +94,7 @@ class OftTraceBackgroundRunnerTest {
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final Task.Backgroundable task = newTraceTask(
                 new OftTraceBackgroundRunner(new OftTraceService(), capturePresenter(presenterCall)),
-                OftTraceInputs.wholeProject(Path.of(".")),
+                OftTraceInputs.wholeProject(Path.of("."), List.of(), List.of()),
                 "Trace"
         );
 
@@ -111,7 +111,7 @@ class OftTraceBackgroundRunnerTest {
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final Task.Backgroundable task = newTraceTask(
                 new OftTraceBackgroundRunner(new OftTraceService(), capturePresenter(presenterCall)),
-                OftTraceInputs.wholeProject(Path.of(".")),
+                OftTraceInputs.wholeProject(Path.of("."), List.of(), List.of()),
                 "Trace"
         );
 

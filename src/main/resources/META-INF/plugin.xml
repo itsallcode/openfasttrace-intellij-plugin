@@ -136,6 +136,7 @@
                 id="org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceProjectConfigurable"
                 displayName="OpenFastTrace"
                 nonDefaultProject="true"/>
+        <configurationType implementation="org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationType"/>
     </extensions>
 
     <actions>

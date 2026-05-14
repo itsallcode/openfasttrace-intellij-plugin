@@ -9,11 +9,12 @@ import org.jspecify.annotations.NonNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-final class OftTraceBackgroundRunner implements OftTraceRunner {
+
+public final class OftTraceBackgroundRunner implements OftTraceRunner {
     private final OftTraceService traceService;
     private final OftTraceOutputPresenter outputPresenter;
 
-    OftTraceBackgroundRunner(final OftTraceService traceService, final OftTraceOutputPresenter outputPresenter) {
+    public OftTraceBackgroundRunner(final OftTraceService traceService, final OftTraceOutputPresenter outputPresenter) {
         this.traceService = traceService;
         this.outputPresenter = outputPresenter;
     }

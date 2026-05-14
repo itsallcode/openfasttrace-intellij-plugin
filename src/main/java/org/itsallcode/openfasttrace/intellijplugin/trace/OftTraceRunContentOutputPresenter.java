@@ -15,14 +15,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-final class OftTraceRunContentOutputPresenter implements OftTraceOutputPresenter {
+public final class OftTraceRunContentOutputPresenter implements OftTraceOutputPresenter {
     public static final String IDEA_CYCLE_BUFFER_SIZE = "idea.cycle.buffer.size";
     private static final AtomicInteger NEXT_DESCRIPTOR_ID = new AtomicInteger(1);
     private final Function<Project, ConsoleView> consoleFactory;
     private final BiConsumer<Project, RunContentDescriptor> runContentShower;
     private final OftAnsiConsoleOutput ansiConsoleOutput = new OftAnsiConsoleOutput();
 
-    OftTraceRunContentOutputPresenter() {
+    public OftTraceRunContentOutputPresenter() {
         this(
                 OftTraceRunContentOutputPresenter::createTraceConsole,
                 (project, descriptor) -> RunContentManager.getInstance(project)

@@ -17,20 +17,21 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 
-final class OftTraceInputResolver {
+public final class OftTraceInputResolver {
     private static final Logger LOG = Logger.getInstance(OftTraceInputResolver.class);
 
     private OftTraceInputResolver() {
         // Prevent constructor invocation.
     }
 
-    static OftTraceInputResolution resolve(final Project project) {
+    public static OftTraceInputResolution resolve(final Project project) {
         return resolve(project, OftTraceProjectSettings.getInstance(project).snapshot());
     }
 
-    static OftTraceInputResolution resolve(final Project project, final OftTraceSettingsSnapshot settings) {
+    public static OftTraceInputResolution resolve(final Project project, final OftTraceSettingsSnapshot settings) {
         final OftTraceInputResolution projectRootResolution = resolveProjectRoot(
-                normalizeProjectPath(project.getBasePath())
+                normalizeProjectPath(project.getBasePath()),
+                settings
         );
         if (projectRootResolution.isValid()) {
             return resolveFromProjectRoot(
@@ -40,7 +41,8 @@ final class OftTraceInputResolver {
             );
         }
         final OftTraceInputResolution projectFileResolution = resolveProjectRoot(
-                normalizeProjectPath(project.getProjectFilePath())
+                normalizeProjectPath(project.getProjectFilePath()),
+                settings
         );
         if (projectFileResolution.isValid()) {
             return resolveFromProjectRoot(
@@ -67,7 +69,7 @@ final class OftTraceInputResolver {
         return Optional.ofNullable(guessedProjectDirectory)
                 .map(VirtualFile::getPath)
                 .map(OftTraceInputResolver::normalizeProjectPath)
-                .map(OftTraceInputResolver::resolveProjectRoot)
+                .map(basePath -> resolveProjectRoot(basePath, settings))
                 .filter(OftTraceInputResolution::isValid)
                 .map(resolution -> resolveFromProjectRoot(
                         project,
@@ -76,7 +78,7 @@ final class OftTraceInputResolver {
                 ));
     }
 
-    static OftTraceInputResolution resolveProjectRoot(final String basePath) {
+    static OftTraceInputResolution resolveProjectRoot(final String basePath, final OftTraceSettingsSnapshot settings) {
         if (basePath == null || basePath.isBlank()) {
             return OftTraceInputResolution.invalid(
                     "The current project does not expose a local base path for tracing."
@@ -101,7 +103,11 @@ final class OftTraceInputResolver {
                     "The current project base path is not a directory: " + inputPath
             );
         }
-        return OftTraceInputResolution.valid(OftTraceInputs.wholeProject(inputPath));
+        return OftTraceInputResolution.valid(OftTraceInputs.wholeProject(
+                inputPath,
+                settings.artifactTypes(),
+                settings.tags()
+        ));
     }
 
     // [impl->dsn~trace-selected-project-resources~1]
@@ -114,7 +120,11 @@ final class OftTraceInputResolver {
             final OftTraceSettingsSnapshot settings
     ) {
         if (settings.scopeMode() == OftTraceScopeMode.WHOLE_PROJECT) {
-            return OftTraceInputResolution.valid(OftTraceInputs.wholeProject(projectRoot));
+            return OftTraceInputResolution.valid(OftTraceInputs.wholeProject(
+                    projectRoot,
+                    settings.artifactTypes(),
+                    settings.tags()
+            ));
         }
         final LinkedHashSet<Path> inputs = new LinkedHashSet<>();
         if (settings.includeSourceRoots()) {
@@ -126,7 +136,8 @@ final class OftTraceInputResolver {
         for (final String additionalPath : settings.additionalPaths()) {
             final OftTraceInputResolution additionalPathResolution = resolveConfiguredAdditionalPath(
                     projectRoot,
-                    additionalPath
+                    additionalPath,
+                    settings
             );
             if (!additionalPathResolution.isValid()) {
                 return additionalPathResolution;
@@ -138,7 +149,11 @@ final class OftTraceInputResolver {
                     "The current trace configuration does not resolve to any files or directories."
             );
         }
-        return OftTraceInputResolution.valid(OftTraceInputs.selectedResources(List.copyOf(inputs)));
+        return OftTraceInputResolution.valid(OftTraceInputs.selectedResources(
+                List.copyOf(inputs),
+                settings.artifactTypes(),
+                settings.tags()
+        ));
     }
 
     private static List<Path> resolveModuleSourceFolders(final Project project, final boolean testSource) {
@@ -172,7 +187,8 @@ final class OftTraceInputResolver {
     // [impl->dsn~add-project-relative-paths-to-selected-resource-trace~1]
     private static OftTraceInputResolution resolveConfiguredAdditionalPath(
             final Path projectRoot,
-            final String additionalPath
+            final String additionalPath,
+            final OftTraceSettingsSnapshot settings
     ) {
         final Path relativePath;
         try {
@@ -199,7 +215,11 @@ final class OftTraceInputResolver {
                     "The configured additional trace path is neither a file nor a directory: " + resolvedPath
             );
         }
-        return OftTraceInputResolution.valid(OftTraceInputs.selectedResources(List.of(resolvedPath)));
+        return OftTraceInputResolution.valid(OftTraceInputs.selectedResources(
+                List.of(resolvedPath),
+                settings.artifactTypes(),
+                settings.tags()
+        ));
     }
 
     private static String normalizeProjectPath(final String projectPath) {

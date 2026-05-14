@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
@@ -35,7 +36,7 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
         final Path temporaryDirectory = createManagedTestArtifactDirectory("trace-run-content-output-presenter-input");
         writeLongFailingTraceProject(temporaryDirectory, 2000);
         final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());

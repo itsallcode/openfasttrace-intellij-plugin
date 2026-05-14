@@ -6,6 +6,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 
 import javax.swing.ButtonGroup;
@@ -17,7 +18,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.nio.file.Path;
 
-final class OftTraceSettingsComponent {
+public final class OftTraceSettingsComponent {
     private final JBRadioButton wholeProjectRadioButton =
             new JBRadioButton("Trace the whole project");
     private final JBRadioButton selectedResourcesRadioButton =
@@ -27,12 +28,14 @@ final class OftTraceSettingsComponent {
     private final JBCheckBox includeTestRootsCheckBox =
             new JBCheckBox("Include IntelliJ test directories");
     private final JBTextArea additionalPathsTextArea = new JBTextArea();
+    private final JBTextField artifactTypesField = new JBTextField();
+    private final JBTextField tagsField = new JBTextField();
     private final JBLabel resolvedRelativeToLabel = new JBLabel();
     private final JBTextArea validationMessagesArea = new JBTextArea();
     private final Path projectRoot;
     private final JPanel panel;
 
-    OftTraceSettingsComponent(final Path projectRoot) {
+    public OftTraceSettingsComponent(final Path projectRoot) {
         this.projectRoot = projectRoot;
         final ButtonGroup traceScopeGroup = new ButtonGroup();
         traceScopeGroup.add(wholeProjectRadioButton);
@@ -81,51 +84,55 @@ final class OftTraceSettingsComponent {
                 .addComponent(includeSourceRootsCheckBox, 1)
                 .addComponent(includeTestRootsCheckBox, 1)
                 .addComponent(additionalPathsPanel, 1)
+                .addSeparator()
+                .addLabeledComponent("Artifact types:", artifactTypesField)
+                .addTooltip("comma-separated, empty = all")
+                .addLabeledComponent("Tags:", tagsField)
+                .addTooltip("comma-separated, empty = all")
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
-        setSettings(new OftTraceSettingsSnapshot(
-                OftTraceScopeMode.WHOLE_PROJECT,
-                true,
-                true,
-                OftTraceProjectSettings.DEFAULT_ADDITIONAL_PATH
-        ));
+        setSettings(OftTraceSettingsSnapshot.DEFAULT);
     }
 
-    JComponent getPanel() {
+    public JComponent getPanel() {
         return panel;
     }
 
-    OftTraceSettingsSnapshot getSettings() {
+    public OftTraceSettingsSnapshot getSettings() {
         return new OftTraceSettingsSnapshot(
                 selectedResourcesRadioButton.isSelected()
                         ? OftTraceScopeMode.SELECTED_RESOURCES
                         : OftTraceScopeMode.WHOLE_PROJECT,
                 includeSourceRootsCheckBox.isSelected(),
                 includeTestRootsCheckBox.isSelected(),
-                additionalPathsTextArea.getText()
+                additionalPathsTextArea.getText(),
+                artifactTypesField.getText(),
+                tagsField.getText()
         );
     }
 
-    void setSettings(final OftTraceSettingsSnapshot settings) {
+    public void setSettings(final OftTraceSettingsSnapshot settings) {
         wholeProjectRadioButton.setSelected(settings.scopeMode() == OftTraceScopeMode.WHOLE_PROJECT);
         selectedResourcesRadioButton.setSelected(settings.scopeMode() == OftTraceScopeMode.SELECTED_RESOURCES);
         includeSourceRootsCheckBox.setSelected(settings.includeSourceRoots());
         includeTestRootsCheckBox.setSelected(settings.includeTestRoots());
         additionalPathsTextArea.setText(settings.additionalPathsText());
+        artifactTypesField.setText(settings.artifactTypesText());
+        tagsField.setText(settings.tagsText());
         updateSelectedResourcesEnabledState();
     }
 
-    boolean isSelectedResourcesEnabled() {
+    public boolean isSelectedResourcesEnabled() {
         return includeSourceRootsCheckBox.isEnabled()
                 && includeTestRootsCheckBox.isEnabled()
                 && additionalPathsTextArea.isEnabled();
     }
 
-    String resolvedRelativeToText() {
+    public String resolvedRelativeToText() {
         return resolvedRelativeToLabel.getText();
     }
 
-    String validationMessagesText() {
+    public String validationMessagesText() {
         return validationMessagesArea.getText();
     }
 
