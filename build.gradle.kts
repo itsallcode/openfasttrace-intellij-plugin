@@ -72,6 +72,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:${providers.gradleProperty("junitBomVersion").get()}"))
     testImplementation("junit:junit:${providers.gradleProperty("junit4Version").get()}")
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.platform:junit-platform-launcher")
     testImplementation("org.hamcrest:hamcrest:${providers.gradleProperty("hamcrestVersion").get()}")
     testImplementation("org.opentest4j:opentest4j:${providers.gradleProperty("opentest4jVersion").get()}")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
