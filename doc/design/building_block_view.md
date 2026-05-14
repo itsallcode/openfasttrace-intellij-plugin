@@ -217,6 +217,8 @@ Needs: impl
 
 The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project and through dedicated run configurations. It exposes those settings through project configuration UI and the run configuration editor, and resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria.
 
+Needs: impl
+
 #### Run Configuration Editor UI Mockup
 
 ```plantuml

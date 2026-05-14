@@ -6,7 +6,6 @@ import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 // [bld->dsn~plugin-build-uses-intellij-platform-gradle-plugin~1]
-// [bld->dsn~dependency-vulnerability-monitoring-uses-dependabot~1]
 plugins {
     id("java")
     id("jacoco")
@@ -42,15 +41,7 @@ sonar {
 
 requirementTracing {
     failBuild = true
-    inputDirectories = files("doc", "src/main/java", "src/test/java")
-    tags {
-        tag {
-            paths = files("build.gradle.kts")
-            coveredItemArtifactType = "dsn"
-            tagArtifactType = "bld"
-            coveredItemNamePrefix = ""
-        }
-    }
+    inputDirectories = files("doc", "src/main/java", "src/test/java", "build.gradle.kts")
 }
 
 repositories {
