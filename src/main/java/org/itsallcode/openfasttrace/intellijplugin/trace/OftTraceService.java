@@ -46,11 +46,10 @@ public final class OftTraceService {
             progress.checkCanceled();
             final List<SpecificationItem> items = importItems(inputs);
             final List<SpecificationItem> filteredItems = filterImportedItems(items, inputs);
-            final List<SpecificationItem> filteredNeedsItems = filterNeeds(filteredItems, inputs.artifactTypes());
 
             progress.phase("Linking OpenFastTrace items...", 0.4D);
             progress.checkCanceled();
-            final List<LinkedSpecificationItem> linkedItems = oft.link(filteredNeedsItems);
+            final List<LinkedSpecificationItem> linkedItems = oft.link(filteredItems);
 
             progress.phase("Tracing OpenFastTrace items...", 0.65D);
             progress.checkCanceled();
@@ -82,37 +81,6 @@ public final class OftTraceService {
                     .toList();
         }
         return filteredItems;
-    }
-
-    private List<SpecificationItem> filterNeeds(final List<SpecificationItem> items, final List<String> allowedTypes) {
-        if (allowedTypes.isEmpty()) {
-            return items;
-        }
-        return items.stream()
-                .map(item -> filterNeedsOfItem(item, allowedTypes))
-                .toList();
-    }
-
-    private SpecificationItem filterNeedsOfItem(final SpecificationItem item, final List<String> allowedTypes) {
-        final SpecificationItem.Builder builder = SpecificationItem.builder()
-                .id(item.getId())
-                .title(item.getTitle())
-                .description(item.getDescription())
-                .rationale(item.getRationale())
-                .comment(item.getComment())
-                .status(item.getStatus())
-                .location(item.getLocation())
-                .forwards(item.isForwarding());
-
-        item.getCoveredIds().forEach(builder::addCoveredId);
-        item.getDependOnIds().forEach(builder::addDependOnId);
-        item.getTags().forEach(builder::addTag);
-
-        item.getNeedsArtifactTypes().stream()
-                .filter(allowedTypes::contains)
-                .forEach(builder::addNeedsArtifactType);
-
-        return builder.build();
     }
 
     private List<SpecificationItem> importItems(final OftTraceInputs inputs) {

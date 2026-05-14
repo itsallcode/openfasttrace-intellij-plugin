@@ -200,6 +200,7 @@ class OftTraceServiceTest {
         final String renderedOutput = stripAnsi(result.output());
 
         Assertions.assertAll(
+                () -> assertThat(result.isSuccessful(), is(true)),
                 () -> assertThat(renderedOutput, Matchers.containsString("ok - 1 total")),
                 () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("3 total")))
         );

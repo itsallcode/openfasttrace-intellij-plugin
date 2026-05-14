@@ -28,6 +28,7 @@ import static org.hamcrest.Matchers.is;
 
 class OftTraceInputResolverTest {
     private static final String PROJECT_ROOT_ADDITIONAL_PATH = "<project-root>";
+    private static final OftTraceSettingsSnapshot DEFAULT_SETTINGS = OftTraceSettingsSnapshot.DEFAULT;
 
     @Test
     void testGivenNullBasePathWhenResolvingProjectRootThenItReturnsAnInvalidResolution() {
