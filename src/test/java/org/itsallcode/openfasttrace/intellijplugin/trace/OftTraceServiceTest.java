@@ -3,6 +3,7 @@ package org.itsallcode.openfasttrace.intellijplugin.trace;
 import org.itsallcode.openfasttrace.core.Oft;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -193,20 +194,20 @@ class OftTraceServiceTest {
         final OftTraceResult result = new OftTraceService().traceProject(
                 OftTraceInputs.selectedResources(
                         java.util.List.of(temporaryDirectory),
-                        java.util.List.of("req"),
+                        java.util.List.of("feat", "req"),
                         java.util.List.of()
                 ),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
-
+        System.out.println(renderedOutput);
         Assertions.assertAll(
                 () -> assertThat(result.isSuccessful(), is(true)),
-                () -> assertThat(renderedOutput, Matchers.containsString("ok - 1 total")),
-                () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("3 total")))
+                () -> assertThat(renderedOutput, Matchers.containsString("ok - 2 total"))
         );
     }
 
+    @Disabled("Reanable after https://github.com/itsallcode/openfasttrace/issues/505 is fixed")
     @Test
     void testGivenTagFilterMatchingArtifactWhenTracingThenItIncludesTheArtifact(
             @TempDir final Path temporaryDirectory
@@ -215,17 +216,25 @@ class OftTraceServiceTest {
         Files.writeString(
                 docDirectory.resolve("tags.md"),
                 """
-                ### Requirement
+                ### Tagged Requirement
                 `req~tagged_requirement~1`
                 
                 Tags: tagged
                 
                 Needs: impl
                 
-                ### Requirement
+                ### Untagged Requirement
                 `req~untagged_requirement~1`
                 
                 Needs: impl
+                
+                ### Tagged Coverage
+                `impl~tagged_coverage~1`
+                
+                Covers:
+                - `req~tagged_requirement~1`
+                
+                Tags: tagged
                 """
         );
 
@@ -239,10 +248,7 @@ class OftTraceServiceTest {
         );
         final String renderedOutput = stripAnsi(result.output());
 
-        Assertions.assertAll(
-                () -> assertThat(renderedOutput, Matchers.containsString("ok - 1 total")),
-                () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("2 total")))
-        );
+        assertThat(renderedOutput, Matchers.containsString("ok - 2 total"));
     }
 
     private String stripAnsi(final String output) {

@@ -3,6 +3,7 @@ package org.itsallcode.openfasttrace.intellijplugin.trace;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import org.itsallcode.openfasttrace.api.ColorScheme;
 import org.itsallcode.openfasttrace.api.DetailsSectionDisplay;
+import org.itsallcode.openfasttrace.api.FilterSettings;
 import org.itsallcode.openfasttrace.api.ReportSettings;
 import org.itsallcode.openfasttrace.api.core.LinkedSpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
@@ -14,7 +15,9 @@ import org.itsallcode.openfasttrace.core.Oft;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -40,16 +43,20 @@ public final class OftTraceService {
     // [impl->dsn~show-scanned-base-directory-in-trace-output-window~1]
     // [impl->dsn~show-failing-trace-output-in-ide-output-window~1]
     // [impl->dsn~preserve-defect-count-for-unclean-trace-chain-in-output-window~1]
+    // [impl->dsn~filter-trace-by-artifact-types-and-tags~1]
     public OftTraceResult traceProject(final OftTraceInputs inputs, final OftTraceProgress progress) {
         try {
             progress.phase("Importing OpenFastTrace items...", 0.15D);
             progress.checkCanceled();
-            final List<SpecificationItem> items = importItems(inputs);
-            final List<SpecificationItem> filteredItems = filterImportedItems(items, inputs);
+            final FilterSettings filterSettings = FilterSettings.builder()
+                    .artifactTypes(Set.copyOf(inputs.artifactTypes()))
+                    .tags(Set.copyOf(inputs.tags()))
+                    .build();
+            final List<SpecificationItem> items = importItems(inputs.inputPaths(), filterSettings);
 
             progress.phase("Linking OpenFastTrace items...", 0.4D);
             progress.checkCanceled();
-            final List<LinkedSpecificationItem> linkedItems = oft.link(filteredItems);
+            final List<LinkedSpecificationItem> linkedItems = oft.link(items);
 
             progress.phase("Tracing OpenFastTrace items...", 0.65D);
             progress.checkCanceled();
@@ -67,25 +74,11 @@ public final class OftTraceService {
         }
     }
 
-    // [impl->dsn~filter-trace-by-artifact-types-and-tags~1]
-    private List<SpecificationItem> filterImportedItems(final List<SpecificationItem> items, final OftTraceInputs inputs) {
-        List<SpecificationItem> filteredItems = items;
-        if (!inputs.artifactTypes().isEmpty()) {
-            filteredItems = filteredItems.stream()
-                    .filter(item -> inputs.artifactTypes().contains(item.getArtifactType()))
-                    .toList();
-        }
-        if (!inputs.tags().isEmpty()) {
-            filteredItems = filteredItems.stream()
-                    .filter(item -> item.getTags().stream().anyMatch(tag -> inputs.tags().contains(tag)))
-                    .toList();
-        }
-        return filteredItems;
-    }
 
-    private List<SpecificationItem> importItems(final OftTraceInputs inputs) {
+    private List<SpecificationItem> importItems(final List<Path> inputs, final FilterSettings filterSettings) {
         final ImportSettings settings = ImportSettings.builder()
-                .addInputs(inputs.inputPaths())
+                .addInputs(inputs)
+                .filter(filterSettings)
                 .build();
         return runWithPluginClassLoader(() -> oft.importItems(settings));
     }
