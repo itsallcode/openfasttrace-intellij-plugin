@@ -21,6 +21,7 @@ public record OftTraceSettingsSnapshot(
     );
 
     private static final Pattern LINE_SEPARATOR = Pattern.compile("\\R");
+    public static final Pattern COMMA = Pattern.compile(",");
 
     public List<String> additionalPaths() {
         return LINE_SEPARATOR.splitAsStream(additionalPathsText)
@@ -37,11 +38,11 @@ public record OftTraceSettingsSnapshot(
         return splitCommaSeparated(tagsText);
     }
 
-    private List<String> splitCommaSeparated(final String text) {
+    private static List<String> splitCommaSeparated(final String text) {
         if (text == null || text.isBlank()) {
             return List.of();
         }
-        return Pattern.compile(",").splitAsStream(text)
+        return COMMA.splitAsStream(text)
                 .map(String::trim)
                 .filter(item -> !item.isEmpty())
                 .toList();
