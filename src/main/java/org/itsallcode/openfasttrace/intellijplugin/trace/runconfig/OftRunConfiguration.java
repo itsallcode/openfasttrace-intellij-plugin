@@ -1,6 +1,5 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace.runconfig;
 
-import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.LocatableConfigurationBase;
@@ -15,15 +14,16 @@ import com.intellij.util.xmlb.XmlSerializer;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jdom.Element;
+import org.jspecify.annotations.NonNull;
 
 import java.io.Serial;
+import java.io.Serializable;
 
 public final class OftRunConfiguration extends LocatableConfigurationBase<OftRunProfileState> {
     @Serial
-    public static final long serialVersionUID = 1L;
-    private State state = new State();
+    private static final long serialVersionUID = 1L;
+    private final State state = new State();
 
     public OftRunConfiguration(final Project project, final ConfigurationFactory factory, final String name) {
         super(project, factory, name);
@@ -35,31 +35,31 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
     }
 
     @Override
-    public @Nullable RunProfileState getState(
+    public @NonNull RunProfileState getState(
             @NotNull final Executor executor,
             @NotNull final ExecutionEnvironment environment
-    ) throws ExecutionException {
+    ) {
         return new OftRunProfileState(environment, snapshot());
     }
 
     public OftTraceSettingsSnapshot snapshot() {
         return new OftTraceSettingsSnapshot(
-                parseScopeMode(state.traceScopeMode),
-                state.includeSourceRoots,
-                state.includeTestRoots,
-                state.additionalPathsText,
-                state.artifactTypesText,
-                state.tagsText
+                parseScopeMode(state.getTraceScopeMode()),
+                state.isIncludeSourceRoots(),
+                state.isIncludeTestRoots(),
+                state.getAdditionalPathsText(),
+                state.getArtifactTypesText(),
+                state.getTagsText()
         );
     }
 
     public void updateFrom(final OftTraceSettingsSnapshot snapshot) {
-        state.traceScopeMode = snapshot.scopeMode().name();
-        state.includeSourceRoots = snapshot.includeSourceRoots();
-        state.includeTestRoots = snapshot.includeTestRoots();
-        state.additionalPathsText = snapshot.additionalPathsText();
-        state.artifactTypesText = snapshot.artifactTypesText();
-        state.tagsText = snapshot.tagsText();
+        state.setTraceScopeMode(snapshot.scopeMode().name());
+        state.setIncludeSourceRoots(snapshot.includeSourceRoots());
+        state.setIncludeTestRoots(snapshot.includeTestRoots());
+        state.setAdditionalPathsText(snapshot.additionalPathsText());
+        state.setArtifactTypesText(snapshot.artifactTypesText());
+        state.setTagsText(snapshot.tagsText());
     }
 
     @Override
@@ -85,12 +85,62 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
         }
     }
 
-    private static final class State {
-        public String traceScopeMode = OftTraceSettingsSnapshot.DEFAULT.scopeMode().name();
-        public boolean includeSourceRoots = OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots();
-        public boolean includeTestRoots = OftTraceSettingsSnapshot.DEFAULT.includeTestRoots();
-        public String additionalPathsText = OftTraceSettingsSnapshot.DEFAULT.additionalPathsText();
-        public String artifactTypesText = OftTraceSettingsSnapshot.DEFAULT.artifactTypesText();
-        public String tagsText = OftTraceSettingsSnapshot.DEFAULT.tagsText();
+    private static final class State implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+        private String traceScopeMode = OftTraceSettingsSnapshot.DEFAULT.scopeMode().name();
+        private boolean includeSourceRoots = OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots();
+        private boolean includeTestRoots = OftTraceSettingsSnapshot.DEFAULT.includeTestRoots();
+        private String additionalPathsText = OftTraceSettingsSnapshot.DEFAULT.additionalPathsText();
+        private String artifactTypesText = OftTraceSettingsSnapshot.DEFAULT.artifactTypesText();
+        private String tagsText = OftTraceSettingsSnapshot.DEFAULT.tagsText();
+
+        public String getTraceScopeMode() {
+            return traceScopeMode;
+        }
+
+        public void setTraceScopeMode(final String traceScopeMode) {
+            this.traceScopeMode = traceScopeMode;
+        }
+
+        public boolean isIncludeSourceRoots() {
+            return includeSourceRoots;
+        }
+
+        public void setIncludeSourceRoots(final boolean includeSourceRoots) {
+            this.includeSourceRoots = includeSourceRoots;
+        }
+
+        public boolean isIncludeTestRoots() {
+            return includeTestRoots;
+        }
+
+        public void setIncludeTestRoots(final boolean includeTestRoots) {
+            this.includeTestRoots = includeTestRoots;
+        }
+
+        public String getAdditionalPathsText() {
+            return additionalPathsText;
+        }
+
+        public void setAdditionalPathsText(final String additionalPathsText) {
+            this.additionalPathsText = additionalPathsText;
+        }
+
+        public String getArtifactTypesText() {
+            return artifactTypesText;
+        }
+
+        public void setArtifactTypesText(final String artifactTypesText) {
+            this.artifactTypesText = artifactTypesText;
+        }
+
+        public String getTagsText() {
+            return tagsText;
+        }
+
+        public void setTagsText(final String tagsText) {
+            this.tagsText = tagsText;
+        }
     }
 }

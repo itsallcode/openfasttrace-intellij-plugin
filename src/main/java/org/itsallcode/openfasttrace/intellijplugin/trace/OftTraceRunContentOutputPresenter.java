@@ -30,7 +30,7 @@ public final class OftTraceRunContentOutputPresenter implements OftTraceOutputPr
         );
     }
 
-    OftTraceRunContentOutputPresenter(
+    public OftTraceRunContentOutputPresenter(
             final Function<Project, ConsoleView> consoleFactory,
             final BiConsumer<Project, RunContentDescriptor> runContentShower
     ) {
@@ -63,7 +63,7 @@ public final class OftTraceRunContentOutputPresenter implements OftTraceOutputPr
         );
     }
 
-    static ConsoleView createTraceConsole(final Project project) {
+    public static ConsoleView createTraceConsole(final Project project) {
         final String previousBufferSize = System.getProperty(IDEA_CYCLE_BUFFER_SIZE);
         try {
             System.setProperty(IDEA_CYCLE_BUFFER_SIZE, "disabled");
