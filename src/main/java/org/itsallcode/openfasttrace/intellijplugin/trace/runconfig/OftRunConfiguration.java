@@ -17,12 +17,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jdom.Element;
 import org.jspecify.annotations.NonNull;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 public final class OftRunConfiguration extends LocatableConfigurationBase<OftRunProfileState> {
-    @Serial
-    private static final long serialVersionUID = 1L;
     private final State state = new State();
 
     public OftRunConfiguration(final Project project, final ConfigurationFactory factory, final String name) {
@@ -86,8 +83,6 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
     }
 
     private static final class State implements Serializable {
-        @Serial
-        private static final long serialVersionUID = 1L;
         private String traceScopeMode = OftTraceSettingsSnapshot.DEFAULT.scopeMode().name();
         private boolean includeSourceRoots = OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots();
         private boolean includeTestRoots = OftTraceSettingsSnapshot.DEFAULT.includeTestRoots();
