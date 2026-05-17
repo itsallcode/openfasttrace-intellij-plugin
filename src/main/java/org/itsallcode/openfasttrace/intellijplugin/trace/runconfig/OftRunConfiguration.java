@@ -18,7 +18,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jdom.Element;
 
+import java.io.Serial;
+
 public final class OftRunConfiguration extends LocatableConfigurationBase<OftRunProfileState> {
+    @Serial
+    public static final long serialVersionUID = 1L;
     private State state = new State();
 
     public OftRunConfiguration(final Project project, final ConfigurationFactory factory, final String name) {
@@ -81,7 +85,7 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
         }
     }
 
-    public static final class State {
+    private static final class State {
         public String traceScopeMode = OftTraceSettingsSnapshot.DEFAULT.scopeMode().name();
         public boolean includeSourceRoots = OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots();
         public boolean includeTestRoots = OftTraceSettingsSnapshot.DEFAULT.includeTestRoots();
