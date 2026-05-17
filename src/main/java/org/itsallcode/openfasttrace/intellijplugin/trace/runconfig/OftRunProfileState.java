@@ -1,11 +1,14 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace.runconfig;
 
-import com.intellij.execution.ExecutionException;
+import com.intellij.execution.DefaultExecutionResult;
 import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.RunProfileState;
+import com.intellij.execution.process.NopProcessHandler;
+import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
+import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.project.Project;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceBackgroundRunner;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceInputResolution;
@@ -29,24 +32,32 @@ public final class OftRunProfileState implements RunProfileState {
     }
 
     @Override
-    public @Nullable ExecutionResult execute(final Executor executor, @NotNull final ProgramRunner<?> runner) throws ExecutionException {
+    public @Nullable ExecutionResult execute(final Executor executor, @NotNull final ProgramRunner<?> runner) {
         final Project project = environment.getProject();
         final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(project, settings);
 
         final String contentTitle = "OpenFastTrace Trace: " + environment.getRunProfile().getName();
-        final OftTraceOutputPresenter outputPresenter = new OftTraceRunContentOutputPresenter();
+        final ConsoleView console = OftTraceRunContentOutputPresenter.createTraceConsole(project);
+        final OftTraceOutputPresenter outputPresenter = new OftTraceRunContentOutputPresenter(
+                p -> console,
+                (p, descriptor) -> {
+                    // The descriptor is handled by the execution framework.
+                }
+        );
 
         if (!resolution.isValid()) {
             outputPresenter.show(project, contentTitle, OftTraceResult.invalidInput(resolution.errorMessage()));
-            return null;
+            return new DefaultExecutionResult(console, new NopProcessHandler());
         }
 
+        final ProcessHandler processHandler = new NopProcessHandler();
         final OftTraceRunner traceRunner = new OftTraceBackgroundRunner(
                 new OftTraceService(),
-                outputPresenter
+                outputPresenter,
+                processHandler
         );
 
         traceRunner.run(project, resolution.inputs(), contentTitle);
-        return null;
+        return new DefaultExecutionResult(console, processHandler);
     }
 }
