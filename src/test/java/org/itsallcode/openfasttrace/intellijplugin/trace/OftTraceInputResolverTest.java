@@ -28,10 +28,11 @@ import static org.hamcrest.Matchers.is;
 
 class OftTraceInputResolverTest {
     private static final String PROJECT_ROOT_ADDITIONAL_PATH = "<project-root>";
+    private static final OftTraceSettingsSnapshot DEFAULT_SETTINGS = OftTraceSettingsSnapshot.DEFAULT;
 
     @Test
     void testGivenNullBasePathWhenResolvingProjectRootThenItReturnsAnInvalidResolution() {
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot(null);
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot(null, OftTraceSettingsSnapshot.DEFAULT);
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -44,7 +45,7 @@ class OftTraceInputResolverTest {
 
     @Test
     void testGivenBlankBasePathWhenResolvingProjectRootThenItReturnsAnInvalidResolution() {
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot("   ");
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot("   ", OftTraceSettingsSnapshot.DEFAULT);
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -60,7 +61,7 @@ class OftTraceInputResolverTest {
             @TempDir final Path temporaryDirectory
     ) {
         final OftTraceInputResolution resolution =
-                OftTraceInputResolver.resolveProjectRoot(temporaryDirectory.resolve("missing").toString());
+                OftTraceInputResolver.resolveProjectRoot(temporaryDirectory.resolve("missing").toString(), OftTraceSettingsSnapshot.DEFAULT);
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -74,7 +75,7 @@ class OftTraceInputResolverTest {
     ) throws IOException {
         final Path file = Files.writeString(temporaryDirectory.resolve("build.gradle.kts"), "plugins {}");
 
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot(file.toString());
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot(file.toString(), DEFAULT_SETTINGS);
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -87,7 +88,8 @@ class OftTraceInputResolverTest {
             @TempDir final Path temporaryDirectory
     ) {
         final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot(
-                temporaryDirectory.toString()
+                temporaryDirectory.toString(),
+                DEFAULT_SETTINGS
         );
 
         Assertions.assertAll(
@@ -99,7 +101,7 @@ class OftTraceInputResolverTest {
 
     @Test
     void testGivenInvalidBasePathStringWhenResolvingProjectRootThenItReturnsAnInvalidResolution() {
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot("\0");
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolveProjectRoot("\0", DEFAULT_SETTINGS);
 
         Assertions.assertAll(
                 () -> assertThat(resolution.isValid(), is(false)),
@@ -115,7 +117,7 @@ class OftTraceInputResolverTest {
 
         final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(
                 project,
-                new OftTraceSettingsSnapshot(OftTraceScopeMode.WHOLE_PROJECT, true, true, "doc/")
+                OftTraceSettingsSnapshot.DEFAULT
         );
 
         Assertions.assertAll(
@@ -134,7 +136,7 @@ class OftTraceInputResolverTest {
 
         final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(
                 project,
-                new OftTraceSettingsSnapshot(OftTraceScopeMode.WHOLE_PROJECT, true, true, "doc/")
+                OftTraceSettingsSnapshot.DEFAULT
         );
 
         Assertions.assertAll(
@@ -158,7 +160,9 @@ class OftTraceInputResolverTest {
                         OftTraceScopeMode.SELECTED_RESOURCES,
                         false,
                         false,
-                        "doc/\ntrace.conf"
+                        "doc/\ntrace.conf",
+                        "",
+                        ""
                 )
         );
 
@@ -187,7 +191,9 @@ class OftTraceInputResolverTest {
                         OftTraceScopeMode.SELECTED_RESOURCES,
                         false,
                         false,
-                        additionalPathsText
+                        additionalPathsText,
+                        "",
+                        ""
                 )
         );
 
@@ -206,7 +212,7 @@ class OftTraceInputResolverTest {
 
         final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(
                 project,
-                new OftTraceSettingsSnapshot(OftTraceScopeMode.WHOLE_PROJECT, true, true, "doc/")
+                OftTraceSettingsSnapshot.DEFAULT
         );
 
         Assertions.assertAll(
@@ -234,7 +240,7 @@ class OftTraceInputResolverTest {
                 new Class<?>[]{Project.class, VirtualFile.class, OftTraceSettingsSnapshot.class},
                 projectProxy(null, null, "trace-project"),
                 virtualFileAt(temporaryDirectory),
-                new OftTraceSettingsSnapshot(OftTraceScopeMode.WHOLE_PROJECT, true, true, "doc/")
+                OftTraceSettingsSnapshot.DEFAULT
         );
 
         assertThat(resolution.orElseThrow().inputs().inputPaths(), contains(temporaryDirectory));

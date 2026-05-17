@@ -55,9 +55,7 @@ The plugin uses the minimum set of dependencies required for:
 
 Additional libraries are not allowed by default. Any new third-party dependency requires an explicit design decision and approval before it is added to the build.
 
-The Gradle dependency verification metadata in `gradle/verification-metadata.xml` is committed to source control. Maintainers update and review this metadata whenever dependency declarations, Gradle plugin versions, the IntelliJ Platform version, or other build inputs change the resolved dependency artifacts. The standard update command is `./gradlew --write-verification-metadata sha256 help`.
-
-Generated local IntelliJ Platform Ivy metadata for bundled plugin and module artifacts is trusted without checksum verification because the IntelliJ Platform Gradle Plugin can generate environment-specific Ivy descriptors for the local IntelliJ Platform artifact repository. This exception applies only to `ivy-*.xml` descriptors in the `bundledPlugin` and `bundledModule` groups. Resolved JAR artifacts remain checksum verified.
+The Gradle dependency verification is disabled. Otherwise, we would have to review each dependency. Instead, we only use dependencies from the Central Repository.
 
 ## Static Analysis And Security Gates
 

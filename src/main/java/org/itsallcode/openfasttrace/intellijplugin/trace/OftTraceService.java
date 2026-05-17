@@ -3,6 +3,7 @@ package org.itsallcode.openfasttrace.intellijplugin.trace;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import org.itsallcode.openfasttrace.api.ColorScheme;
 import org.itsallcode.openfasttrace.api.DetailsSectionDisplay;
+import org.itsallcode.openfasttrace.api.FilterSettings;
 import org.itsallcode.openfasttrace.api.ReportSettings;
 import org.itsallcode.openfasttrace.api.core.LinkedSpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
@@ -14,11 +15,13 @@ import org.itsallcode.openfasttrace.core.Oft;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-final class OftTraceService {
+public final class OftTraceService {
     @SuppressWarnings("java:S3032")
     // OFT ServiceLoader discovery must use the plugin class loader, not an arbitrary caller context loader.
     private static final ClassLoader PLUGIN_CLASS_LOADER = OftTraceService.class.getClassLoader();
@@ -27,7 +30,7 @@ final class OftTraceService {
     private final OftTraceReportRenderer reportRenderer;
 
     // [impl->dsn~trace-execution-service~1]
-    OftTraceService() {
+    public OftTraceService() {
         this(Oft.create(), new OftPlainTextTraceReportRenderer());
     }
 
@@ -40,11 +43,16 @@ final class OftTraceService {
     // [impl->dsn~show-scanned-base-directory-in-trace-output-window~1]
     // [impl->dsn~show-failing-trace-output-in-ide-output-window~1]
     // [impl->dsn~preserve-defect-count-for-unclean-trace-chain-in-output-window~1]
-    OftTraceResult traceProject(final OftTraceInputs inputs, final OftTraceProgress progress) {
+    // [impl->dsn~filter-trace-by-artifact-types-and-tags~1]
+    public OftTraceResult traceProject(final OftTraceInputs inputs, final OftTraceProgress progress) {
         try {
             progress.phase("Importing OpenFastTrace items...", 0.15D);
             progress.checkCanceled();
-            final List<SpecificationItem> items = importItems(inputs);
+            final FilterSettings filterSettings = FilterSettings.builder()
+                    .artifactTypes(Set.copyOf(inputs.artifactTypes()))
+                    .tags(Set.copyOf(inputs.tags()))
+                    .build();
+            final List<SpecificationItem> items = importItems(inputs.inputPaths(), filterSettings);
 
             progress.phase("Linking OpenFastTrace items...", 0.4D);
             progress.checkCanceled();
@@ -66,9 +74,11 @@ final class OftTraceService {
         }
     }
 
-    private List<SpecificationItem> importItems(final OftTraceInputs inputs) {
+
+    private List<SpecificationItem> importItems(final List<Path> inputs, final FilterSettings filterSettings) {
         final ImportSettings settings = ImportSettings.builder()
-                .addInputs(inputs.inputPaths())
+                .addInputs(inputs)
+                .filter(filterSettings)
                 .build();
         return runWithPluginClassLoader(() -> oft.importItems(settings));
     }

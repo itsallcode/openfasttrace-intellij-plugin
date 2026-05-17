@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
@@ -25,6 +26,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
+// [itest->dsn~trace-output-presentation~1]
 public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTestCase {
     private static final Pattern ANSI_ESCAPE_SEQUENCE = Pattern.compile("\u001B\\[[;\\d]*m");
     private static final String FIRST_ITEM_ID = "req~long_requirement_00000~1";
@@ -35,7 +37,7 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
         final Path temporaryDirectory = createManagedTestArtifactDirectory("trace-run-content-output-presenter-input");
         writeLongFailingTraceProject(temporaryDirectory, 2000);
         final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.wholeProject(temporaryDirectory),
+                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());

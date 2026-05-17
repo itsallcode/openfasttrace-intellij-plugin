@@ -1,5 +1,6 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
+import com.intellij.execution.process.NopProcessHandler;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
@@ -31,9 +32,10 @@ class OftTraceBackgroundRunnerTest {
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final OftTraceBackgroundRunner runner = new OftTraceBackgroundRunner(
                 new OftTraceService(),
-                (project, contentTitle, result) -> presenterCall.set(new PresenterCall(project, contentTitle, result))
+                (project, contentTitle, result) -> presenterCall.set(new PresenterCall(project, contentTitle, result)),
+                new NopProcessHandler()
         );
-        final Task.Backgroundable task = newTraceTask(runner, OftTraceInputs.wholeProject(temporaryDirectory), "Trace");
+        final Task.Backgroundable task = newTraceTask(runner, OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()), "Trace");
         final List<String> progressEvents = new ArrayList<>();
         final ProgressIndicator indicator = progressIndicator(progressEvents);
 
@@ -74,8 +76,8 @@ class OftTraceBackgroundRunnerTest {
     void testGivenTraceTaskWhenCancelledThenItPresentsCancelledResult() throws Exception {
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final Task.Backgroundable task = newTraceTask(
-                new OftTraceBackgroundRunner(new OftTraceService(), capturePresenter(presenterCall)),
-                OftTraceInputs.wholeProject(Path.of(".")),
+                new OftTraceBackgroundRunner(new OftTraceService(), capturePresenter(presenterCall), new NopProcessHandler()),
+                OftTraceInputs.wholeProject(Path.of("."), List.of(), List.of()),
                 "Trace"
         );
 
@@ -93,8 +95,8 @@ class OftTraceBackgroundRunnerTest {
     void testGivenProcessCanceledExceptionWhenHandlingThrowableThenItPresentsCancelledResult() throws Exception {
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final Task.Backgroundable task = newTraceTask(
-                new OftTraceBackgroundRunner(new OftTraceService(), capturePresenter(presenterCall)),
-                OftTraceInputs.wholeProject(Path.of(".")),
+                new OftTraceBackgroundRunner(new OftTraceService(), capturePresenter(presenterCall), new NopProcessHandler()),
+                OftTraceInputs.wholeProject(Path.of("."), List.of(), List.of()),
                 "Trace"
         );
 
@@ -110,8 +112,8 @@ class OftTraceBackgroundRunnerTest {
     void testGivenUnexpectedThrowableWhenHandlingThrowableThenItPresentsFormattedError() throws Exception {
         final AtomicReference<PresenterCall> presenterCall = new AtomicReference<>();
         final Task.Backgroundable task = newTraceTask(
-                new OftTraceBackgroundRunner(new OftTraceService(), capturePresenter(presenterCall)),
-                OftTraceInputs.wholeProject(Path.of(".")),
+                new OftTraceBackgroundRunner(new OftTraceService(), capturePresenter(presenterCall), new NopProcessHandler()),
+                OftTraceInputs.wholeProject(Path.of("."), List.of(), List.of()),
                 "Trace"
         );
 

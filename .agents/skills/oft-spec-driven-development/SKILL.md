@@ -39,7 +39,7 @@ When the user gives you a new issue link, derive the work plan from:
 4. the quality requirements document
 5. the current code and tests
 
-Do not jump straight to code. First determine whether the issue changes:
+Do not jump straight to code. First, determine whether the issue changes:
 
 - user-visible behavior
 - traced requirements or scenarios
@@ -95,6 +95,7 @@ Use that mapping to decide what must change:
 - If architecture or technical behavior changes, update or add `dsn` items and relevant arc42 design sections.
 - If a lower layer adds no new information, prefer OFT forwarding instead of redundant new items.
 - Ensure each runtime design item covers only one scenario unless forwarding is the better fit.
+- When you semantically change an existing requirement, increase the requirement revision number.
 
 ### 4. Treat Quality Requirements As Non-Negotiable
 

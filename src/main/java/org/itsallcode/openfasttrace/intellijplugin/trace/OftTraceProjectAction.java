@@ -1,5 +1,6 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
+import com.intellij.execution.process.NopProcessHandler;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -22,7 +23,8 @@ public final class OftTraceProjectAction extends DumbAwareAction {
                 OftTraceInputResolver::resolve,
                 new OftTraceBackgroundRunner(
                         new OftTraceService(),
-                        new OftTraceRunContentOutputPresenter()
+                        new OftTraceRunContentOutputPresenter(),
+                        new NopProcessHandler()
                 ),
                 new OftTraceRunContentOutputPresenter()
         );
