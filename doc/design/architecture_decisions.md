@@ -88,7 +88,7 @@ Comment:
 
 Builds remain responsible for ordinary compilation, tests, tracing, plugin verification, and static analysis. Dependency verification metadata still protects artifact integrity, but it is not a vulnerability scanner.
 
-Needs: bld
+We add no "needs" here, since we cannot trace into dependabot.
 
 Tags: Build, Security, Dependabot
 

@@ -215,15 +215,7 @@ Needs: impl
 ### Trace Configuration Integration
 `dsn~trace-configuration-integration~1`
 
-The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project, exposes those settings through project configuration UI, and resolves the selected-resource options into a normalized OpenFastTrace input set assembled from IntelliJ source roots, IntelliJ test roots, and additional project-relative paths.
-
-Covers:
-- `scn~configure-trace-scope-in-project-settings~1`
-- `scn~trace-selected-project-resources~1`
-- `scn~include-intellij-source-directories-in-selected-resource-trace~1`
-- `scn~include-intellij-test-directories-in-selected-resource-trace~1`
-- `scn~add-project-relative-paths-to-selected-resource-trace~1`
-- `scn~show-per-line-validation-for-additional-trace-paths~1`
+The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project and through dedicated run configurations. It exposes those settings through project configuration UI and the run configuration editor, and resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria.
 
 Needs: impl
 
@@ -238,7 +230,7 @@ Covers:
 - `scn~run-trace-project-in-background~1`
 - `scn~reject-trace-project-without-valid-project-path~1`
 
-Needs: impl
+Needs: impl, itest
 
 ### Trace Execution Service
 `dsn~trace-execution-service~1`
@@ -257,7 +249,7 @@ Covers:
 - `scn~show-resolved-trace-inputs-in-trace-output-window~1`
 - `scn~show-failing-trace-output-in-ide-output-window~1`
 
-Needs: impl
+Needs: impl, itest
 
 ### Trace Output Presentation
 `dsn~trace-output-presentation~1`
@@ -269,4 +261,63 @@ Covers:
 - `scn~show-failing-trace-output-in-ide-output-window~1`
 - `scn~open-specification-item-from-trace-output-window~1`
 
-Needs: impl
+Needs: impl, itest
+
+## GUI Mockups
+
+#### Run Configuration Editor UI Mockup
+
+```plantuml
+@startsalt
+title OFT Trace — Run Configuration Editor
+scale 2
+{+
+  {T
+    + <&folder> OpenFastTrace
+    ++ <&media-skip-forward> Trace All
+    ++ <&media-skip-forward> Trace User Requirements
+    ++ <&media-skip-forward> <b>Trace Design
+  } |
+  {
+    {
+        .
+        Name: | "Trace Design                    "
+        .
+    }
+    {
+        .
+        <b>Trace Scope
+        .
+        ()  Whole project         |  (X) Selected resources
+        .                         | .
+        Include paths             | [X] Source roots
+        .                         | [X] Test roots
+        .                         | .
+        Additional paths          | {SI
+                                     doc/spec/
+
+                                     .
+                                     "                     "
+                                    }
+        .
+      }
+      ---
+      {
+        .
+        <b>Filters      | .
+        .               | .
+        Artifact types: | "dsn, constr               "
+        .               | <i>(comma-separated, empty = all)
+        .               | .
+        Tags:           | "mvp                       "
+        .               | <i>(comma-separated, empty = all)
+        .               | .
+    }
+
+    {
+      [Apply] | [Run]
+    }
+  }
+}
+@endsalt
+```

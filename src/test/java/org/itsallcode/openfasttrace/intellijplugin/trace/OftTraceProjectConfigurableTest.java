@@ -22,10 +22,10 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
         configurable.reset();
 
         final OftTraceSettingsSnapshot settings = configurableSettings(configurable);
-        assertEquals(OftTraceScopeMode.WHOLE_PROJECT, settings.scopeMode());
-        assertTrue(settings.includeSourceRoots());
-        assertTrue(settings.includeTestRoots());
-        assertEquals("doc/", settings.additionalPathsText());
+        assertEquals(OftTraceSettingsSnapshot.DEFAULT.scopeMode(), settings.scopeMode());
+        assertEquals(OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots(), settings.includeSourceRoots());
+        assertEquals(OftTraceSettingsSnapshot.DEFAULT.includeTestRoots(), settings.includeTestRoots());
+        assertEquals(OftTraceSettingsSnapshot.DEFAULT.additionalPathsText(), settings.additionalPathsText());
     }
 
     public void testGivenDefaultSettingsWhenResettingConfigurableThenSelectedResourceControlsAreDisabled() {
@@ -45,7 +45,9 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
                 OftTraceScopeMode.SELECTED_RESOURCES,
                 true,
                 false,
-                "doc/\nspec/"
+                "doc/\nspec/",
+                "",
+                ""
         ));
 
         assertTrue(configurable.isModified());
@@ -65,7 +67,9 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
                 OftTraceScopeMode.SELECTED_RESOURCES,
                 true,
                 true,
-                "/absolute/path"
+                "/absolute/path",
+                "",
+                ""
         ));
 
         final ConfigurationException exception =
@@ -81,7 +85,9 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
                 OftTraceScopeMode.SELECTED_RESOURCES,
                 true,
                 true,
-                "bad\0path"
+                "bad\0path",
+                "",
+                ""
         ));
 
         final ConfigurationException exception =
@@ -116,7 +122,9 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
                 OftTraceScopeMode.SELECTED_RESOURCES,
                 true,
                 true,
-                "doc/\nmissing"
+                "doc/\nmissing",
+                "",
+                ""
         ));
         final OftTraceProjectConfigurable configurable = new OftTraceProjectConfigurable(project);
         configurable.createComponent();
@@ -148,9 +156,11 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
 
         component(configurable).setSettings(new OftTraceSettingsSnapshot(
                 OftTraceScopeMode.SELECTED_RESOURCES,
-                true,
-                true,
-                "doc/"
+                OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots(),
+                OftTraceSettingsSnapshot.DEFAULT.includeTestRoots(),
+                OftTraceSettingsSnapshot.DEFAULT.additionalPathsText(),
+                OftTraceSettingsSnapshot.DEFAULT.artifactTypesText(),
+                OftTraceSettingsSnapshot.DEFAULT.tagsText()
         ));
 
         assertEquals("", component(configurable).resolvedRelativeToText());
@@ -164,9 +174,11 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
 
         component(configurable).setSettings(new OftTraceSettingsSnapshot(
                 OftTraceScopeMode.SELECTED_RESOURCES,
-                true,
-                true,
-                "doc/"
+                OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots(),
+                OftTraceSettingsSnapshot.DEFAULT.includeTestRoots(),
+                OftTraceSettingsSnapshot.DEFAULT.additionalPathsText(),
+                OftTraceSettingsSnapshot.DEFAULT.artifactTypesText(),
+                OftTraceSettingsSnapshot.DEFAULT.tagsText()
         ));
 
         assertEquals("", component(configurable).resolvedRelativeToText());

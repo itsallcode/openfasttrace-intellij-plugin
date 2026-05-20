@@ -1,6 +1,6 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
-enum OftTraceScopeMode {
+public enum OftTraceScopeMode {
     WHOLE_PROJECT,
     SELECTED_RESOURCES
 }

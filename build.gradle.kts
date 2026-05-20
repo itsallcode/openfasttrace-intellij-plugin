@@ -6,7 +6,6 @@ import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 // [bld->dsn~plugin-build-uses-intellij-platform-gradle-plugin~1]
-// [bld->dsn~dependency-vulnerability-monitoring-uses-dependabot~1]
 plugins {
     id("java")
     id("jacoco")
@@ -45,10 +44,9 @@ requirementTracing {
     inputDirectories = files("doc", "src/main/java", "src/test/java")
     tags {
         tag {
-            paths = files("build.gradle.kts")
-            coveredItemArtifactType = "dsn"
+            paths = fileTree("./").include("build.gradle.kts") as FileCollection?
             tagArtifactType = "bld"
-            coveredItemNamePrefix = ""
+            coveredItemArtifactType = "dsn"
         }
     }
 }
@@ -74,6 +72,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:${providers.gradleProperty("junitBomVersion").get()}"))
     testImplementation("junit:junit:${providers.gradleProperty("junit4Version").get()}")
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.platform:junit-platform-launcher")
     testImplementation("org.hamcrest:hamcrest:${providers.gradleProperty("hamcrestVersion").get()}")
     testImplementation("org.opentest4j:opentest4j:${providers.gradleProperty("opentest4jVersion").get()}")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine")

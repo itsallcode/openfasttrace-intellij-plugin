@@ -1,6 +1,6 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
-final class OftTraceResult {
+public final class OftTraceResult {
     private final Status status;
     private final String output;
 
@@ -9,23 +9,23 @@ final class OftTraceResult {
         this.output = output;
     }
 
-    static OftTraceResult success(final String output) {
+    public static OftTraceResult success(final String output) {
         return new OftTraceResult(Status.SUCCESS, output);
     }
 
-    static OftTraceResult failure(final String output) {
+    public static OftTraceResult failure(final String output) {
         return new OftTraceResult(Status.FAILURE, output);
     }
 
-    static OftTraceResult error(final String output) {
+    public static OftTraceResult error(final String output) {
         return new OftTraceResult(Status.ERROR, output);
     }
 
-    static OftTraceResult invalidInput(final String output) {
+    public static OftTraceResult invalidInput(final String output) {
         return new OftTraceResult(Status.INVALID_INPUT, output);
     }
 
-    static OftTraceResult cancelled() {
+    public static OftTraceResult cancelled() {
         return new OftTraceResult(Status.CANCELLED, "OpenFastTrace trace was cancelled.");
     }
 
@@ -37,7 +37,7 @@ final class OftTraceResult {
         return status != Status.SUCCESS;
     }
 
-    String statusMessage() {
+    public String statusMessage() {
         return switch (status) {
             case SUCCESS -> "OpenFastTrace trace completed successfully.";
             case FAILURE -> "OpenFastTrace trace completed with defects.";
@@ -47,7 +47,7 @@ final class OftTraceResult {
         };
     }
 
-    String output() {
+    public String output() {
         return output;
     }
 

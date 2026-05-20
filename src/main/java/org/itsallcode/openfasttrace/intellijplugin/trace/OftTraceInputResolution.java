@@ -1,6 +1,6 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
-final class OftTraceInputResolution {
+public final class OftTraceInputResolution {
     private final OftTraceInputs inputs;
     private final String errorMessage;
 
@@ -9,23 +9,23 @@ final class OftTraceInputResolution {
         this.errorMessage = errorMessage;
     }
 
-    static OftTraceInputResolution valid(final OftTraceInputs inputs) {
+    public static OftTraceInputResolution valid(final OftTraceInputs inputs) {
         return new OftTraceInputResolution(inputs, null);
     }
 
-    static OftTraceInputResolution invalid(final String errorMessage) {
+    public static OftTraceInputResolution invalid(final String errorMessage) {
         return new OftTraceInputResolution(null, errorMessage);
     }
 
-    boolean isValid() {
+    public boolean isValid() {
         return inputs != null;
     }
 
-    OftTraceInputs inputs() {
+    public OftTraceInputs inputs() {
         return inputs;
     }
 
-    String errorMessage() {
+    public String errorMessage() {
         return errorMessage;
     }
 }
