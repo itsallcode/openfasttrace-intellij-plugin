@@ -1,19 +1,32 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace.runconfig;
 
-import com.intellij.openapi.util.InvalidDataException;
-import com.intellij.openapi.util.WriteExternalException;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
-import org.jdom.Element;
 import org.junit.jupiter.api.Assertions;
+
+import javax.swing.JComponent;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
-// [itest->dsn~openfasttrace-run-configuration~1]
-public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
-    public void testGivenRunConfigurationWhenUpdatingFromSnapshotThenItStoresTheSettings() {
+public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTestCase {
+    private OftRunConfigurationSettingsEditor editor;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        editor = new OftRunConfigurationSettingsEditor(getProject());
+    }
+
+    public void testGivenEditorWhenCreatingEditorThenItReturnsNonNullComponent() {
+        final JComponent component = editor.createEditor();
+        assertThat(component, is(notNullValue()));
+    }
+
+    public void testGivenEditorWhenResettingFromConfigurationThenItUpdatesUI() {
+        editor.createEditor(); // Initialize component
         final OftRunConfiguration configuration = createConfiguration("Test");
         final OftTraceSettingsSnapshot snapshot = new OftTraceSettingsSnapshot(
                 OftTraceScopeMode.SELECTED_RESOURCES,
@@ -23,40 +36,38 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 "dsn",
                 "mvp"
         );
-
         configuration.updateFrom(snapshot);
 
-        final OftTraceSettingsSnapshot stored = configuration.snapshot();
+        editor.resetEditorFrom(configuration);
+
+        // Verify UI matches snapshot
+        final OftTraceSettingsSnapshot uiSettings = editor.component.getSettings();
         Assertions.assertAll(
-                () -> assertThat(stored.scopeMode(), is(snapshot.scopeMode())),
-                () -> assertThat(stored.includeSourceRoots(), is(snapshot.includeSourceRoots())),
-                () -> assertThat(stored.includeTestRoots(), is(snapshot.includeTestRoots())),
-                () -> assertThat(stored.additionalPathsText(), is(snapshot.additionalPathsText())),
-                () -> assertThat(stored.artifactTypesText(), is(snapshot.artifactTypesText())),
-                () -> assertThat(stored.tagsText(), is(snapshot.tagsText()))
+                () -> assertThat(uiSettings.scopeMode(), is(snapshot.scopeMode())),
+                () -> assertThat(uiSettings.includeSourceRoots(), is(snapshot.includeSourceRoots())),
+                () -> assertThat(uiSettings.includeTestRoots(), is(snapshot.includeTestRoots())),
+                () -> assertThat(uiSettings.additionalPathsText(), is(snapshot.additionalPathsText())),
+                () -> assertThat(uiSettings.artifactTypesText(), is(snapshot.artifactTypesText())),
+                () -> assertThat(uiSettings.tagsText(), is(snapshot.tagsText()))
         );
     }
 
-    public void testGivenRunConfigurationWithSettingsWhenWritingAndReadingExternalThenItPreservesSettings()
-            throws WriteExternalException, InvalidDataException {
-        final OftRunConfiguration configuration = createConfiguration("Test");
+    public void testGivenEditorWhenApplyingToConfigurationThenItUpdatesConfiguration() {
+        editor.createEditor(); // Initialize component
         final OftTraceSettingsSnapshot snapshot = new OftTraceSettingsSnapshot(
                 OftTraceScopeMode.SELECTED_RESOURCES,
-                false,
                 true,
-                "additional",
-                "dsn",
-                "mvp"
+                false,
+                "more paths",
+                "req",
+                "tag"
         );
-        configuration.updateFrom(snapshot);
+        editor.component.setSettings(snapshot);
 
-        final Element element = new Element("configuration");
-        configuration.writeExternal(element);
+        final OftRunConfiguration configuration = createConfiguration("Test");
+        editor.applyEditorTo(configuration);
 
-        final OftRunConfiguration otherConfiguration = createConfiguration("Other");
-        otherConfiguration.readExternal(element);
-
-        final OftTraceSettingsSnapshot stored = otherConfiguration.snapshot();
+        final OftTraceSettingsSnapshot stored = configuration.snapshot();
         Assertions.assertAll(
                 () -> assertThat(stored.scopeMode(), is(snapshot.scopeMode())),
                 () -> assertThat(stored.includeSourceRoots(), is(snapshot.includeSourceRoots())),

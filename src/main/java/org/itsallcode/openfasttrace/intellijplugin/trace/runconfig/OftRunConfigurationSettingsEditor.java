@@ -5,13 +5,16 @@ import com.intellij.openapi.project.Project;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsComponent;
 import org.jetbrains.annotations.NotNull;
 
+import org.jetbrains.annotations.VisibleForTesting;
+
 import javax.swing.JComponent;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public final class OftRunConfigurationSettingsEditor extends SettingsEditor<OftRunConfiguration> {
     private final Project project;
-    private OftTraceSettingsComponent component;
+    @VisibleForTesting
+    OftTraceSettingsComponent component;
 
     public OftRunConfigurationSettingsEditor(final Project project) {
         this.project = project;
