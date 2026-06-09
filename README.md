@@ -27,6 +27,7 @@ SonarCloud status:
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=org.itsallcode.openfasttrace%3Aopenfasttrace-intellij-plugin&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=org.itsallcode.openfasttrace%3Aopenfasttrace-intellij-plugin)
 
 **User Guides**
+* [OpenFastTrace IntelliJ Plugin User Guide](doc/user_guide.md)
 * [OpenFastTrace User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md)
 * [OpenFastTrace in IDE Help Action](src/main/java/org/itsallcode/openfasttrace/intellijplugin/help/OpenFastTraceUserGuide.java)
 * [OpenFastTrace IntelliJ Plugin Demo](doc/demo/plugin-demo.md)
@@ -44,6 +45,8 @@ SonarCloud status:
 ## Using the Plugin
 Use an IntelliJ Platform IDE and install/build this plugin to get OFT support while editing project files.
 
+For installation and workflow instructions, see the [OpenFastTrace IntelliJ Plugin User Guide](doc/user_guide.md).
+
 The plugin currently focuses on:
 * syntax highlighting for OFT items in supported files
 * navigation support (`Go To Declaration`, symbol search, and related navigation paths)
@@ -55,6 +58,7 @@ The plugin currently focuses on:
 * quick access to the OpenFastTrace user guide from the IDE help menu
 
 For expected behavior and scope details, see:
+* [User Guide](doc/user_guide.md)
 * [System Requirements](doc/system_requirements.md)
 * [Runtime View](doc/design/runtime_view.md)
 * [Plugin Demo Script](doc/demo/plugin-demo.md)
@@ -72,7 +76,7 @@ For manual IDE testing, launch a sandbox IDE with the plugin:
 ./gradlew manualTestIde
 ```
 
-## Using the Plugin
+## Trace Settings
 
 After the sandbox IDE opens a project, configure trace scope under `Settings | Tools | OpenFastTrace`. By default, `Trace Project` scans the whole opened project. If you switch to selected-resource tracing, the plugin includes IntelliJ source roots, IntelliJ test roots, and one default additional project-relative path entry, `doc/`, until you change it. Additional files or directories are entered one per line.
 
