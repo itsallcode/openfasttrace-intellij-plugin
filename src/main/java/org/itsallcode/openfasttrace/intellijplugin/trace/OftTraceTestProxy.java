@@ -4,13 +4,9 @@ import com.intellij.execution.testframework.sm.runner.SMTestProxy;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 
-import java.io.Serial;
 import java.util.Optional;
 
 final class OftTraceTestProxy extends SMTestProxy {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
     private final transient Project project;
     private final String specificationId;
     private final String sourcePath;
@@ -18,11 +14,6 @@ final class OftTraceTestProxy extends SMTestProxy {
 
     OftTraceTestProxy(final Project project, final String name, final boolean suite, final String navigationId) {
         this(project, name, suite, navigationId, null);
-    }
-
-    // [impl->dsn~navigate-from-test-runner-source-files~1]
-    static OftTraceTestProxy sourceFileSuite(final Project project, final String name, final String sourcePath) {
-        return new OftTraceTestProxy(project, name, true, null, sourcePath);
     }
 
     private OftTraceTestProxy(
@@ -37,6 +28,11 @@ final class OftTraceTestProxy extends SMTestProxy {
         this.specificationId = specificationId;
         this.sourcePath = sourcePath;
         this.navigationResolver = new OftTraceNavigationResolver(project);
+    }
+
+    // [impl->dsn~navigate-from-test-runner-source-files~1]
+    static OftTraceTestProxy sourceFileSuite(final Project project, final String name, final String sourcePath) {
+        return new OftTraceTestProxy(project, name, true, null, sourcePath);
     }
 
     @Override

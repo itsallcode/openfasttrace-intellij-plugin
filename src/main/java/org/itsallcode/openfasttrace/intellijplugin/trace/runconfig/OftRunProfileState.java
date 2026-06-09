@@ -1,7 +1,6 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace.runconfig;
 
 import com.intellij.execution.DefaultExecutionResult;
-import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.RunProfileState;
@@ -26,7 +25,7 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceService;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestRunnerOutputPresenter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 public final class OftRunProfileState implements RunProfileState {
     private final ExecutionEnvironment environment;
@@ -38,8 +37,7 @@ public final class OftRunProfileState implements RunProfileState {
     }
 
     @Override
-    public @Nullable ExecutionResult execute(final Executor executor, @NotNull final ProgramRunner<?> runner)
-            throws ExecutionException {
+    public @NonNull ExecutionResult execute(final Executor executor, @NotNull final ProgramRunner<?> runner) {
         final Project project = environment.getProject();
         final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(project, settings);
 
@@ -84,7 +82,10 @@ public final class OftRunProfileState implements RunProfileState {
 
     // [impl->dsn~test-runner-as-default-run-configuration-result-view~1]
     // [impl->dsn~select-test-runner-trace-result-view~1]
-    private ExecutionPresentation createTestRunnerExecutionPresentation(final Project project, final Executor executor) {
+    private ExecutionPresentation createTestRunnerExecutionPresentation(
+            final Project project,
+            final Executor executor
+    ) {
         final SMTRunnerConsoleProperties properties = new SMTRunnerConsoleProperties(
                 project,
                 environment.getRunProfile(),

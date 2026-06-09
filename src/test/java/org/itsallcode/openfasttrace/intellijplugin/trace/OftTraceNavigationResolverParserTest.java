@@ -219,7 +219,10 @@ class OftTraceNavigationResolverParserTest {
             final Class<?>[] parameterTypes,
             final Object... arguments
     ) throws ReflectiveOperationException {
-        final Method method = OftTraceNavigationResolver.class.getDeclaredMethod(methodName, parameterTypes);
+        final Method method = OftCoverageTagTraceItemNavigator.class.getDeclaredMethod(
+                methodName,
+                parameterTypes
+        );
         method.setAccessible(true);
         return method.invoke(null, arguments);
     }

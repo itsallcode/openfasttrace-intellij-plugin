@@ -66,6 +66,20 @@ public class OftTraceNavigationResolverTest extends AbstractOftPlatformTestCase 
         assertThat(target, nullValue());
     }
 
+    public void testGivenSourcePathMatchingProjectFileSuffixWhenResolvingSourceFileThenItFindsIndexedFile() {
+        final PsiFile file = myFixture.addFileToProject("module/doc/source.md", """
+                req~runner_suffix_source_navigation~1
+                """);
+
+        final OftTraceNavigationTarget target = new OftTraceNavigationResolver(getProject())
+                .resolveSourceFile("doc/source.md")
+                .orElse(null);
+
+        assertThat(target, notNullValue());
+        assertThat(target.file(), is(file.getVirtualFile()));
+        assertThat(target.offset(), is(0));
+    }
+
     private String generatedCoverageItemId(
             final String filePath,
             final int lineNumber,
@@ -73,7 +87,8 @@ public class OftTraceNavigationResolverTest extends AbstractOftPlatformTestCase 
             final String sourceArtifactType,
             final String coveredId
     ) {
-        return sourceArtifactType + "~" + coveredId.split("~")[1] + "-" + crc32(filePath + lineNumber + lineMatchCount + coveredId) + "~0";
+        return sourceArtifactType + "~" + coveredId.split("~")[1] + "-"
+                + crc32(filePath + lineNumber + lineMatchCount + coveredId) + "~0";
     }
 
     private long crc32(final String value) {

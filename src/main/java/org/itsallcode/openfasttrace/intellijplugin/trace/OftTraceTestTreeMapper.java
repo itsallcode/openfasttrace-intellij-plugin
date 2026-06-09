@@ -1,33 +1,39 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
+import com.intellij.openapi.diagnostic.Logger;
 import org.itsallcode.openfasttrace.api.core.DeepCoverageStatus;
 import org.itsallcode.openfasttrace.api.core.LinkedSpecificationItem;
 import org.itsallcode.openfasttrace.api.core.LinkStatus;
 import org.itsallcode.openfasttrace.api.core.Location;
 import org.itsallcode.openfasttrace.api.core.Trace;
 import org.itsallcode.openfasttrace.api.core.TracedLink;
+import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestTree.OftTraceItemNode;
+import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestTree.OftTraceLinkNode;
+import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestTree.OftTraceSuiteNode;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.IdentityHashMap;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 final class OftTraceTestTreeMapper {
+    private static final Logger LOG = Logger.getInstance(OftTraceTestTreeMapper.class);
     private static final String UNKNOWN_SOURCE = "Unknown source";
     private static final Comparator<LinkedSpecificationItem> ITEM_ORDER = Comparator
             .comparing(LinkedSpecificationItem::getArtifactType)
             .thenComparing(LinkedSpecificationItem::getName)
             .thenComparingInt(LinkedSpecificationItem::getRevision);
+    private static final EnumMap<LinkStatus, LinkStatus> REVERSE_LINK_STATUSES = createReverseLinkStatuses();
+
+    private OftTraceTestTreeMapper() {
+    }
 
     // [impl->dsn~trace-test-runner-presentation~1]
     // [impl->dsn~show-trace-source-files-as-test-runner-suites~1]
@@ -48,38 +54,34 @@ final class OftTraceTestTreeMapper {
     // [impl->dsn~navigate-from-test-runner-source-files~1]
     // [impl->dsn~navigate-from-test-runner-specification-items~1]
     // [impl->dsn~navigate-from-test-runner-trace-links~1]
-    OftTraceTestTree map(final Trace trace) {
+    static OftTraceTestTree map(final Trace trace) {
         return map(trace, null);
     }
 
-    OftTraceTestTree map(final Trace trace, final String projectBasePath) {
-        final Map<LinkedSpecificationItem, List<VisibleTraceLink>> visibleLinksByItem =
-                visibleLinksByItem(trace.getItems());
+    static OftTraceTestTree map(final Trace trace, final String projectBasePath) {
+        final List<TraceItemLinks> visibleLinksByItem = visibleLinksByItem(trace.getItems());
         final Map<String, SourceFileItems> itemsBySource = new LinkedHashMap<>();
-        for (final LinkedSpecificationItem item : trace.getItems()) {
-            final SourceFileSuite sourceFileSuite = sourceFileSuite(item, projectBasePath);
+        for (final TraceItemLinks itemLinks : visibleLinksByItem) {
+            final SourceFileSuite sourceFileSuite = sourceFileSuite(itemLinks.item(), projectBasePath);
             itemsBySource.computeIfAbsent(
                     sourceFileSuite.name(),
                     ignored -> new SourceFileItems(sourceFileSuite.name(), sourceFileSuite.sourcePath())
-            ).add(item);
+            ).add(itemLinks);
         }
         final List<OftTraceSuiteNode> suites = itemsBySource.values().stream()
                 .map(source -> new OftTraceSuiteNode(
                         source.name(),
                         source.sourcePath(),
-                        mapItems(source.items(), visibleLinksByItem)
+                        mapItems(source.items())
                 ))
                 .toList();
         return new OftTraceTestTree(suites);
     }
 
-    private static List<OftTraceItemNode> mapItems(
-            final List<LinkedSpecificationItem> items,
-            final Map<LinkedSpecificationItem, List<VisibleTraceLink>> visibleLinksByItem
-    ) {
+    private static List<OftTraceItemNode> mapItems(final List<TraceItemLinks> items) {
         return items.stream()
-                .sorted(ITEM_ORDER)
-                .map(item -> mapItem(item, visibleLinksByItem.get(item)))
+                .sorted(Comparator.comparing(TraceItemLinks::item, ITEM_ORDER))
+                .map(itemLinks -> mapItem(itemLinks.item(), itemLinks.links()))
                 .toList();
     }
 
@@ -102,51 +104,49 @@ final class OftTraceTestTreeMapper {
         );
     }
 
-    private static Map<LinkedSpecificationItem, List<VisibleTraceLink>> visibleLinksByItem(
+    private static List<TraceItemLinks> visibleLinksByItem(
             final List<LinkedSpecificationItem> items
     ) {
-        final Set<LinkedSpecificationItem> traceItems = Collections.newSetFromMap(new IdentityHashMap<>());
-        final Map<LinkedSpecificationItem, Set<VisibleTraceLink>> linkSetsByItem = new LinkedHashMap<>();
-        for (final LinkedSpecificationItem item : items) {
-            traceItems.add(item);
-            linkSetsByItem.put(item, new LinkedHashSet<>());
-        }
-        for (final LinkedSpecificationItem owner : items) {
+        final List<TraceItemLinks> linksByItem = items.stream()
+                .map(TraceItemLinks::new)
+                .toList();
+        for (final TraceItemLinks ownerLinks : linksByItem) {
+            final LinkedSpecificationItem owner = ownerLinks.item();
             for (final TracedLink link : owner.getTracedLinks()) {
-                addVisibleLink(linkSetsByItem, owner, link.getOtherLinkEnd(), link.getStatus());
-                if (traceItems.contains(link.getOtherLinkEnd())) {
-                    reverseStatus(link.getStatus())
-                            .ifPresent(status -> addVisibleLink(linkSetsByItem, link.getOtherLinkEnd(), owner, status));
-                }
+                ownerLinks.add(link.getOtherLinkEnd(), link.getStatus());
+                findTraceItemLinks(linksByItem, link.getOtherLinkEnd())
+                        .ifPresent(otherLinks -> reverseStatus(link.getStatus())
+                                .ifPresent(status -> otherLinks.add(owner, status)));
             }
         }
-        final Map<LinkedSpecificationItem, List<VisibleTraceLink>> linksByItem = new LinkedHashMap<>();
-        linkSetsByItem.forEach((item, links) -> linksByItem.put(item, List.copyOf(links)));
         return linksByItem;
     }
 
-    private static void addVisibleLink(
-            final Map<LinkedSpecificationItem, Set<VisibleTraceLink>> linkSetsByItem,
-            final LinkedSpecificationItem owner,
-            final LinkedSpecificationItem otherItem,
-            final LinkStatus status
+    private static Optional<TraceItemLinks> findTraceItemLinks(
+            final List<TraceItemLinks> traceItemLinks,
+            final LinkedSpecificationItem item
     ) {
-        linkSetsByItem.get(owner).add(new VisibleTraceLink(otherItem, status));
+        return traceItemLinks.stream()
+                .filter(candidate -> candidate.item() == item)
+                .findFirst();
     }
 
     private static Optional<LinkStatus> reverseStatus(final LinkStatus status) {
-        return switch (status) {
-            case COVERS -> Optional.of(LinkStatus.COVERED_SHALLOW);
-            case COVERED_SHALLOW -> Optional.of(LinkStatus.COVERS);
-            case PREDATED -> Optional.of(LinkStatus.COVERED_PREDATED);
-            case COVERED_PREDATED -> Optional.of(LinkStatus.PREDATED);
-            case OUTDATED -> Optional.of(LinkStatus.COVERED_OUTDATED);
-            case COVERED_OUTDATED -> Optional.of(LinkStatus.OUTDATED);
-            case UNWANTED -> Optional.of(LinkStatus.COVERED_UNWANTED);
-            case COVERED_UNWANTED -> Optional.of(LinkStatus.UNWANTED);
-            case DUPLICATE -> Optional.of(LinkStatus.DUPLICATE);
-            case AMBIGUOUS, ORPHANED -> Optional.empty();
-        };
+        return Optional.ofNullable(REVERSE_LINK_STATUSES.get(status));
+    }
+
+    private static EnumMap<LinkStatus, LinkStatus> createReverseLinkStatuses() {
+        final EnumMap<LinkStatus, LinkStatus> statuses = new EnumMap<>(LinkStatus.class);
+        statuses.put(LinkStatus.COVERS, LinkStatus.COVERED_SHALLOW);
+        statuses.put(LinkStatus.COVERED_SHALLOW, LinkStatus.COVERS);
+        statuses.put(LinkStatus.PREDATED, LinkStatus.COVERED_PREDATED);
+        statuses.put(LinkStatus.COVERED_PREDATED, LinkStatus.PREDATED);
+        statuses.put(LinkStatus.OUTDATED, LinkStatus.COVERED_OUTDATED);
+        statuses.put(LinkStatus.COVERED_OUTDATED, LinkStatus.OUTDATED);
+        statuses.put(LinkStatus.UNWANTED, LinkStatus.COVERED_UNWANTED);
+        statuses.put(LinkStatus.COVERED_UNWANTED, LinkStatus.UNWANTED);
+        statuses.put(LinkStatus.DUPLICATE, LinkStatus.DUPLICATE);
+        return statuses;
     }
 
     private static OftTraceLinkNode mapLink(final LinkedSpecificationItem owner, final VisibleTraceLink link) {
@@ -177,7 +177,7 @@ final class OftTraceTestTreeMapper {
 
     private static String itemName(final LinkedSpecificationItem item) {
         final String title = item.getTitle();
-        return title == null || title.isBlank() ? item.getId().toString() : title;
+        return (title == null || title.isBlank()) ? item.getId().toString() : title;
     }
 
     private static String nodeName(final String baseName, final String status, final boolean clean) {
@@ -221,6 +221,7 @@ final class OftTraceTestTreeMapper {
         try {
             return Path.of(path);
         } catch (final InvalidPathException exception) {
+            LOG.debug("Ignoring invalid OFT trace source path: " + path, exception);
             return null;
         }
     }
@@ -269,17 +270,41 @@ final class OftTraceTestTreeMapper {
     private record SourceFileSuite(String name, @Nullable String sourcePath) {
     }
 
+    private static final class TraceItemLinks {
+        private final LinkedSpecificationItem item;
+        private final List<VisibleTraceLink> links = new ArrayList<>();
+
+        private TraceItemLinks(final LinkedSpecificationItem item) {
+            this.item = item;
+        }
+
+        private LinkedSpecificationItem item() {
+            return item;
+        }
+
+        private void add(final LinkedSpecificationItem otherItem, final LinkStatus status) {
+            final VisibleTraceLink visibleTraceLink = new VisibleTraceLink(otherItem, status);
+            if (!links.contains(visibleTraceLink)) {
+                links.add(visibleTraceLink);
+            }
+        }
+
+        private List<VisibleTraceLink> links() {
+            return List.copyOf(links);
+        }
+    }
+
     private static final class SourceFileItems {
         private final String name;
         private final String sourcePath;
-        private final List<LinkedSpecificationItem> items = new ArrayList<>();
+        private final List<TraceItemLinks> items = new ArrayList<>();
 
         private SourceFileItems(final String name, final String sourcePath) {
             this.name = name;
             this.sourcePath = sourcePath;
         }
 
-        private void add(final LinkedSpecificationItem item) {
+        private void add(final TraceItemLinks item) {
             items.add(item);
         }
 
@@ -291,7 +316,7 @@ final class OftTraceTestTreeMapper {
             return sourcePath;
         }
 
-        private List<LinkedSpecificationItem> items() {
+        private List<TraceItemLinks> items() {
             return items;
         }
     }

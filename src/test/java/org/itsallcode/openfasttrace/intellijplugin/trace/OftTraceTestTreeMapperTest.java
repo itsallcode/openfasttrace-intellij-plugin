@@ -6,6 +6,9 @@ import org.itsallcode.openfasttrace.api.core.LinkStatus;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItemId;
 import org.itsallcode.openfasttrace.api.core.Trace;
+import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestTree.OftTraceItemNode;
+import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestTree.OftTraceLinkNode;
+import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestTree.OftTraceSuiteNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,8 +24,6 @@ import static org.hamcrest.Matchers.is;
 class OftTraceTestTreeMapperTest {
     private static final String PROJECT_BASE = "/workspace/openfasttrace-intellij-plugin";
 
-    private final OftTraceTestTreeMapper mapper = new OftTraceTestTreeMapper();
-
     // [itest->dsn~trace-test-runner-presentation~1]
     // [itest->dsn~show-trace-source-files-as-test-runner-suites~1]
     // [itest->dsn~roll-up-source-file-suite-trace-status~1]
@@ -33,7 +34,11 @@ class OftTraceTestTreeMapperTest {
         final LinkedSpecificationItem secondRequirement = item("req~second_requirement~1", "doc/requirements.md");
         final LinkedSpecificationItem implementation = item("impl~first_requirement~1", "src/Main.java");
 
-        final OftTraceTestTree tree = mapper.map(trace(firstRequirement, secondRequirement, implementation));
+        final OftTraceTestTree tree = OftTraceTestTreeMapper.map(trace(
+                firstRequirement,
+                secondRequirement,
+                implementation
+        ));
 
         Assertions.assertAll(
                 () -> assertThat(tree.suites().stream().map(OftTraceSuiteNode::name).toList(),
@@ -60,7 +65,7 @@ class OftTraceTestTreeMapperTest {
                 PROJECT_BASE + "/src/main/java/Main.java"
         );
 
-        final OftTraceTestTree tree = mapper.map(trace(requirement, implementation), PROJECT_BASE);
+        final OftTraceTestTree tree = OftTraceTestTreeMapper.map(trace(requirement, implementation), PROJECT_BASE);
 
         Assertions.assertAll(
                 () -> assertThat(
@@ -73,6 +78,20 @@ class OftTraceTestTreeMapperTest {
                         suiteNamed(tree, "doc/system_requirements.md").sourcePath(),
                         is(PROJECT_BASE + "/doc/system_requirements.md")
                 )
+        );
+    }
+
+    @Test
+    void testGivenTraceItemsWithoutUsableSourcePathsWhenMappingThenItCreatesFallbackSuites() {
+        final LinkedSpecificationItem withoutLocation = itemWithoutLocation("req~unknown_source~1");
+        final LinkedSpecificationItem invalidPath = item("req~invalid_source~1", "doc/\0requirements.md");
+
+        final OftTraceTestTree tree = OftTraceTestTreeMapper.map(trace(withoutLocation, invalidPath), "\0");
+
+        Assertions.assertAll(
+                () -> assertThat(suiteNamed(tree, "Unknown source").sourcePath(), is((String) null)),
+                () -> assertThat(suiteNamed(tree, "doc/\0requirements.md").sourcePath(), is((String) null)),
+                () -> assertThat(tree.testCount(), is(2))
         );
     }
 
@@ -104,7 +123,7 @@ class OftTraceTestTreeMapperTest {
         requirement.addLinkToItemWithStatus(test, LinkStatus.COVERED_SHALLOW);
 
         final OftTraceItemNode requirementNode = onlyItem(
-                mapper.map(trace(requirement, test)),
+                OftTraceTestTreeMapper.map(trace(requirement, test)),
                 "doc/requirements.md"
         );
 
@@ -153,7 +172,7 @@ class OftTraceTestTreeMapperTest {
         implementation.addLinkToItemWithStatus(requirement, LinkStatus.COVERS);
 
         final OftTraceItemNode requirementNode = onlyItem(
-                mapper.map(trace(implementation, requirement)),
+                OftTraceTestTreeMapper.map(trace(implementation, requirement)),
                 "doc/requirements.md"
         );
 
@@ -165,11 +184,38 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
+    @Test
+    void testGivenDuplicateTraceLinkWhenMappingThenItCreatesNonDirectionalFailedLinksOnBothItems() {
+        final LinkedSpecificationItem firstRequirement = titledItem(
+                "req~duplicate_requirement~1",
+                "doc/first.md",
+                "First duplicate requirement"
+        );
+        final LinkedSpecificationItem secondRequirement = titledItem(
+                "req~duplicate_requirement~1",
+                "doc/second.md",
+                "Second duplicate requirement"
+        );
+        firstRequirement.addLinkToItemWithStatus(secondRequirement, LinkStatus.DUPLICATE);
+
+        final OftTraceTestTree tree = OftTraceTestTreeMapper.map(trace(firstRequirement, secondRequirement));
+
+        Assertions.assertAll(
+                () -> assertThat(onlyItem(tree, "doc/first.md").name(),
+                        is("First duplicate requirement (duplicate)")),
+                () -> assertThat(onlyItem(tree, "doc/first.md").links().getFirst().name(),
+                        is("↔ Second duplicate requirement (duplicate)")),
+                () -> assertThat(onlyItem(tree, "doc/second.md").links().getFirst().name(),
+                        is("↔ First duplicate requirement (duplicate)")),
+                () -> assertThat(tree.failed(), is(true))
+        );
+    }
+
     // [itest->dsn~trace-test-runner-presentation~1]
     // [itest->dsn~sort-specification-items-in-test-runner-ui~1]
     @Test
     void testGivenUnsortedSpecificationItemsInOneSourceFileWhenMappingThenItSortsItemsByIdParts() {
-        final OftTraceTestTree tree = mapper.map(trace(
+        final OftTraceTestTree tree = OftTraceTestTreeMapper.map(trace(
                 item("req~zeta_requirement~1", "doc/requirements.md"),
                 item("impl~zeta_requirement~1", "doc/requirements.md"),
                 item("req~alpha_requirement~2", "doc/requirements.md"),
@@ -207,7 +253,7 @@ class OftTraceTestTreeMapperTest {
         final LinkedSpecificationItem missingRequirement = item("req~missing_requirement~1", "doc/requirements.md");
         implementation.addLinkToItemWithStatus(missingRequirement, LinkStatus.ORPHANED);
 
-        final OftTraceTestTree tree = mapper.map(trace(implementation));
+        final OftTraceTestTree tree = OftTraceTestTreeMapper.map(trace(implementation));
         final OftTraceItemNode implementationNode = onlyItem(
                 tree,
                 "src/Main.java"
@@ -238,7 +284,7 @@ class OftTraceTestTreeMapperTest {
         final LinkedSpecificationItem requirement = item("req~uncovered_requirement~1", "doc/requirements.md", "dsn");
 
         final OftTraceItemNode requirementNode = onlyItem(
-                mapper.map(trace(requirement)),
+                OftTraceTestTreeMapper.map(trace(requirement)),
                 "doc/requirements.md"
         );
 
@@ -285,6 +331,14 @@ class OftTraceTestTreeMapperTest {
             final String... needsArtifactTypes
     ) {
         return titledItem(id, locationPath, "", needsArtifactTypes);
+    }
+
+    private static LinkedSpecificationItem itemWithoutLocation(final String id) {
+        return new LinkedSpecificationItem(SpecificationItem.builder()
+                .id(SpecificationItemId.parseId(id))
+                .title("")
+                .status(ItemStatus.APPROVED)
+                .build());
     }
 
     private static LinkedSpecificationItem titledItem(

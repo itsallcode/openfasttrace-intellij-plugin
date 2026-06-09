@@ -1,5 +1,7 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 record OftTraceTestTree(List<OftTraceSuiteNode> suites) {
@@ -12,45 +14,45 @@ record OftTraceTestTree(List<OftTraceSuiteNode> suites) {
     boolean failed() {
         return suites.stream().anyMatch(OftTraceSuiteNode::failed);
     }
-}
 
-record OftTraceSuiteNode(String name, String sourcePath, List<OftTraceItemNode> items) {
-    int testCount() {
-        return items.stream()
-                .mapToInt(OftTraceItemNode::testCount)
-                .sum();
+    record OftTraceSuiteNode(String name, @Nullable String sourcePath, List<OftTraceItemNode> items) {
+        int testCount() {
+            return items.stream()
+                    .mapToInt(OftTraceItemNode::testCount)
+                    .sum();
+        }
+
+        boolean failed() {
+            return items.stream().anyMatch(OftTraceItemNode::failed);
+        }
+
+        OftTraceTestNodeDetails failureDetails() {
+            return OftTraceTestNodeDetails.sourceSuiteFailure(name);
+        }
     }
 
-    boolean failed() {
-        return items.stream().anyMatch(OftTraceItemNode::failed);
+    record OftTraceItemNode(
+            String name,
+            String navigationId,
+            boolean defective,
+            OftTraceTestNodeDetails details,
+            List<OftTraceLinkNode> links
+    ) {
+        int testCount() {
+            return 1 + links.size();
+        }
+
+        boolean failed() {
+            return defective || links.stream().anyMatch(OftTraceLinkNode::failed);
+        }
+
+        OftTraceTestNodeDetails failureDetails() {
+            return defective
+                    ? details
+                    : OftTraceTestNodeDetails.specificationItemLinkFailure(navigationId);
+        }
     }
 
-    OftTraceTestNodeDetails failureDetails() {
-        return OftTraceTestNodeDetails.sourceSuiteFailure(name);
+    record OftTraceLinkNode(String name, String navigationId, boolean failed, OftTraceTestNodeDetails details) {
     }
-}
-
-record OftTraceItemNode(
-        String name,
-        String navigationId,
-        boolean defective,
-        OftTraceTestNodeDetails details,
-        List<OftTraceLinkNode> links
-) {
-    int testCount() {
-        return 1 + links.size();
-    }
-
-    boolean failed() {
-        return defective || links.stream().anyMatch(OftTraceLinkNode::failed);
-    }
-
-    OftTraceTestNodeDetails failureDetails() {
-        return defective
-                ? details
-                : OftTraceTestNodeDetails.specificationItemLinkFailure(navigationId);
-    }
-}
-
-record OftTraceLinkNode(String name, String navigationId, boolean failed, OftTraceTestNodeDetails details) {
 }

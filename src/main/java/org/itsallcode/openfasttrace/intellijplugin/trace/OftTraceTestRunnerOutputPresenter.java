@@ -5,23 +5,17 @@ import com.intellij.execution.testframework.sm.runner.ui.SMTRunnerConsoleView;
 import com.intellij.execution.testframework.sm.runner.ui.SMTestRunnerResultsForm;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.project.Project;
+import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestTree.OftTraceItemNode;
+import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestTree.OftTraceLinkNode;
+import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestTree.OftTraceSuiteNode;
 
 import java.util.function.Function;
 
 public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPresenter {
     private final Function<Project, SMTRunnerConsoleView> consoleFactory;
-    private final OftTraceTestTreeMapper testTreeMapper;
 
     public OftTraceTestRunnerOutputPresenter(final Function<Project, SMTRunnerConsoleView> consoleFactory) {
-        this(consoleFactory, new OftTraceTestTreeMapper());
-    }
-
-    OftTraceTestRunnerOutputPresenter(
-            final Function<Project, SMTRunnerConsoleView> consoleFactory,
-            final OftTraceTestTreeMapper testTreeMapper
-    ) {
         this.consoleFactory = consoleFactory;
-        this.testTreeMapper = testTreeMapper;
     }
 
     // [impl->dsn~trace-test-runner-presentation~1]
@@ -33,7 +27,10 @@ public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPr
         root.setPresentation(contentTitle);
         resultsViewer.onTestingStarted(root);
         final PresentationOutcome outcome = result.trace()
-                .map(trace -> showTrace(project, resultsViewer, root, testTreeMapper.map(trace, project.getBasePath())))
+                .map(trace -> showTrace(project, resultsViewer, root, OftTraceTestTreeMapper.map(
+                        trace,
+                        project.getBasePath()
+                )))
                 .orElseGet(() -> showResultWithoutTrace(console, resultsViewer, root, result));
         if (outcome.failed()) {
             markFailed(root, outcome.details());
@@ -158,7 +155,12 @@ public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPr
                 new SMTestProxy(result.statusMessage(), false, null, true);
         root.addChild(failureProxy);
         resultsViewer.onTestsCountInSuite(1);
-        showTestNode(resultsViewer, failureProxy, result.requiresAttention(), OftTraceTestNodeDetails.resultWithoutTrace(result));
+        showTestNode(
+                resultsViewer,
+                failureProxy,
+                result.requiresAttention(),
+                OftTraceTestNodeDetails.resultWithoutTrace(result)
+        );
         return new PresentationOutcome(
                 result.requiresAttention(),
                 result.requiresAttention()
