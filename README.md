@@ -97,6 +97,10 @@ You need a JetBrains IDE based on the IntelliJ Platform (for example, IntelliJ I
 ### Development Dependencies
 To build and test from source, use the project’s configured Gradle wrapper and a compatible JDK.
 
+## Icon Assets
+
+The plugin logo asset `src/main/resources/META-INF/pluginIcon.svg` and the run-configuration icon asset `src/main/resources/icons/openfasttrace.svg` are derived from the OpenFastTrace logo artwork in this repository and use the same Apache 2.0 license as the project.
+
 ## Development
 To understand product intent and implementation scope, start with:
 * [System Requirements](doc/system_requirements.md)

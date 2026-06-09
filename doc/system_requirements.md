@@ -505,6 +505,35 @@ Covers:
 
 Needs: scn
 
+### Plugin Distribution
+
+The following requirements refine how the plugin distribution appears in JetBrains plugin management surfaces.
+
+### Plugin Logo for JetBrains Plugin Surfaces
+`req~plugin-logo-for-jetbrains-plugin-surfaces~1`
+
+The plugin distribution includes JetBrains-compliant OpenFastTrace plugin logo assets that IntelliJ Platform IDEs and JetBrains Marketplace can display for the plugin. Users can recognize the plugin in plugin-management surfaces.
+
+Rationale:
+
+JetBrains plugin surfaces use packaged plugin logo resources to distinguish plugins in lists and detail views. Providing suitable OpenFastTrace logo assets improves recognition without changing plugin behavior.
+
+Needs: scn
+
+### Run Configuration Presentation
+
+The following requirements refine how OpenFastTrace run configurations appear in the IDE run/debug UI.
+
+### OpenFastTrace Run Configuration Icon
+`req~openfasttrace-run-configuration-icon~1`
+
+The plugin shows an OpenFastTrace-specific icon for the `OpenFastTrace` run configuration type. Users can distinguish OpenFastTrace trace configurations from generic run actions in the run/debug UI.
+
+Covers:
+- `feat~oft-run-configurations~1`
+
+Needs: scn
+
 ### Show Trace Source Files as Test Runner Suites
 `req~show-trace-source-files-as-test-runner-suites~1`
 
@@ -1394,6 +1423,30 @@ Needs: dsn
 
 Covers:
 - `req~select-trace-result-view-in-run-configuration~2`
+
+Needs: dsn
+
+### Show Plugin Logo in JetBrains Plugin Surfaces
+`scn~show-plugin-logo-in-jetbrains-plugin-surfaces~1`
+
+**Given** a user installs the OpenFastTrace plugin distribution in an IntelliJ Platform IDE
+**When** the IDE displays the plugin in `Settings | Plugins`, or JetBrains Marketplace displays the plugin after publication
+**Then** the surface can load an OpenFastTrace plugin logo from packaged `META-INF` SVG assets that are designed for JetBrains plugin-logo sizes and light/dark backgrounds
+
+Covers:
+- `req~plugin-logo-for-jetbrains-plugin-surfaces~1`
+
+Needs: dsn
+
+### Show OpenFastTrace Icon for Run Configurations
+`scn~show-openfasttrace-icon-for-run-configurations~1`
+
+**Given** an IntelliJ project is open
+**When** a user creates or views an `OpenFastTrace` run configuration in the run/debug UI
+**Then** the IDE shows an OpenFastTrace-specific icon for that configuration type instead of the generic execute icon
+
+Covers:
+- `req~openfasttrace-run-configuration-icon~1`
 
 Needs: dsn
 

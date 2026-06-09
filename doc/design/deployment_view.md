@@ -38,3 +38,7 @@ Plugin --> Project : reads specification documents\nand coverage tag files
 The deployment model stays intentionally simple. All plugin logic runs locally in the host IDE, uses the IDE-provided caches and state stores, and works on files inside the active project.
 
 Network access is not part of the normal processing path. In the MVP, network access is only used when the user opens the OpenFastTrace user guide from GitHub.
+
+## Packaged Plugin Resources
+
+The plugin distribution includes JetBrains plugin logo SVG assets in the plugin main JAR under `META-INF`. The default logo resource is `META-INF/pluginIcon.svg`; if the default logo is not sufficiently visible on dark backgrounds, the distribution also includes `META-INF/pluginIcon_dark.svg`.

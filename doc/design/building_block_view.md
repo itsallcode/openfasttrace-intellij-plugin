@@ -217,15 +217,26 @@ Covers:
 
 Needs: impl
 
+### Plugin Distribution Resources
+`dsn~packaged-plugin-logo-assets~1`
+
+The plugin distribution resources include JetBrains plugin logo SVG assets in the plugin main JAR under `META-INF`. The default logo resource is `META-INF/pluginIcon.svg`; if the default logo is not sufficiently visible on dark backgrounds, the distribution also includes `META-INF/pluginIcon_dark.svg`. The logo assets use a 40x40 SVG size, keep transparent padding around the visible OpenFastTrace branding, and remain recognizable at JetBrains Plugin Manager and Marketplace display sizes.
+
+Covers:
+- `scn~show-plugin-logo-in-jetbrains-plugin-surfaces~1`
+
+Needs: bld, itest
+
 ### Trace Configuration Integration
 `dsn~trace-configuration-integration~1`
 
-The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project and through dedicated run configurations. It exposes those settings through project configuration UI and the run configuration editor, resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria, stores the run-configuration result-view selection, and treats the IntelliJ Test Runner UI as the result-view default when no selection is stored.
+The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project and through dedicated run configurations. It exposes those settings through project configuration UI and the run configuration editor, resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria, stores the run-configuration result-view selection, treats the IntelliJ Test Runner UI as the result-view default when no selection is stored, and owns the plugin resource used as the OpenFastTrace run-configuration icon.
 
 Covers:
 - `scn~test-runner-as-default-run-configuration-result-view~1`
 - `scn~select-plain-text-trace-result-view~1`
 - `scn~select-test-runner-trace-result-view~1`
+- `scn~show-openfasttrace-icon-for-run-configurations~1`
 
 Needs: impl, itest
 

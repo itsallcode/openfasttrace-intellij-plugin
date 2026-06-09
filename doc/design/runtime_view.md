@@ -495,6 +495,18 @@ Covers:
 
 Needs: impl, itest
 
+### OpenFastTrace Run Configuration Icon
+`dsn~openfasttrace-run-configuration-icon~1`
+
+**Given** the IDE renders the `OpenFastTrace` run configuration type in the run/debug UI
+**When** the IntelliJ Run Configuration API requests the configuration type icon
+**Then** the plugin returns an OpenFastTrace-specific icon loaded from a plugin-owned SVG resource instead of the generic execute icon.
+
+Covers:
+- `scn~show-openfasttrace-icon-for-run-configurations~1`
+
+Needs: impl, itest
+
 ### Filter Trace by Artifact Types and Tags
 `dsn~filter-trace-by-artifact-types-and-tags~1`
 

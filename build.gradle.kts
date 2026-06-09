@@ -138,6 +138,7 @@ tasks {
         options.encoding = "UTF-8"
     }
 
+    // [bld->dsn~packaged-plugin-logo-assets~1]
     named<Zip>("buildPlugin") {
         archiveBaseName.set("OpenFastTrace")
     }

@@ -14,9 +14,12 @@ This gives you a faster trace review workflow:
 
 The global `Tools | OpenFastTrace | Trace Project` action and new or previously unconfigured run configurations use the Test Runner UI. Run configurations can still opt into the existing plain text output when you want the raw OpenFastTrace report.
 
+The plugin distribution also contains JetBrains-compliant OpenFastTrace icon assets so the plugin can be identified in JetBrains plugin surfaces, and OpenFastTrace run configurations now use a dedicated OpenFastTrace icon instead of the generic execute icon.
+
 ## Features
 
 #40: Integrate OFT Trace into Test Runner UI
+#52: Add JetBrains Marketplace plugin icon assets
 
 ## Documentation
 
