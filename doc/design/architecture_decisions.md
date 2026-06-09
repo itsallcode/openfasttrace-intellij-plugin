@@ -51,6 +51,64 @@ Needs: bld
 
 Tags: Build, Gradle
 
+### How Does the Project Keep Gradle Dependency Metadata Predictable?
+
+The project needs predictable Gradle dependency resolution for static analysis
+and reproducible local and CI builds. It also needs a lightweight way to check
+whether newer dependency, build-plugin, or Gradle versions are available without
+making ordinary builds fail when an update exists.
+
+This decision is architecture-relevant because it impacts:
+
+* build reproducibility
+* dependency maintenance effort
+* SonarCloud analysis compatibility
+* the project's dependency-policy boundary for build plugins
+
+We considered the following alternatives:
+
+1. Use Gradle dependency verification metadata only.
+
+   This would verify artifact integrity, but it would require reviewing and
+   maintaining checksums for each resolved artifact. The project explicitly does
+   not want that review burden at this stage.
+
+1. Use Gradle dependency locking and a custom version-check task.
+
+   This would keep the dependency set predictable, but a custom version-check
+   task would add project-specific Gradle logic for behavior that already has a
+   maintained plugin solution.
+
+1. Use Gradle dependency locking and the Gradle Versions Plugin.
+
+   This keeps normal dependency resolution locked through Gradle's built-in
+   mechanism and delegates update discovery to a maintained build plugin that
+   can be run on demand by maintainers.
+
+#### Gradle Dependency Maintenance Uses Locks And Versions Plugin
+`dsn~gradle-dependency-maintenance-uses-locks-and-versions-plugin~1`
+
+The Gradle build uses dependency locking for predictable dependency resolution
+and the Gradle Versions Plugin for on-demand dependency, build-plugin, and
+Gradle wrapper update reports.
+
+Rationale:
+
+Gradle dependency locking satisfies the need for stable resolved dependency
+versions without enabling full dependency verification metadata. The Gradle
+Versions Plugin is an approved build-only dependency for GH-45 and avoids
+custom version-check logic in the build script.
+
+Comment:
+
+The version-check task is informational and stays outside the standard `check`
+lifecycle. Available updates change over time, so update discovery must not
+make normal local or CI builds unstable.
+
+Needs: bld
+
+Tags: Build, Gradle, Dependencies, SonarCloud
+
 ### How Does the Project Monitor Dependency Vulnerabilities?
 
 The project needs vulnerability monitoring for Gradle dependencies without making local and CI builds depend on an external vulnerability-audit service during every run.

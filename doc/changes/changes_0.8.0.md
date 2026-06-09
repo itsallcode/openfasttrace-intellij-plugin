@@ -21,3 +21,7 @@ The global `Tools | OpenFastTrace | Trace Project` action and new or previously 
 ## Documentation
 
 #43: Add a use-case-centric plugin user guide
+
+## Build Maintenance
+
+#45: Add Gradle dependency locks and dependency version checks
