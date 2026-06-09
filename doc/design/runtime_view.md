@@ -632,7 +632,7 @@ Needs: impl, itest
 
 **Given** the trace test-runner presentation creates a trace-link sub-test node
 **When** it derives the direction marker from the OpenFastTrace link status
-**Then** it uses `←` for incoming links, `→` for outgoing links, and `↔` for links without a single incoming or outgoing direction.
+**Then** it uses `⊙←` for incoming links, `⊙→` for outgoing links, and `↔` for links without a single incoming or outgoing direction.
 
 Covers:
 - `scn~show-unicode-trace-link-direction-in-test-runner-ui~1`

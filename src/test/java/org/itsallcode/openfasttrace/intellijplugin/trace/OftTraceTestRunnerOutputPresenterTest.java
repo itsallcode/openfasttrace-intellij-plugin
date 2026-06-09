@@ -21,6 +21,7 @@ import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfiguration;
 import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationFactory;
 import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationType;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -103,7 +104,7 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         );
         final SMTestProxy link = childNamed(
                 item,
-                "\u2192 Missing requirement (orphaned)"
+                "⊙→ Missing requirement (orphaned)"
         );
 
         assertThat(resultsViewer.getTestsRootNode().isDefect(), is(true));
@@ -118,7 +119,7 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         assertThat(item.getStacktrace(), containsString("Trace status: defective"));
         assertThat(item.getStacktrace(), containsString("orphaned link to req~missing_requirement~1"));
         assertThat(link.getPresentableName(),
-                is("\u2192 Missing requirement (orphaned)"));
+                is("⊙→ Missing requirement (orphaned)"));
         assertThat(link.getErrorMessage(), is("Orphaned outgoing trace link."));
         assertThat(link.getStacktrace(), containsString("Owning item ID: impl~missing_requirement~1"));
         assertThat(link.getStacktrace(), containsString("Linked item ID: req~missing_requirement~1"));
@@ -201,17 +202,17 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         final StringBuilder output = new StringBuilder();
         proxy.printOwnPrintablesOn(new Printer() {
             @Override
-            public void print(final String text, final ConsoleViewContentType contentType) {
+            public void print(final @NonNull String text, final ConsoleViewContentType contentType) {
                 output.append(text);
             }
 
             @Override
-            public void onNewAvailable(final Printable printable) {
+            public void onNewAvailable(final @NonNull Printable printable) {
                 // Intentionally empty.
             }
 
             @Override
-            public void printHyperlink(final String text, final HyperlinkInfo info) {
+            public void printHyperlink(final @NonNull String text, final HyperlinkInfo info) {
                 output.append(text);
             }
 

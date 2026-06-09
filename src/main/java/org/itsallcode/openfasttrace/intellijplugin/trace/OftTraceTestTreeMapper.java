@@ -255,12 +255,12 @@ final class OftTraceTestTreeMapper {
 
     private static LinkDirection direction(final LinkStatus status) {
         if (status.isIncoming()) {
-            return new LinkDirection("\u2190", "incoming");
+            return new LinkDirection("⊙←", "incoming");
         }
         if (status.isOutgoing()) {
-            return new LinkDirection("\u2192", "outgoing");
+            return new LinkDirection("⊙→", "outgoing");
         }
-        return new LinkDirection("\u2194", "non-directional");
+        return new LinkDirection("↔", "non-directional");
     }
 
     private record VisibleTraceLink(LinkedSpecificationItem otherItem, LinkStatus status) {

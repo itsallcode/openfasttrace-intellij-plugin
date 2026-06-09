@@ -119,7 +119,7 @@ class OftTraceTestTreeMapperTest {
                 () -> assertThat(requirementNode.testCount(), is(2)),
                 () -> assertThat(requirementNode.links(), hasSize(1)),
                 () -> assertThat(requirementNode.links().getFirst().name(),
-                        is("\u2190 Covered requirement test")),
+                        is("⊙← Covered requirement test")),
                 () -> assertThat(requirementNode.links().getFirst().navigationId(),
                         is("tst~covered_requirement~1")),
                 () -> assertThat(requirementNode.links().getFirst().failed(), is(false)),
@@ -161,7 +161,7 @@ class OftTraceTestTreeMapperTest {
                 requirementNode.links().stream()
                         .map(OftTraceLinkNode::name)
                         .toList(),
-                contains("\u2190 Covered requirement implementation")
+                contains("⊙← Covered requirement implementation")
         );
     }
 
@@ -219,7 +219,7 @@ class OftTraceTestTreeMapperTest {
                 () -> assertThat(suiteNamed(tree, "src/Main.java").failed(), is(true)),
                 () -> assertThat(implementationNode.failed(), is(true)),
                 () -> assertThat(implementationNode.links(), hasSize(1)),
-                () -> assertThat(link.name(), is("\u2192 req~missing_requirement~1 (orphaned)")),
+                () -> assertThat(link.name(), is("⊙→ req~missing_requirement~1 (orphaned)")),
                 () -> assertThat(link.failed(), is(true)),
                 () -> assertThat(link.details().failureMessage(), is("Orphaned outgoing trace link.")),
                 () -> assertThat(link.details().detailText(), containsString("Owning item ID: impl~missing_requirement~1")),
