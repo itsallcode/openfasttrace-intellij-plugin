@@ -1,8 +1,10 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace.runconfig;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
+import org.itsallcode.openfasttrace.intellijplugin.OftIcons;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceResultView;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
@@ -11,6 +13,8 @@ import org.junit.jupiter.api.Assertions;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 
 // [itest->dsn~openfasttrace-run-configuration~1]
 public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
@@ -108,6 +112,16 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
         configuration.readExternal(element);
 
         assertThat(configuration.snapshot().resultView(), is(OftTraceResultView.TEST_RUNNER));
+    }
+
+    // [itest->dsn~openfasttrace-run-configuration-icon~1]
+    public void testGivenRunConfigurationTypeWhenReadingIconThenItUsesTheOpenFastTraceIcon() {
+        final OftRunConfigurationType type = new OftRunConfigurationType();
+
+        Assertions.assertAll(
+                () -> assertThat(type.getIcon(), sameInstance(OftIcons.OPEN_FAST_TRACE)),
+                () -> assertThat(type.getIcon(), is(not(sameInstance(AllIcons.Actions.Execute))))
+        );
     }
 
     private OftRunConfiguration createConfiguration(final String name) {
