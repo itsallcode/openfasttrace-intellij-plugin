@@ -39,7 +39,7 @@ public final class OftTraceService {
         this.reportRenderer = reportRenderer;
     }
 
-    // [impl->dsn~show-successful-trace-output-in-ide-output-window~1]
+    // [impl->dsn~show-successful-trace-output-in-ide-output-window~2]
     // [impl->dsn~show-scanned-base-directory-in-trace-output-window~1]
     // [impl->dsn~show-failing-trace-output-in-ide-output-window~1]
     // [impl->dsn~preserve-defect-count-for-unclean-trace-chain-in-output-window~1]

@@ -110,9 +110,9 @@ The plugin suggests existing OpenFastTrace specification item IDs while users fi
 Needs: req
 
 ### Run OFT Trace
-`feat~run-oft-trace~1`
+`feat~run-oft-trace~2`
 
-The plugin lets users run an OpenFastTrace trace for the currently opened IntelliJ project and inspect the textual result inside the IDE using a global action for the default project trace.
+The plugin lets users run an OpenFastTrace trace for the currently opened IntelliJ project and inspect the result inside the IDE using the IntelliJ Test Runner UI as the default view for the global project trace.
 
 Needs: req
 
@@ -340,7 +340,7 @@ The following requirements refine the Run OFT Trace feature into user-visible ca
 The plugin adds an `OpenFastTrace` group with a `Trace Project` action to the global `Tools` menu. Users can find the trace entry in the established IDE location for project-level tooling actions.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
@@ -354,7 +354,7 @@ Rationale:
 Users cannot invoke the trace action when the IDE has no project context to trace.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
@@ -364,7 +364,7 @@ Needs: scn
 The plugin traces the currently opened IntelliJ project by using the opened project directory as the default OpenFastTrace input root. Users can run a whole-project trace without manually selecting files and directories first.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
@@ -374,7 +374,7 @@ Needs: scn
 The plugin integrates OpenFastTrace trace-scope settings into IntelliJ project configuration. Users can configure whether the `Trace Project` action traces the whole opened project or only selected resources and can edit the selected-resource paths directly in the IDE settings workflow.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
@@ -384,7 +384,7 @@ Needs: scn
 The plugin can trace selected project resources instead of the whole opened project directory. Users can restrict the OpenFastTrace scan to the resources they intend to include in the trace.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
@@ -394,7 +394,7 @@ Needs: scn
 When selected-resource tracing is active, the plugin can include source directories known to IntelliJ in the effective OpenFastTrace input set. Users do not need to discover and configure ordinary source roots by hand.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
@@ -404,7 +404,7 @@ Needs: scn
 When selected-resource tracing is active, the plugin can include test directories known to IntelliJ in the effective OpenFastTrace input set. Users do not need to discover and configure ordinary test roots by hand.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
@@ -414,7 +414,7 @@ Needs: scn
 When selected-resource tracing is active, the plugin lets users add additional trace inputs through a multi-line text field in the project settings. Each non-empty line specifies one file or directory path relative to the opened project directory that OpenFastTrace should scan. If the user has not changed that setting, the field contains exactly one default entry: `doc/`.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
@@ -424,17 +424,29 @@ Needs: scn
 The plugin runs the OpenFastTrace project trace in a background task with IDE progress reporting. Users can start a trace without blocking the editor UI while the trace is running.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
+
+Needs: scn
+
+### Show Trace Project in Test Runner UI by Default
+`req~show-trace-project-in-test-runner-ui-by-default~1`
+
+When a user starts the global `Trace Project` action from the `Tools` menu, the plugin shows the default trace result in IntelliJ's Test Runner UI. Users can inspect the default project trace as structured source-file suites, specification-item tests, and trace-link sub-tests without creating a run configuration first.
+
+Covers:
+- `feat~run-oft-trace~2`
+- `feat~oft-test-runner-trace-results~1`
 
 Needs: scn
 
 ### Show Trace Output in IDE Output Window
-`req~show-trace-output-in-ide-output-window~1`
+`req~show-trace-output-in-ide-output-window~2`
 
-The plugin shows the OpenFastTrace text trace output in an IDE output sub-window and keeps that output available after the trace finishes. Users can inspect the plain text result inside the IDE without looking at log files or an external terminal.
+The plugin can show the OpenFastTrace text trace output in an IDE output sub-window and keep that output available after the trace finishes. Users who select the plain text result view can inspect the plain text result inside the IDE without looking at log files or an external terminal.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
+- `feat~oft-run-configurations~1`
 
 Needs: scn
 
@@ -444,7 +456,7 @@ Needs: scn
 The plugin makes OpenFastTrace specification item IDs in the trace output window navigable to their declarations in the opened project. Users can jump from a reported item in the trace output directly to the defining specification item without searching manually.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
@@ -479,13 +491,13 @@ Covers:
 Needs: scn
 
 ### Select Trace Result View in Run Configuration
-`req~select-trace-result-view-in-run-configuration~1`
+`req~select-trace-result-view-in-run-configuration~2`
 
 The OpenFastTrace run configuration includes a result-view option for choosing plain text output or the IntelliJ Test Runner UI.
 
 Rationale:
 
-Users who prefer the existing text report can keep using it, while users who need structured trace inspection can opt into the native test runner presentation per run configuration.
+Users get structured trace inspection by default, while users who prefer the existing text report can opt into plain text output per run configuration.
 
 Covers:
 - `feat~oft-run-configurations~1`
@@ -696,20 +708,20 @@ Needs: scn
 ### Show Scanned Base Directory in Trace Output Window
 `req~show-scanned-base-directory-in-trace-output-window~1`
 
-When a project trace starts, the plugin writes the resolved project base directory that OpenFastTrace scans into the IDE output sub-window. Users can confirm the actual trace input root directly from the trace output.
+When a plain text project trace starts, the plugin writes the resolved project base directory that OpenFastTrace scans into the IDE output sub-window. Users can confirm the actual trace input root directly from the trace output.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
 ### Show Resolved Trace Inputs in Trace Output Window
 `req~show-resolved-trace-inputs-in-trace-output-window~1`
 
-When a project trace starts with selected-resource tracing, the plugin writes the resolved files and directories that it passes to OpenFastTrace into the IDE output sub-window. Users can confirm the actual configured trace scope directly from the trace output.
+When a plain text project trace starts with selected-resource tracing, the plugin writes the resolved files and directories that it passes to OpenFastTrace into the IDE output sub-window. Users can confirm the actual configured trace scope directly from the trace output.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
@@ -719,17 +731,17 @@ Needs: scn
 The plugin reports when the opened project does not resolve to a valid local path before starting the trace. Users can see why the trace cannot start without inspecting plugin logs.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
 ### Show Failing Trace Result in IDE Output Window
 `req~show-failing-trace-result-in-ide-output-window~1`
 
-The plugin shows failing OpenFastTrace executions through the same IDE output flow as successful traces, including the text output and the failing result. Users can inspect trace failures without switching to plugin logs or an external terminal.
+When plain text output is selected, the plugin shows failing OpenFastTrace executions through the same IDE output flow as successful traces, including the text output and the failing result. Users can inspect trace failures without switching to plugin logs or an external terminal.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
@@ -739,7 +751,7 @@ Needs: scn
 The plugin preserves the OpenFastTrace plain-text defect summary for an unclean trace chain in the IDE output window, including the reported total-item count and defect count. Users can verify how many trace issues OpenFastTrace found directly from the text result.
 
 Covers:
-- `feat~run-oft-trace~1`
+- `feat~run-oft-trace~2`
 
 Needs: scn
 
@@ -1143,6 +1155,18 @@ Covers:
 
 Needs: dsn
 
+### Show Trace Project in Test Runner UI by Default
+`scn~show-trace-project-in-test-runner-ui-by-default~1`
+
+**Given** an IntelliJ project is open, its configured trace inputs are valid, and the OFT trace completes
+**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Then** the IDE shows the trace result in the IntelliJ Test Runner UI
+
+Covers:
+- `req~show-trace-project-in-test-runner-ui-by-default~1`
+
+Needs: dsn
+
 ### Configure Trace Scope in Project Settings
 `scn~configure-trace-scope-in-project-settings~1`
 
@@ -1229,14 +1253,14 @@ Covers:
 Needs: dsn
 
 ### Show Successful Trace Output in IDE Output Window
-`scn~show-successful-trace-output-in-ide-output-window~1`
+`scn~show-successful-trace-output-in-ide-output-window~2`
 
-**Given** an IntelliJ project is open, its project directory is a valid OFT trace input, and the OFT trace completes successfully
-**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Given** an IntelliJ project is open, its configured trace inputs are valid, an `OpenFastTrace` run configuration uses the plain text result view, and the OFT trace completes successfully
+**When** a user runs that configuration
 **Then** the IDE shows the resulting OpenFastTrace text report in an output sub-window that remains available after the trace completes
 
 Covers:
-- `req~show-trace-output-in-ide-output-window~1`
+- `req~show-trace-output-in-ide-output-window~2`
 
 Needs: dsn
 
@@ -1256,7 +1280,7 @@ Needs: dsn
 `scn~show-scanned-base-directory-in-trace-output-window~1`
 
 **Given** an IntelliJ project is open and its project directory resolves to a valid local OFT trace input
-**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**When** a user runs a trace using the plain text result view
 **Then** the IDE output for that trace starts with the resolved base directory that the plugin passes to OpenFastTrace
 
 Covers:
@@ -1268,7 +1292,7 @@ Needs: dsn
 `scn~show-resolved-trace-inputs-in-trace-output-window~1`
 
 **Given** an IntelliJ project is open, selected-resource tracing is active, and the plugin resolved the configured trace files and directories successfully
-**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**When** a user runs a trace using the plain text result view
 **Then** the IDE output for that trace lists the resolved files and directories that the plugin passes to OpenFastTrace
 
 Covers:
@@ -1279,8 +1303,8 @@ Needs: dsn
 ### Show Failing Trace Output in IDE Output Window
 `scn~show-failing-trace-output-in-ide-output-window~1`
 
-**Given** an IntelliJ project is open, its project directory is a valid OFT trace input, and the OFT trace reports a failure
-**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Given** an IntelliJ project is open, its configured trace inputs are valid, a trace uses the plain text result view, and the OFT trace reports a failure
+**When** the trace completes
 **Then** the IDE shows the OpenFastTrace text output together with the failing result through the same trace output flow
 
 Covers:
@@ -1291,8 +1315,8 @@ Needs: dsn
 ### Show Defect Count for Unclean Trace Chain in IDE Output Window
 `scn~show-defect-count-for-unclean-trace-chain-in-output-window~1`
 
-**Given** an IntelliJ project is open, its project directory is a valid OFT trace input, and the OFT trace finds an unclean feature-to-requirement-to-design chain with missing implementation coverage
-**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Given** an IntelliJ project is open, its configured trace inputs are valid, a trace uses the plain text result view, and the OFT trace finds an unclean feature-to-requirement-to-design chain with missing implementation coverage
+**When** the trace completes
 **Then** the IDE output contains the OpenFastTrace plain-text summary line with the reported total-item count and defect count for that unclean chain
 
 Covers:
@@ -1336,16 +1360,28 @@ Covers:
 
 Needs: dsn
 
-### Plain Text as Default Run Configuration Result View
-`scn~plain-text-as-default-run-configuration-result-view~1`
+### Test Runner as Default Run Configuration Result View
+`scn~test-runner-as-default-run-configuration-result-view~1`
 
 **Given** an IntelliJ project is open and an `OpenFastTrace` run configuration has no explicit result-view selection
 **When** a user runs that configuration
-**Then** the plugin shows the trace result in the existing plain text output view
+**Then** the plugin shows the trace result in the IntelliJ Test Runner UI
 
 Covers:
-- `req~select-trace-result-view-in-run-configuration~1`
-- `req~show-trace-output-in-ide-output-window~1`
+- `req~select-trace-result-view-in-run-configuration~2`
+
+Needs: dsn
+
+### Select Plain Text Trace Result View
+`scn~select-plain-text-trace-result-view~1`
+
+**Given** an IntelliJ project is open and a user edits an `OpenFastTrace` run configuration
+**When** the user selects plain text output as the result view and runs the configuration
+**Then** the plugin saves that selection and shows the trace result in the existing plain text output view
+
+Covers:
+- `req~select-trace-result-view-in-run-configuration~2`
+- `req~show-trace-output-in-ide-output-window~2`
 
 Needs: dsn
 
@@ -1357,7 +1393,7 @@ Needs: dsn
 **Then** the plugin saves that selection and shows the trace result in the IntelliJ Test Runner UI
 
 Covers:
-- `req~select-trace-result-view-in-run-configuration~1`
+- `req~select-trace-result-view-in-run-configuration~2`
 
 Needs: dsn
 

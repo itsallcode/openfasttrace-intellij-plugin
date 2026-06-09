@@ -32,7 +32,7 @@ public class OftRunProfileStateTest extends AbstractOftPlatformTestCase {
         }
     }
 
-    // [itest->dsn~plain-text-as-default-run-configuration-result-view~1]
+    // [itest->dsn~select-plain-text-trace-result-view~1]
     public void testGivenPlainTextResultViewWhenExecutingThenItUsesPlainTextConsole() throws Exception {
         final ExecutionEnvironment environment = createEnvironment();
         final OftRunProfileState state = new OftRunProfileState(
@@ -44,6 +44,20 @@ public class OftRunProfileStateTest extends AbstractOftPlatformTestCase {
 
         Disposer.register(getTestRootDisposable(), result.getExecutionConsole());
         assertThat(result.getExecutionConsole(), is(not(instanceOf(SMTRunnerConsoleView.class))));
+    }
+
+    // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
+    public void testGivenDefaultResultViewWhenExecutingThenItUsesTestRunnerConsole() throws Exception {
+        final ExecutionEnvironment environment = createEnvironment();
+        final OftRunProfileState state = new OftRunProfileState(
+                environment,
+                invalidInputsSettings(OftTraceSettingsSnapshot.DEFAULT.resultView())
+        );
+
+        final ExecutionResult result = state.execute(environment.getExecutor(), environment.getRunner());
+
+        Disposer.register(getTestRootDisposable(), result.getExecutionConsole());
+        assertThat(result.getExecutionConsole(), is(instanceOf(SMTRunnerConsoleView.class)));
     }
 
     // [itest->dsn~select-test-runner-trace-result-view~1]

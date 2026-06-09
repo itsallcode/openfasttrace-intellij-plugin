@@ -171,7 +171,10 @@ public final class OftTraceSettingsComponent {
     }
 
     private OftTraceResultView selectedResultView() {
-        if (!showResultViewSelection || plainTextResultViewRadioButton.isSelected()) {
+        if (!showResultViewSelection) {
+            return OftTraceSettingsSnapshot.DEFAULT.resultView();
+        }
+        if (plainTextResultViewRadioButton.isSelected()) {
             return OftTraceResultView.PLAIN_TEXT;
         }
         return OftTraceResultView.TEST_RUNNER;

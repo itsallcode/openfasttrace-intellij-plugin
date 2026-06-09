@@ -19,6 +19,7 @@ public class OftTraceProjectSettingsTest extends AbstractOftPlatformTestCase {
         assertThat(snapshot.includeSourceRoots(), is(OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots()));
         assertThat(snapshot.includeTestRoots(), is(OftTraceSettingsSnapshot.DEFAULT.includeTestRoots()));
         assertThat(snapshot.additionalPathsText(), is(OftTraceSettingsSnapshot.DEFAULT.additionalPathsText()));
+        assertThat(snapshot.resultView(), is(OftTraceSettingsSnapshot.DEFAULT.resultView()));
     }
 
     public void testGivenStoredStateWhenLoadingThenItNormalizesTheSnapshot() {

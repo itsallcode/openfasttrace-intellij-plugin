@@ -4,14 +4,14 @@
 
 Let users run an OpenFastTrace run configuration and inspect the structured trace result in IntelliJ's built-in test runner UI instead of only reading the plain text trace output.
 
-The implementation should preserve the existing plain text output as the default result view while adding a run-configuration option that presents trace results as source-file suites, specification-item tests, and trace-link sub-tests with pass/fail status and navigation back to the source.
+The implementation originally preserved the existing plain text output as the default result view while adding a run-configuration option that presents trace results as source-file suites, specification-item tests, and trace-link sub-tests with pass/fail status and navigation back to the source. The follow-up changeset [Default Test Runner Trace Result View](default-test-runner-trace-result-view.md) changes that default to the IntelliJ Test Runner UI.
 
 ## Scope
 
 In scope:
 
 * Add a result-view option to the `OpenFastTrace` run configuration editor for plain text output or IntelliJ test runner output.
-* Preserve the existing plain text output behavior for `Tools | OpenFastTrace | Trace Project` and for run configurations unless the user selects the test runner view.
+* Preserve the existing plain text output behavior for run configurations that select the plain text result view.
 * Keep the structured `Trace` object produced by `OftTraceService` available to output presenters.
 * Implement an `OftTraceOutputPresenter` that feeds trace results into `SMTRunnerConsoleView`.
 * Build the test runner hierarchy by source file, specification item, and incoming or outgoing trace link.
@@ -96,7 +96,7 @@ Keep presentation selection at the run-configuration layer. The global `Trace Pr
 - [x] Add presenter tests for `SMTRunnerConsoleView` creation and event emission for successful and defective traces.
 - [x] Add mapper and presenter tests for suite roll-up, top-level roll-up, Unicode arrows, and failed-node details.
 - [x] Add mapper and presenter tests for compact item labels, ID details, and per-file item ordering.
-- [x] Add run-profile tests proving plain text output remains the default and test-runner output is selected only when configured.
+- [x] Add run-profile tests proving the configured result-view selection controls whether plain text or test-runner output is used.
 - [x] Add navigation tests proving test-runner nodes navigate to specification declarations and source-side coverage tags through `OftTraceNavigationResolver`.
 - [x] Keep existing trace action, trace service, console presenter, run-configuration, and navigation tests green.
 - [x] Keep the OpenFastTrace trace clean for `feat`, `req`, `scn`, `dsn`, `impl`, `utest`, and `itest` artifacts in scope.

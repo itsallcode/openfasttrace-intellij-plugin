@@ -73,7 +73,7 @@ Failure presentation is likewise kept narrow. The plugin may emphasize the short
 
 ## Structured Test Runner Trace Results
 
-The test-runner trace-result increment keeps the existing plain text trace output as the default result view and adds structured presentation as a per-run-configuration choice.
+The test-runner trace-result increment makes structured presentation the default result view for both the global `Trace Project` action and OpenFastTrace run configurations. The existing plain text trace output remains available as a per-run-configuration choice.
 
 The plugin uses IntelliJ's SM test runner infrastructure for this structured presentation. Source files become test suites labeled with project-local paths when they are below the opened project directory, specification items become tests below their source-file suite, and incoming or outgoing trace links become sub-tests below connected specification items. This gives users the native test runner tree, progress, status, and navigation behavior without introducing a parallel result-tree widget.
 

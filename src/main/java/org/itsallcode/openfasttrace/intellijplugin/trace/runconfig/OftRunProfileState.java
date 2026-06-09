@@ -70,7 +70,7 @@ public final class OftRunProfileState implements RunProfileState {
         return createPlainTextExecutionPresentation(project);
     }
 
-    // [impl->dsn~plain-text-as-default-run-configuration-result-view~1]
+    // [impl->dsn~select-plain-text-trace-result-view~1]
     private static ExecutionPresentation createPlainTextExecutionPresentation(final Project project) {
         final ConsoleView console = OftTraceRunContentOutputPresenter.createTraceConsole(project);
         final OftTraceOutputPresenter outputPresenter = new OftTraceRunContentOutputPresenter(
@@ -82,6 +82,7 @@ public final class OftRunProfileState implements RunProfileState {
         return new ExecutionPresentation(console, outputPresenter);
     }
 
+    // [impl->dsn~test-runner-as-default-run-configuration-result-view~1]
     // [impl->dsn~select-test-runner-trace-result-view~1]
     private ExecutionPresentation createTestRunnerExecutionPresentation(final Project project, final Executor executor) {
         final SMTRunnerConsoleProperties properties = new SMTRunnerConsoleProperties(

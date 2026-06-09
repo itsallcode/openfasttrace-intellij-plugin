@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.is;
 class OftTraceServiceTest {
     private static final Pattern ANSI_ESCAPE_SEQUENCE = Pattern.compile("\u001B\\[[;\\d]*m");
 
-    // [itest->dsn~show-successful-trace-output-in-ide-output-window~1]
+    // [itest->dsn~show-successful-trace-output-in-ide-output-window~2]
     @Test
     void testGivenCleanTraceInputWhenTracingThenItReturnsSuccessfulPlainTextOutput(@TempDir final Path temporaryDirectory)
             throws IOException {

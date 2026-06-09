@@ -7,9 +7,10 @@ import com.intellij.openapi.project.Project;
 
 import java.util.function.Function;
 
-// [impl->dsn~trace-action-integration~1]
+// [impl->dsn~trace-action-integration~2]
 // [impl->dsn~show-trace-project-action-in-tools-menu~1]
 // [impl->dsn~disable-trace-project-action-without-open-project~1]
+// [impl->dsn~show-trace-project-in-test-runner-ui-by-default~1]
 public final class OftTraceProjectAction extends DumbAwareAction {
     public static final String ACTION_ID = "Oft.TraceProject.ToolsMenu";
     public static final String TOOLS_GROUP_ID = "Oft.ToolsMenu";
@@ -19,14 +20,14 @@ public final class OftTraceProjectAction extends DumbAwareAction {
     private final OftTraceOutputPresenter outputPresenter;
 
     public OftTraceProjectAction() {
+        this(defaultDependencies());
+    }
+
+    private OftTraceProjectAction(final DefaultDependencies dependencies) {
         this(
                 OftTraceInputResolver::resolve,
-                new OftTraceBackgroundRunner(
-                        new OftTraceService(),
-                        new OftTraceRunContentOutputPresenter(),
-                        new NopProcessHandler()
-                ),
-                new OftTraceRunContentOutputPresenter()
+                dependencies.traceRunner(),
+                dependencies.outputPresenter()
         );
     }
 
@@ -63,5 +64,24 @@ public final class OftTraceProjectAction extends DumbAwareAction {
 
     static String createContentTitle(final Project project) {
         return "OpenFastTrace Trace: " + project.getName();
+    }
+
+    static OftTraceOutputPresenter createDefaultOutputPresenter() {
+        return new OftTraceTestRunnerRunContentOutputPresenter();
+    }
+
+    private static DefaultDependencies defaultDependencies() {
+        final OftTraceOutputPresenter presenter = createDefaultOutputPresenter();
+        return new DefaultDependencies(
+                new OftTraceBackgroundRunner(
+                        new OftTraceService(),
+                        presenter,
+                        new NopProcessHandler()
+                ),
+                presenter
+        );
+    }
+
+    private record DefaultDependencies(OftTraceRunner traceRunner, OftTraceOutputPresenter outputPresenter) {
     }
 }

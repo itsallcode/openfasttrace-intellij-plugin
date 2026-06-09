@@ -85,6 +85,7 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
         }
     }
 
+    // [impl->dsn~test-runner-as-default-run-configuration-result-view~1]
     private static OftTraceResultView parseResultView(final String value) {
         if (value == null || value.isBlank()) {
             return OftTraceSettingsSnapshot.DEFAULT.resultView();

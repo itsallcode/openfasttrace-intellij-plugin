@@ -19,7 +19,7 @@ public record OftTraceSettingsSnapshot(
             "doc/",
             "",
             "",
-            OftTraceResultView.PLAIN_TEXT
+            OftTraceResultView.TEST_RUNNER
     );
 
     private static final Pattern LINE_SEPARATOR = Pattern.compile("\\R");
@@ -40,7 +40,7 @@ public record OftTraceSettingsSnapshot(
                 additionalPathsText,
                 artifactTypesText,
                 tagsText,
-                OftTraceResultView.PLAIN_TEXT
+                DEFAULT.resultView()
         );
     }
 

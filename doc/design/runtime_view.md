@@ -388,6 +388,18 @@ Covers:
 
 Needs: impl, itest
 
+### Show Trace Project in Test Runner UI by Default
+`dsn~show-trace-project-in-test-runner-ui-by-default~1`
+
+**Given** the global `Trace Project` action receives a valid OpenFastTrace trace result
+**When** the trace-action flow presents that result
+**Then** it creates an IntelliJ Test Runner UI console, maps the structured OpenFastTrace trace to SM test runner nodes, and shows that console as the default run content for the action.
+
+Covers:
+- `scn~show-trace-project-in-test-runner-ui-by-default~1`
+
+Needs: impl, itest
+
 ### Configure Trace Scope in Project Settings
 `dsn~configure-trace-scope-in-project-settings~1`
 
@@ -495,15 +507,27 @@ Covers:
 
 Needs: impl, itest
 
-### Plain Text as Default Run Configuration Result View
-`dsn~plain-text-as-default-run-configuration-result-view~1`
+### Test Runner as Default Run Configuration Result View
+`dsn~test-runner-as-default-run-configuration-result-view~1`
 
 **Given** an OpenFastTrace run configuration has no persisted result-view selection
 **When** the run-profile state prepares the trace result presentation
-**Then** it selects the existing plain text trace-output presentation.
+**Then** it selects the trace test-runner presentation.
 
 Covers:
-- `scn~plain-text-as-default-run-configuration-result-view~1`
+- `scn~test-runner-as-default-run-configuration-result-view~1`
+
+Needs: impl, itest
+
+### Select Plain Text Trace Result View
+`dsn~select-plain-text-trace-result-view~1`
+
+**Given** an OpenFastTrace run configuration stores the plain text result-view selection
+**When** the run-profile state prepares the trace result presentation
+**Then** it selects the existing plain text trace-output presentation for that run configuration.
+
+Covers:
+- `scn~select-plain-text-trace-result-view~1`
 
 Needs: impl, itest
 
@@ -760,14 +784,14 @@ Covers:
 Needs: impl, itest
 
 ### Show Successful Trace Output in IDE Output Window
-`dsn~show-successful-trace-output-in-ide-output-window~1`
+`dsn~show-successful-trace-output-in-ide-output-window~2`
 
-**Given** a background OpenFastTrace trace run completes successfully for the opened IntelliJ project
+**Given** a background OpenFastTrace trace run uses the plain text result view and completes successfully for the opened IntelliJ project
 **When** the trace-execution service temporarily switches the thread context class loader to the plugin class loader for OFT importer and reporter discovery, restores the previous context loader afterward, and hands the captured text report to trace-output presentation
 **Then** the plugin opens or updates an IDE output sub-window for that trace run and shows the OpenFastTrace text output under a clear trace-specific content title.
 
 Covers:
-- `scn~show-successful-trace-output-in-ide-output-window~1`
+- `scn~show-successful-trace-output-in-ide-output-window~2`
 
 Needs: impl, itest
 
