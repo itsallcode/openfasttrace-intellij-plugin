@@ -207,6 +207,7 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
 
             @Override
             public void onNewAvailable(final Printable printable) {
+                // Intentionally empty.
             }
 
             @Override
@@ -216,6 +217,7 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
 
             @Override
             public void mark() {
+                // Intentionally empty.
             }
         });
         return output.toString();
