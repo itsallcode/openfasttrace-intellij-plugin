@@ -55,7 +55,11 @@ The plugin uses the minimum set of dependencies required for:
 
 Additional libraries are not allowed by default. Any new third-party dependency requires an explicit design decision and approval before it is added to the build.
 
-The Gradle dependency verification is disabled. Otherwise, we would have to review each dependency. Instead, we only use dependencies from the Central Repository.
+The Gradle dependency verification is disabled. Otherwise, we would have to review each dependency. Runtime and test dependencies come from the Central Repository, while approved Gradle build plugins are resolved through the Gradle Plugin Portal.
+
+Gradle dependency locking is enabled for predictable dependency resolution in local and CI builds. Dependency locking is not a replacement for dependency verification; it only fixes the resolved dependency versions until maintainers intentionally refresh the lock metadata.
+
+Third-party build plugins follow the same approval rule as runtime libraries. Approved build plugins must stay limited to build maintenance concerns and must not add plugin runtime dependencies.
 
 ## Static Analysis And Security Gates
 

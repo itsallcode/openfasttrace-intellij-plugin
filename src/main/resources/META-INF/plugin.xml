@@ -62,6 +62,9 @@
                 language="JSON"
                 implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
         <completion.contributor
+                language="XML"
+                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
+        <completion.contributor
                 language="HTML"
                 implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
         <completion.contributor

@@ -109,6 +109,19 @@ To run the automated checks for the trace action and the project trace itself:
 ./gradlew check verifyPlugin
 ```
 
+To check for newer dependency, Gradle plugin, and Gradle wrapper versions:
+
+```sh
+./gradlew --no-configuration-cache --no-parallel dependencyUpdates -Drevision=release
+```
+
+After intentionally changing dependency or Gradle plugin versions, refresh the
+committed Gradle lock file:
+
+```sh
+./gradlew --write-locks dependencies
+```
+
 Example OFT files for manual testing are available under `examples/` in this project.
 For a guided live demonstration, use the script in [doc/demo/plugin-demo.md](doc/demo/plugin-demo.md) with the isolated example project in [doc/demo/example](doc/demo/example).
 
