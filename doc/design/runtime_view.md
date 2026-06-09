@@ -495,6 +495,150 @@ Covers:
 
 Needs: impl, itest
 
+### Plain Text as Default Run Configuration Result View
+`dsn~plain-text-as-default-run-configuration-result-view~1`
+
+**Given** an OpenFastTrace run configuration has no persisted result-view selection
+**When** the run-profile state prepares the trace result presentation
+**Then** it selects the existing plain text trace-output presentation.
+
+Covers:
+- `scn~plain-text-as-default-run-configuration-result-view~1`
+
+Needs: impl, itest
+
+### Select Test Runner Trace Result View
+`dsn~select-test-runner-trace-result-view~1`
+
+**Given** an OpenFastTrace run configuration stores the IntelliJ Test Runner UI result-view selection
+**When** the run-profile state prepares the trace result presentation
+**Then** it selects the trace test-runner presentation for that run configuration.
+
+Covers:
+- `scn~select-test-runner-trace-result-view~1`
+
+Needs: impl, itest
+
+### Show Trace Source Files as Test Runner Suites
+`dsn~show-trace-source-files-as-test-runner-suites~1`
+
+**Given** the trace test-runner presentation receives a structured OpenFastTrace trace result
+**When** it builds the SM test tree
+**Then** it groups traced specification items by source file and creates one SM test suite node for each source file.
+
+Covers:
+- `scn~show-trace-source-files-as-test-runner-suites~1`
+
+Needs: impl, itest
+
+### Show Trace Specification Items as Test Runner Tests
+`dsn~show-trace-specification-items-as-test-runner-tests~1`
+
+**Given** the trace test-runner presentation has created a source-file suite
+**When** it maps traced specification items from that source file
+**Then** it creates one SM test node for each specification item below that source-file suite.
+
+Covers:
+- `scn~show-trace-specification-items-as-test-runner-tests~1`
+
+Needs: impl, itest
+
+### Show Trace Links as Test Runner Sub-Tests
+`dsn~show-trace-links-as-test-runner-sub-tests~1`
+
+**Given** the trace test-runner presentation has created a specification-item test node
+**When** it maps that item's incoming and outgoing trace links
+**Then** it creates one SM sub-test node for each trace link below the specification-item test node.
+
+Covers:
+- `scn~show-trace-links-as-test-runner-sub-tests~1`
+
+Needs: impl, itest
+
+### Show Specification Item Status in Test Runner UI
+`dsn~show-specification-item-status-in-test-runner-ui~1`
+
+**Given** the trace test-runner presentation creates a specification-item test node
+**When** it derives the node name from the OpenFastTrace trace result
+**Then** it appends the specification item's trace status in brackets to the visible node name.
+
+Covers:
+- `scn~show-specification-item-status-in-test-runner-ui~1`
+
+Needs: impl, itest
+
+### Show Trace Link Status in Test Runner UI
+`dsn~show-trace-link-status-in-test-runner-ui~1`
+
+**Given** the trace test-runner presentation creates a trace-link sub-test node
+**When** it derives the node name from the OpenFastTrace trace result
+**Then** it appends the trace link's status in brackets to the visible node name.
+
+Covers:
+- `scn~show-trace-link-status-in-test-runner-ui~1`
+
+Needs: impl, itest
+
+### Show Trace Link Direction in Test Runner UI
+`dsn~show-trace-link-direction-in-test-runner-ui~1`
+
+**Given** the trace test-runner presentation creates a trace-link sub-test node
+**When** the trace link is incoming or outgoing for the owning specification item
+**Then** it marks the visible node name with that trace-link direction.
+
+Covers:
+- `scn~show-trace-link-direction-in-test-runner-ui~1`
+
+Needs: impl, itest
+
+### Map Specification Item Trace Status to Test Runner Status
+`dsn~map-specification-item-trace-status-to-test-runner-status~1`
+
+**Given** the trace test-runner presentation has created a specification-item test node
+**When** the OpenFastTrace trace result marks that specification item as clean or defective
+**Then** it reports the SM test node as passed for a clean item and failed for a defective item.
+
+Covers:
+- `scn~map-specification-item-trace-status-to-test-runner-status~1`
+
+Needs: impl, itest
+
+### Map Trace Link Status to Test Runner Status
+`dsn~map-trace-link-status-to-test-runner-status~1`
+
+**Given** the trace test-runner presentation has created a trace-link sub-test node
+**When** the OpenFastTrace trace result marks that link as clean or defective
+**Then** it reports the SM sub-test node as passed for a clean link and failed for a defective link.
+
+Covers:
+- `scn~map-trace-link-status-to-test-runner-status~1`
+
+Needs: impl, itest
+
+### Navigate from Test Runner Specification Items
+`dsn~navigate-from-test-runner-specification-items~1`
+
+**Given** the trace test-runner presentation creates a specification-item test node
+**When** it attaches source navigation to that node
+**Then** it resolves the specification item ID through OpenFastTrace trace navigation and opens the corresponding declaration in the editor.
+
+Covers:
+- `scn~navigate-from-test-runner-specification-items~1`
+
+Needs: impl, itest
+
+### Navigate from Test Runner Trace Links
+`dsn~navigate-from-test-runner-trace-links~1`
+
+**Given** the trace test-runner presentation creates a trace-link sub-test node
+**When** it attaches source navigation to that node
+**Then** it resolves the link target through OpenFastTrace trace navigation and opens the corresponding declaration or source-side coverage tag in the editor.
+
+Covers:
+- `scn~navigate-from-test-runner-trace-links~1`
+
+Needs: impl, itest
+
 ### Show Successful Trace Output in IDE Output Window
 `dsn~show-successful-trace-output-in-ide-output-window~1`
 

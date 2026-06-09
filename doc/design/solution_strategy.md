@@ -70,3 +70,13 @@ The plugin therefore does not translate OFT report semantics into its own color 
 For IDE rendering, the plugin prefers IntelliJ's existing ANSI-aware console support over custom parsing. This keeps the implementation aligned with platform behavior for colored process output and avoids a parallel ANSI parser inside the plugin.
 
 Failure presentation is likewise kept narrow. The plugin may emphasize the short trace status line as a failure, but it does not print the full OFT report body as one uniform error block. The report body should instead be rendered from ANSI-decoded chunks so OFT's intended mixed coloring remains visible in the output sub-window.
+
+## Structured Test Runner Trace Results
+
+The test-runner trace-result increment keeps the existing plain text trace output as the default result view and adds structured presentation as a per-run-configuration choice.
+
+The plugin uses IntelliJ's SM test runner infrastructure for this structured presentation. Source files become test suites, specification items become tests below their source-file suite, and incoming or outgoing trace links become sub-tests below their owning specification item. This gives users the native test runner tree, progress, status, and navigation behavior without introducing a parallel result-tree widget.
+
+The structured presentation is derived from the OpenFastTrace `Trace` model produced during trace execution, not from the rendered plain text report. OpenFastTrace remains responsible for import, linking, tracing, defect calculation, and text report rendering. The plugin maps the resulting trace model to IntelliJ test-runner nodes only at the presentation boundary.
+
+Navigation from structured result nodes reuses the existing OpenFastTrace trace navigation support. Specification item nodes resolve to specification declarations, while link nodes resolve to the corresponding declaration or source-side coverage tag where possible.
