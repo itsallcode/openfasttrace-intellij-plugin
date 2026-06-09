@@ -388,6 +388,18 @@ Covers:
 
 Needs: impl, itest
 
+### Show Trace Project in Test Runner UI by Default
+`dsn~show-trace-project-in-test-runner-ui-by-default~1`
+
+**Given** the global `Trace Project` action receives a valid OpenFastTrace trace result
+**When** the trace-action flow presents that result
+**Then** it creates an IntelliJ Test Runner UI console, maps the structured OpenFastTrace trace to SM test runner nodes, and shows that console as the default run content for the action.
+
+Covers:
+- `scn~show-trace-project-in-test-runner-ui-by-default~1`
+
+Needs: impl, itest
+
 ### Configure Trace Scope in Project Settings
 `dsn~configure-trace-scope-in-project-settings~1`
 
@@ -495,15 +507,27 @@ Covers:
 
 Needs: impl, itest
 
-### Plain Text as Default Run Configuration Result View
-`dsn~plain-text-as-default-run-configuration-result-view~1`
+### Test Runner as Default Run Configuration Result View
+`dsn~test-runner-as-default-run-configuration-result-view~1`
 
 **Given** an OpenFastTrace run configuration has no persisted result-view selection
 **When** the run-profile state prepares the trace result presentation
-**Then** it selects the existing plain text trace-output presentation.
+**Then** it selects the trace test-runner presentation.
 
 Covers:
-- `scn~plain-text-as-default-run-configuration-result-view~1`
+- `scn~test-runner-as-default-run-configuration-result-view~1`
+
+Needs: impl, itest
+
+### Select Plain Text Trace Result View
+`dsn~select-plain-text-trace-result-view~1`
+
+**Given** an OpenFastTrace run configuration stores the plain text result-view selection
+**When** the run-profile state prepares the trace result presentation
+**Then** it selects the existing plain text trace-output presentation for that run configuration.
+
+Covers:
+- `scn~select-plain-text-trace-result-view~1`
 
 Needs: impl, itest
 
@@ -524,7 +548,7 @@ Needs: impl, itest
 
 **Given** the trace test-runner presentation receives a structured OpenFastTrace trace result
 **When** it builds the SM test tree
-**Then** it groups traced specification items by source file and creates one SM test suite node for each source file.
+**Then** it groups traced specification items by source file and creates one SM test suite node for each source file, using a project-local suite label for source paths below the opened project directory.
 
 Covers:
 - `scn~show-trace-source-files-as-test-runner-suites~1`
@@ -543,11 +567,47 @@ Covers:
 
 Needs: impl, itest
 
+### Show Specification Item Title in Test Runner UI
+`dsn~show-specification-item-title-in-test-runner-ui~2`
+
+**Given** the trace test-runner presentation creates a node for an OpenFastTrace specification item
+**When** the OpenFastTrace item has a non-blank title
+**Then** it uses the title as the visible node name and keeps the full specification item ID out of the tree label.
+
+Covers:
+- `scn~show-specification-item-title-in-test-runner-ui~2`
+
+Needs: impl, itest
+
+### Show Specification Item ID in Test Runner Details
+`dsn~show-specification-item-id-in-test-runner-details~1`
+
+**Given** the trace test-runner presentation creates a specification-item test node
+**When** it maps the OpenFastTrace item status to the SM test node
+**Then** it attaches details that identify the full specification item ID and trace status for passed and failed item nodes.
+
+Covers:
+- `scn~show-specification-item-id-in-test-runner-details~1`
+
+Needs: impl, itest
+
+### Sort Specification Items in Test Runner UI
+`dsn~sort-specification-items-in-test-runner-ui~1`
+
+**Given** the trace test-runner presentation maps traced specification items for one source-file suite
+**When** it creates the specification-item test nodes
+**Then** it orders them by artifact type, the specification item ID name part, and revision number.
+
+Covers:
+- `scn~sort-specification-items-in-test-runner-ui~1`
+
+Needs: impl, itest
+
 ### Show Trace Links as Test Runner Sub-Tests
 `dsn~show-trace-links-as-test-runner-sub-tests~1`
 
 **Given** the trace test-runner presentation has created a specification-item test node
-**When** it maps that item's incoming and outgoing trace links
+**When** it maps incoming and outgoing trace links connected to that item from the structured trace
 **Then** it creates one SM sub-test node for each trace link below the specification-item test node.
 
 Covers:
@@ -556,26 +616,26 @@ Covers:
 Needs: impl, itest
 
 ### Show Specification Item Status in Test Runner UI
-`dsn~show-specification-item-status-in-test-runner-ui~1`
+`dsn~show-specification-item-status-in-test-runner-ui~2`
 
 **Given** the trace test-runner presentation creates a specification-item test node
 **When** it derives the node name from the OpenFastTrace trace result
-**Then** it appends the specification item's trace status in brackets to the visible node name.
+**Then** it appends the specification item's trace status in brackets to the visible node name only if the item status is not clean.
 
 Covers:
-- `scn~show-specification-item-status-in-test-runner-ui~1`
+- `scn~show-specification-item-status-in-test-runner-ui~2`
 
 Needs: impl, itest
 
 ### Show Trace Link Status in Test Runner UI
-`dsn~show-trace-link-status-in-test-runner-ui~1`
+`dsn~show-trace-link-status-in-test-runner-ui~2`
 
 **Given** the trace test-runner presentation creates a trace-link sub-test node
 **When** it derives the node name from the OpenFastTrace trace result
-**Then** it appends the trace link's status in brackets to the visible node name.
+**Then** it appends the trace link's status in brackets to the visible node name only if the link status is not clean.
 
 Covers:
-- `scn~show-trace-link-status-in-test-runner-ui~1`
+- `scn~show-trace-link-status-in-test-runner-ui~2`
 
 Needs: impl, itest
 
@@ -588,6 +648,18 @@ Needs: impl, itest
 
 Covers:
 - `scn~show-trace-link-direction-in-test-runner-ui~1`
+
+Needs: impl, itest
+
+### Show Unicode Trace Link Direction in Test Runner UI
+`dsn~show-unicode-trace-link-direction-in-test-runner-ui~1`
+
+**Given** the trace test-runner presentation creates a trace-link sub-test node
+**When** it derives the direction marker from the OpenFastTrace link status
+**Then** it uses `⊙←` for incoming links, `⊙→` for outgoing links, and `↔` for links without a single incoming or outgoing direction.
+
+Covers:
+- `scn~show-unicode-trace-link-direction-in-test-runner-ui~1`
 
 Needs: impl, itest
 
@@ -615,6 +687,66 @@ Covers:
 
 Needs: impl, itest
 
+### Roll Up Source File Suite Trace Status
+`dsn~roll-up-source-file-suite-trace-status~1`
+
+**Given** the trace test-runner presentation has created a source-file suite
+**When** at least one specification-item test or trace-link sub-test below that suite is failed
+**Then** it marks the source-file suite as failed before finishing the suite node.
+
+Covers:
+- `scn~roll-up-source-file-suite-trace-status~1`
+
+Needs: impl, itest
+
+### Roll Up Top-Level Trace Status
+`dsn~roll-up-top-level-trace-status~1`
+
+**Given** the trace test-runner presentation has created the top-level trace suite
+**When** at least one source-file suite contains a failed descendant
+**Then** it marks the top-level trace suite as failed before finishing the trace result.
+
+Covers:
+- `scn~roll-up-top-level-trace-status~1`
+
+Needs: impl, itest
+
+### Show Specification Item Defect Details in Test Runner UI
+`dsn~show-specification-item-defect-details-in-test-runner-ui~1`
+
+**Given** the trace test-runner presentation creates a failed specification-item test node
+**When** it maps the OpenFastTrace item status to the SM test node
+**Then** it sets a concise failure message and detail text that identify the item and explain the defective status.
+
+Covers:
+- `scn~show-specification-item-defect-details-in-test-runner-ui~1`
+
+Needs: impl, itest
+
+### Show Trace Link Defect Details in Test Runner UI
+`dsn~show-trace-link-defect-details-in-test-runner-ui~1`
+
+**Given** the trace test-runner presentation creates a failed trace-link sub-test node
+**When** it maps the OpenFastTrace link status to the SM test node
+**Then** it combines node-specific IDs and direction with a static shared detail template keyed by the OpenFastTrace link status.
+
+Covers:
+- `scn~show-trace-link-defect-details-in-test-runner-ui~1`
+
+Needs: impl, itest
+
+### Show Trace Link ID Details in Test Runner UI
+`dsn~show-trace-link-id-details-in-test-runner-ui~1`
+
+**Given** the trace test-runner presentation creates a trace-link sub-test node
+**When** it maps the OpenFastTrace link status to the SM test node
+**Then** it attaches details that identify the owning specification item ID, linked specification item ID, link direction, and trace-link status for passed and failed link nodes.
+
+Covers:
+- `scn~show-trace-link-id-details-in-test-runner-ui~1`
+
+Needs: impl, itest
+
 ### Navigate from Test Runner Specification Items
 `dsn~navigate-from-test-runner-specification-items~1`
 
@@ -639,15 +771,27 @@ Covers:
 
 Needs: impl, itest
 
-### Show Successful Trace Output in IDE Output Window
-`dsn~show-successful-trace-output-in-ide-output-window~1`
+### Navigate from Test Runner Source Files
+`dsn~navigate-from-test-runner-source-files~1`
 
-**Given** a background OpenFastTrace trace run completes successfully for the opened IntelliJ project
+**Given** the trace test-runner presentation creates a source-file suite node
+**When** it attaches source navigation to that node
+**Then** it opens the corresponding source file in the editor.
+
+Covers:
+- `scn~navigate-from-test-runner-source-files~1`
+
+Needs: impl, itest
+
+### Show Successful Trace Output in IDE Output Window
+`dsn~show-successful-trace-output-in-ide-output-window~2`
+
+**Given** a background OpenFastTrace trace run uses the plain text result view and completes successfully for the opened IntelliJ project
 **When** the trace-execution service temporarily switches the thread context class loader to the plugin class loader for OFT importer and reporter discovery, restores the previous context loader afterward, and hands the captured text report to trace-output presentation
 **Then** the plugin opens or updates an IDE output sub-window for that trace run and shows the OpenFastTrace text output under a clear trace-specific content title.
 
 Covers:
-- `scn~show-successful-trace-output-in-ide-output-window~1`
+- `scn~show-successful-trace-output-in-ide-output-window~2`
 
 Needs: impl, itest
 

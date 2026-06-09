@@ -3,6 +3,7 @@ package org.itsallcode.openfasttrace.intellijplugin.trace.runconfig;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
+import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceResultView;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
 import org.jdom.Element;
@@ -13,6 +14,16 @@ import static org.hamcrest.Matchers.is;
 
 // [itest->dsn~openfasttrace-run-configuration~1]
 public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
+    // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
+    // [itest->dsn~trace-configuration-integration~1]
+    public void testGivenNewRunConfigurationWhenReadingSnapshotThenItDefaultsToTestRunner() {
+        final OftRunConfiguration configuration = createConfiguration("Test");
+
+        assertThat(configuration.snapshot().resultView(), is(OftTraceResultView.TEST_RUNNER));
+    }
+
+    // [itest->dsn~select-test-runner-trace-result-view~1]
+    // [itest->dsn~trace-configuration-integration~1]
     public void testGivenRunConfigurationWhenUpdatingFromSnapshotThenItStoresTheSettings() {
         final OftRunConfiguration configuration = createConfiguration("Test");
         final OftTraceSettingsSnapshot snapshot = new OftTraceSettingsSnapshot(
@@ -21,7 +32,8 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 true,
                 "additional",
                 "dsn",
-                "mvp"
+                "mvp",
+                OftTraceResultView.TEST_RUNNER
         );
 
         configuration.updateFrom(snapshot);
@@ -33,10 +45,13 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 () -> assertThat(stored.includeTestRoots(), is(snapshot.includeTestRoots())),
                 () -> assertThat(stored.additionalPathsText(), is(snapshot.additionalPathsText())),
                 () -> assertThat(stored.artifactTypesText(), is(snapshot.artifactTypesText())),
-                () -> assertThat(stored.tagsText(), is(snapshot.tagsText()))
+                () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
+                () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
     }
 
+    // [itest->dsn~select-test-runner-trace-result-view~1]
+    // [itest->dsn~trace-configuration-integration~1]
     public void testGivenRunConfigurationWithSettingsWhenWritingAndReadingExternalThenItPreservesSettings()
             throws WriteExternalException, InvalidDataException {
         final OftRunConfiguration configuration = createConfiguration("Test");
@@ -46,7 +61,8 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 true,
                 "additional",
                 "dsn",
-                "mvp"
+                "mvp",
+                OftTraceResultView.TEST_RUNNER
         );
         configuration.updateFrom(snapshot);
 
@@ -63,8 +79,35 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 () -> assertThat(stored.includeTestRoots(), is(snapshot.includeTestRoots())),
                 () -> assertThat(stored.additionalPathsText(), is(snapshot.additionalPathsText())),
                 () -> assertThat(stored.artifactTypesText(), is(snapshot.artifactTypesText())),
-                () -> assertThat(stored.tagsText(), is(snapshot.tagsText()))
+                () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
+                () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
+    }
+
+    // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
+    // [itest->dsn~trace-configuration-integration~1]
+    public void testGivenRunConfigurationWithNoStoredResultViewWhenReadingExternalThenItDefaultsToTestRunner()
+            throws InvalidDataException {
+        final OftRunConfiguration configuration = createConfiguration("Test");
+
+        configuration.readExternal(new Element("configuration"));
+
+        assertThat(configuration.snapshot().resultView(), is(OftTraceResultView.TEST_RUNNER));
+    }
+
+    // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
+    // [itest->dsn~trace-configuration-integration~1]
+    public void testGivenRunConfigurationWithInvalidStoredResultViewWhenReadingExternalThenItDefaultsToTestRunner()
+            throws InvalidDataException {
+        final Element element = new Element("configuration");
+        element.addContent(new Element("option")
+                .setAttribute("name", "resultView")
+                .setAttribute("value", "UNKNOWN_RESULT_VIEW"));
+        final OftRunConfiguration configuration = createConfiguration("Test");
+
+        configuration.readExternal(element);
+
+        assertThat(configuration.snapshot().resultView(), is(OftTraceResultView.TEST_RUNNER));
     }
 
     private OftRunConfiguration createConfiguration(final String name) {

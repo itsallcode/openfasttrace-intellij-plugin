@@ -178,7 +178,7 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
         }
     }
 
-    public void testGivenTraceOutputWhenPresentedThenRunContentDescriptorGetsAnId() {
+    public void testGivenTraceOutputWhenPresentedThenRunContentDescriptorGetsAnExecutionId() {
         final AtomicReference<RunContentDescriptor> descriptorRef = new AtomicReference<>();
         final OftTraceRunContentOutputPresenter presenter = new OftTraceRunContentOutputPresenter(
                 OftTraceRunContentOutputPresenter::createTraceConsole,
@@ -195,8 +195,7 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
         ));
 
         assertThat(descriptorRef.get(), notNullValue());
-        assertThat(descriptorRef.get().getId(), notNullValue());
-        assertThat(descriptorRef.get().getId().getUid(), Matchers.greaterThan(0));
+        assertThat(descriptorRef.get().getExecutionId(), Matchers.greaterThan(0L));
     }
 
     private String readConsoleText(final ConsoleViewImpl console) {

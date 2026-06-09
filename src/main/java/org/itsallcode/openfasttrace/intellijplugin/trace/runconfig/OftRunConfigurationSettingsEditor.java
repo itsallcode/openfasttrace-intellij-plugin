@@ -34,7 +34,7 @@ public final class OftRunConfigurationSettingsEditor extends SettingsEditor<OftR
     protected @NotNull JComponent createEditor() {
         final String basePath = project.getBasePath();
         final Path projectRoot = basePath != null ? Paths.get(basePath) : null;
-        component = new OftTraceSettingsComponent(projectRoot);
+        component = new OftTraceSettingsComponent(projectRoot, true);
         return component.getPanel();
     }
 }

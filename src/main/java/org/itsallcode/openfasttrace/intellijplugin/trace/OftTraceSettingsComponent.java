@@ -30,16 +30,29 @@ public final class OftTraceSettingsComponent {
     private final JBTextArea additionalPathsTextArea = new JBTextArea();
     private final JBTextField artifactTypesField = new JBTextField();
     private final JBTextField tagsField = new JBTextField();
+    private final JBRadioButton plainTextResultViewRadioButton =
+            new JBRadioButton("Plain text output");
+    private final JBRadioButton testRunnerResultViewRadioButton =
+            new JBRadioButton("IntelliJ Test Runner UI");
     private final JBLabel resolvedRelativeToLabel = new JBLabel();
     private final JBTextArea validationMessagesArea = new JBTextArea();
     private final Path projectRoot;
+    private final boolean showResultViewSelection;
     private final JPanel panel;
 
     public OftTraceSettingsComponent(final Path projectRoot) {
+        this(projectRoot, false);
+    }
+
+    public OftTraceSettingsComponent(final Path projectRoot, final boolean showResultViewSelection) {
         this.projectRoot = projectRoot;
+        this.showResultViewSelection = showResultViewSelection;
         final ButtonGroup traceScopeGroup = new ButtonGroup();
         traceScopeGroup.add(wholeProjectRadioButton);
         traceScopeGroup.add(selectedResourcesRadioButton);
+        final ButtonGroup resultViewGroup = new ButtonGroup();
+        resultViewGroup.add(plainTextResultViewRadioButton);
+        resultViewGroup.add(testRunnerResultViewRadioButton);
         selectedResourcesRadioButton.addActionListener(event -> updateSelectedResourcesEnabledState());
         wholeProjectRadioButton.addActionListener(event -> updateSelectedResourcesEnabledState());
         additionalPathsTextArea.setLineWrap(false);
@@ -78,7 +91,7 @@ public final class OftTraceSettingsComponent {
         additionalPathsFeedbackPanel.add(resolvedRelativeToLabel, BorderLayout.NORTH);
         additionalPathsFeedbackPanel.add(validationMessagesArea, BorderLayout.CENTER);
         additionalPathsPanel.add(additionalPathsFeedbackPanel, BorderLayout.SOUTH);
-        panel = FormBuilder.createFormBuilder()
+        final FormBuilder formBuilder = FormBuilder.createFormBuilder()
                 .addComponent(wholeProjectRadioButton)
                 .addComponent(selectedResourcesRadioButton)
                 .addComponent(includeSourceRootsCheckBox, 1)
@@ -88,7 +101,15 @@ public final class OftTraceSettingsComponent {
                 .addLabeledComponent("Artifact types:", artifactTypesField)
                 .addTooltip("comma-separated, empty = all")
                 .addLabeledComponent("Tags:", tagsField)
-                .addTooltip("comma-separated, empty = all")
+                .addTooltip("comma-separated, empty = all");
+        if (showResultViewSelection) {
+            formBuilder
+                    .addSeparator()
+                    .addComponent(new JBLabel("Result view"))
+                    .addComponent(plainTextResultViewRadioButton, 1)
+                    .addComponent(testRunnerResultViewRadioButton, 1);
+        }
+        panel = formBuilder
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
         setSettings(OftTraceSettingsSnapshot.DEFAULT);
@@ -107,7 +128,8 @@ public final class OftTraceSettingsComponent {
                 includeTestRootsCheckBox.isSelected(),
                 additionalPathsTextArea.getText(),
                 artifactTypesField.getText(),
-                tagsField.getText()
+                tagsField.getText(),
+                selectedResultView()
         );
     }
 
@@ -119,6 +141,8 @@ public final class OftTraceSettingsComponent {
         additionalPathsTextArea.setText(settings.additionalPathsText());
         artifactTypesField.setText(settings.artifactTypesText());
         tagsField.setText(settings.tagsText());
+        plainTextResultViewRadioButton.setSelected(settings.resultView() == OftTraceResultView.PLAIN_TEXT);
+        testRunnerResultViewRadioButton.setSelected(settings.resultView() == OftTraceResultView.TEST_RUNNER);
         updateSelectedResourcesEnabledState();
     }
 
@@ -144,6 +168,16 @@ public final class OftTraceSettingsComponent {
         resolvedRelativeToLabel.setEnabled(enabled);
         validationMessagesArea.setEnabled(enabled);
         updateValidationFeedback();
+    }
+
+    private OftTraceResultView selectedResultView() {
+        if (!showResultViewSelection) {
+            return OftTraceSettingsSnapshot.DEFAULT.resultView();
+        }
+        if (plainTextResultViewRadioButton.isSelected()) {
+            return OftTraceResultView.PLAIN_TEXT;
+        }
+        return OftTraceResultView.TEST_RUNNER;
     }
 
     // [impl->dsn~show-per-line-validation-for-additional-trace-paths~1]

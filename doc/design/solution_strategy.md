@@ -73,10 +73,12 @@ Failure presentation is likewise kept narrow. The plugin may emphasize the short
 
 ## Structured Test Runner Trace Results
 
-The test-runner trace-result increment keeps the existing plain text trace output as the default result view and adds structured presentation as a per-run-configuration choice.
+The test-runner trace-result increment makes structured presentation the default result view for both the global `Trace Project` action and OpenFastTrace run configurations. The existing plain text trace output remains available as a per-run-configuration choice.
 
-The plugin uses IntelliJ's SM test runner infrastructure for this structured presentation. Source files become test suites, specification items become tests below their source-file suite, and incoming or outgoing trace links become sub-tests below their owning specification item. This gives users the native test runner tree, progress, status, and navigation behavior without introducing a parallel result-tree widget.
+The plugin uses IntelliJ's SM test runner infrastructure for this structured presentation. Source files become test suites labeled with project-local paths when they are below the opened project directory, specification items become tests below their source-file suite, and incoming or outgoing trace links become sub-tests below connected specification items. This gives users the native test runner tree, progress, status, and navigation behavior without introducing a parallel result-tree widget.
 
 The structured presentation is derived from the OpenFastTrace `Trace` model produced during trace execution, not from the rendered plain text report. OpenFastTrace remains responsible for import, linking, tracing, defect calculation, and text report rendering. The plugin maps the resulting trace model to IntelliJ test-runner nodes only at the presentation boundary.
 
-Navigation from structured result nodes reuses the existing OpenFastTrace trace navigation support. Specification item nodes resolve to specification declarations, while link nodes resolve to the corresponding declaration or source-side coverage tag where possible.
+Suite status and detail text are part of the structured presentation rather than the tracing core. The presenter rolls failed descendants up to source-file suites and the top-level trace suite, uses compact item titles or ID fallback names with Unicode direction arrows for trace-link labels, appends status labels only for non-clean statuses, and attaches concise ID and status details to item and link nodes. Link-detail explanations reuse static templates keyed by OpenFastTrace link status so the constant explanation text is shared while node-specific IDs and directions stay dynamic.
+
+Navigation from structured result nodes reuses the existing OpenFastTrace trace navigation support. Source-file suite nodes open their corresponding file, specification item nodes resolve to specification declarations, and link nodes resolve to the corresponding declaration or source-side coverage tag where possible.

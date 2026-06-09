@@ -33,7 +33,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 
-// [itest->dsn~trace-action-integration~1]
+// [itest->dsn~trace-action-integration~2]
 public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
     // [itest->dsn~show-trace-project-action-in-tools-menu~1]
     public void testGivenPluginIsLoadedWhenToolsMenuActionIsQueriedThenTheTraceActionAndGroupAreRegistered() {
@@ -74,6 +74,14 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
         action.update(createEvent(getProject(), presentation));
 
         assertThat(presentation.isEnabled(), is(true));
+    }
+
+    // [itest->dsn~show-trace-project-in-test-runner-ui-by-default~1]
+    public void testGivenDefaultActionWhenCreatingDefaultPresenterThenItUsesTestRunnerRunContentPresenter() {
+        assertThat(
+                OftTraceProjectAction.createDefaultOutputPresenter(),
+                instanceOf(OftTraceTestRunnerRunContentOutputPresenter.class)
+        );
     }
 
     // [itest->dsn~disable-trace-project-action-without-open-project~1]

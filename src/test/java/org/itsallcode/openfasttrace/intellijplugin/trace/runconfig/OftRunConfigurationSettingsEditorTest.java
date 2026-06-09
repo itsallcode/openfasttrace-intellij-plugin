@@ -1,6 +1,7 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace.runconfig;
 
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
+import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceResultView;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
 import org.junit.jupiter.api.Assertions;
@@ -25,6 +26,8 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
         assertThat(component, is(notNullValue()));
     }
 
+    // [itest->dsn~select-test-runner-trace-result-view~1]
+    // [itest->dsn~trace-configuration-integration~1]
     public void testGivenEditorWhenResettingFromConfigurationThenItUpdatesUI() {
         editor.createEditor(); // Initialize component
         final OftRunConfiguration configuration = createConfiguration("Test");
@@ -34,7 +37,8 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 true,
                 "additional",
                 "dsn",
-                "mvp"
+                "mvp",
+                OftTraceResultView.TEST_RUNNER
         );
         configuration.updateFrom(snapshot);
 
@@ -48,10 +52,13 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 () -> assertThat(uiSettings.includeTestRoots(), is(snapshot.includeTestRoots())),
                 () -> assertThat(uiSettings.additionalPathsText(), is(snapshot.additionalPathsText())),
                 () -> assertThat(uiSettings.artifactTypesText(), is(snapshot.artifactTypesText())),
-                () -> assertThat(uiSettings.tagsText(), is(snapshot.tagsText()))
+                () -> assertThat(uiSettings.tagsText(), is(snapshot.tagsText())),
+                () -> assertThat(uiSettings.resultView(), is(snapshot.resultView()))
         );
     }
 
+    // [itest->dsn~select-test-runner-trace-result-view~1]
+    // [itest->dsn~trace-configuration-integration~1]
     public void testGivenEditorWhenApplyingToConfigurationThenItUpdatesConfiguration() {
         editor.createEditor(); // Initialize component
         final OftTraceSettingsSnapshot snapshot = new OftTraceSettingsSnapshot(
@@ -60,7 +67,8 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 false,
                 "more paths",
                 "req",
-                "tag"
+                "tag",
+                OftTraceResultView.TEST_RUNNER
         );
         editor.component.setSettings(snapshot);
 
@@ -74,7 +82,8 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 () -> assertThat(stored.includeTestRoots(), is(snapshot.includeTestRoots())),
                 () -> assertThat(stored.additionalPathsText(), is(snapshot.additionalPathsText())),
                 () -> assertThat(stored.artifactTypesText(), is(snapshot.artifactTypesText())),
-                () -> assertThat(stored.tagsText(), is(snapshot.tagsText()))
+                () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
+                () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
     }
 

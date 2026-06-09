@@ -220,23 +220,25 @@ Needs: impl
 ### Trace Configuration Integration
 `dsn~trace-configuration-integration~1`
 
-The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project and through dedicated run configurations. It exposes those settings through project configuration UI and the run configuration editor, resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria, and stores the run-configuration result-view selection.
+The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project and through dedicated run configurations. It exposes those settings through project configuration UI and the run configuration editor, resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria, stores the run-configuration result-view selection, and treats the IntelliJ Test Runner UI as the result-view default when no selection is stored.
 
 Covers:
-- `scn~plain-text-as-default-run-configuration-result-view~1`
+- `scn~test-runner-as-default-run-configuration-result-view~1`
+- `scn~select-plain-text-trace-result-view~1`
 - `scn~select-test-runner-trace-result-view~1`
 
 Needs: impl, itest
 
 ### Trace Action Integration
-`dsn~trace-action-integration~1`
+`dsn~trace-action-integration~2`
 
-The plugin provides a trace-action component that contributes an `OpenFastTrace` action group with a `Trace Project` action under the global `Tools` menu. This component is responsible for exposing the entry only in an opened project context and for handing the action invocation to trace-configuration resolution and trace execution.
+The plugin provides a trace-action component that contributes an `OpenFastTrace` action group with a `Trace Project` action under the global `Tools` menu. This component is responsible for exposing the entry only in an opened project context and for handing the action invocation to trace-configuration resolution, trace execution, and the default IntelliJ Test Runner UI presentation.
 
 Covers:
 - `scn~show-trace-project-action-in-tools-menu~1`
 - `scn~disable-trace-project-action-without-open-project~1`
 - `scn~run-trace-project-in-background~1`
+- `scn~show-trace-project-in-test-runner-ui-by-default~1`
 - `scn~reject-trace-project-without-valid-project-path~1`
 
 Needs: impl, itest
@@ -252,7 +254,7 @@ Covers:
 - `scn~run-trace-project-in-background~1`
 - `scn~trace-selected-project-resources~1`
 - `scn~reject-trace-project-without-valid-project-path~1`
-- `scn~show-successful-trace-output-in-ide-output-window~1`
+- `scn~show-successful-trace-output-in-ide-output-window~2`
 - `scn~show-resolved-trace-inputs-in-trace-output-window~1`
 - `scn~show-failing-trace-output-in-ide-output-window~1`
 
@@ -264,7 +266,7 @@ Needs: impl, itest
 The plugin provides a trace-output presentation component that opens an IDE output sub-window for each trace run, assigns a clear trace-specific content title, renders both successful and failing OpenFastTrace text output through the same IDE-visible flow, and adds declaration hyperlinks for OFT specification item IDs shown in that output when the corresponding items exist in the opened project.
 
 Covers:
-- `scn~show-successful-trace-output-in-ide-output-window~1`
+- `scn~show-successful-trace-output-in-ide-output-window~2`
 - `scn~show-failing-trace-output-in-ide-output-window~1`
 - `scn~open-specification-item-from-trace-output-window~1`
 
@@ -273,19 +275,29 @@ Needs: impl, itest
 ### Trace Test Runner Presentation
 `dsn~trace-test-runner-presentation~1`
 
-The plugin provides a trace test-runner presentation component that maps the structured OpenFastTrace trace result to IntelliJ SM test runner nodes. It creates source-file suites, specification-item tests, and incoming or outgoing trace-link sub-tests; derives labels and pass/fail status from the OpenFastTrace trace status; and connects node navigation to the existing OpenFastTrace trace navigation support.
+The plugin provides a trace test-runner presentation component that maps the structured OpenFastTrace trace result to IntelliJ SM test runner nodes. It creates project-local source-file suites, sorted specification-item tests, and incoming or outgoing trace-link sub-tests; derives compact title-aware labels, Unicode direction markers, pass/fail status, status roll-up, and item/link details from the OpenFastTrace trace status; and connects source-file, item, and link node navigation to the existing OpenFastTrace trace navigation support.
 
 Covers:
 - `scn~show-trace-source-files-as-test-runner-suites~1`
 - `scn~show-trace-specification-items-as-test-runner-tests~1`
+- `scn~show-specification-item-title-in-test-runner-ui~2`
+- `scn~show-specification-item-id-in-test-runner-details~1`
+- `scn~sort-specification-items-in-test-runner-ui~1`
 - `scn~show-trace-links-as-test-runner-sub-tests~1`
-- `scn~show-specification-item-status-in-test-runner-ui~1`
-- `scn~show-trace-link-status-in-test-runner-ui~1`
+- `scn~show-specification-item-status-in-test-runner-ui~2`
+- `scn~show-trace-link-status-in-test-runner-ui~2`
 - `scn~show-trace-link-direction-in-test-runner-ui~1`
+- `scn~show-unicode-trace-link-direction-in-test-runner-ui~1`
 - `scn~map-specification-item-trace-status-to-test-runner-status~1`
 - `scn~map-trace-link-status-to-test-runner-status~1`
+- `scn~roll-up-source-file-suite-trace-status~1`
+- `scn~roll-up-top-level-trace-status~1`
+- `scn~show-specification-item-defect-details-in-test-runner-ui~1`
+- `scn~show-trace-link-defect-details-in-test-runner-ui~1`
+- `scn~show-trace-link-id-details-in-test-runner-ui~1`
 - `scn~navigate-from-test-runner-specification-items~1`
 - `scn~navigate-from-test-runner-trace-links~1`
+- `scn~navigate-from-test-runner-source-files~1`
 
 Needs: impl, itest
 
@@ -338,8 +350,8 @@ scale 2
         Tags:           | "mvp                       "
         .               | <i>(comma-separated, empty = all)
         .               | .
-        Result view:    | (X) Plain text output
-        .               | ()  IntelliJ Test Runner UI
+        Result view:    | ()  Plain text output
+        .               | (X) IntelliJ Test Runner UI
         .               | .
     }
 
