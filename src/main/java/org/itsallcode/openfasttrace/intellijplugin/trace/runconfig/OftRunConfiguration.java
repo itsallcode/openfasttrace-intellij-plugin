@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.util.xmlb.XmlSerializer;
+import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceResultView;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,8 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
                 state.isIncludeTestRoots(),
                 state.getAdditionalPathsText(),
                 state.getArtifactTypesText(),
-                state.getTagsText()
+                state.getTagsText(),
+                parseResultView(state.getResultView())
         );
     }
 
@@ -57,6 +59,7 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
         state.setAdditionalPathsText(snapshot.additionalPathsText());
         state.setArtifactTypesText(snapshot.artifactTypesText());
         state.setTagsText(snapshot.tagsText());
+        state.setResultView(snapshot.resultView().name());
     }
 
     @Override
@@ -82,6 +85,17 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
         }
     }
 
+    private static OftTraceResultView parseResultView(final String value) {
+        if (value == null || value.isBlank()) {
+            return OftTraceSettingsSnapshot.DEFAULT.resultView();
+        }
+        try {
+            return OftTraceResultView.valueOf(value);
+        } catch (final IllegalArgumentException ignored) {
+            return OftTraceSettingsSnapshot.DEFAULT.resultView();
+        }
+    }
+
     private static final class State implements Serializable {
         private String traceScopeMode = OftTraceSettingsSnapshot.DEFAULT.scopeMode().name();
         private boolean includeSourceRoots = OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots();
@@ -89,6 +103,7 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
         private String additionalPathsText = OftTraceSettingsSnapshot.DEFAULT.additionalPathsText();
         private String artifactTypesText = OftTraceSettingsSnapshot.DEFAULT.artifactTypesText();
         private String tagsText = OftTraceSettingsSnapshot.DEFAULT.tagsText();
+        private String resultView = OftTraceSettingsSnapshot.DEFAULT.resultView().name();
 
         public String getTraceScopeMode() {
             return traceScopeMode;
@@ -136,6 +151,14 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
 
         public void setTagsText(final String tagsText) {
             this.tagsText = tagsText;
+        }
+
+        public String getResultView() {
+            return resultView;
+        }
+
+        public void setResultView(final String resultView) {
+            this.resultView = resultView;
         }
     }
 }

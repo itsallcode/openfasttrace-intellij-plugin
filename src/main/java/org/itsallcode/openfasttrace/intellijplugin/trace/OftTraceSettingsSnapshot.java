@@ -9,7 +9,8 @@ public record OftTraceSettingsSnapshot(
         boolean includeTestRoots,
         String additionalPathsText,
         String artifactTypesText,
-        String tagsText
+        String tagsText,
+        OftTraceResultView resultView
 ) {
     public static final OftTraceSettingsSnapshot DEFAULT = new OftTraceSettingsSnapshot(
             OftTraceScopeMode.WHOLE_PROJECT,
@@ -17,11 +18,31 @@ public record OftTraceSettingsSnapshot(
             true,
             "doc/",
             "",
-            ""
+            "",
+            OftTraceResultView.PLAIN_TEXT
     );
 
     private static final Pattern LINE_SEPARATOR = Pattern.compile("\\R");
     public static final Pattern COMMA = Pattern.compile(",");
+
+    public OftTraceSettingsSnapshot(
+            final OftTraceScopeMode scopeMode,
+            final boolean includeSourceRoots,
+            final boolean includeTestRoots,
+            final String additionalPathsText,
+            final String artifactTypesText,
+            final String tagsText
+    ) {
+        this(
+                scopeMode,
+                includeSourceRoots,
+                includeTestRoots,
+                additionalPathsText,
+                artifactTypesText,
+                tagsText,
+                OftTraceResultView.PLAIN_TEXT
+        );
+    }
 
     public List<String> additionalPaths() {
         return LINE_SEPARATOR.splitAsStream(additionalPathsText)

@@ -1,32 +1,46 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
+import org.itsallcode.openfasttrace.api.core.Trace;
+
+import java.util.Optional;
+
 public final class OftTraceResult {
     private final Status status;
     private final String output;
+    private final Trace trace;
 
-    private OftTraceResult(final Status status, final String output) {
+    private OftTraceResult(final Status status, final String output, final Trace trace) {
         this.status = status;
         this.output = output;
+        this.trace = trace;
     }
 
     public static OftTraceResult success(final String output) {
-        return new OftTraceResult(Status.SUCCESS, output);
+        return success(output, null);
+    }
+
+    public static OftTraceResult success(final String output, final Trace trace) {
+        return new OftTraceResult(Status.SUCCESS, output, trace);
     }
 
     public static OftTraceResult failure(final String output) {
-        return new OftTraceResult(Status.FAILURE, output);
+        return failure(output, null);
+    }
+
+    public static OftTraceResult failure(final String output, final Trace trace) {
+        return new OftTraceResult(Status.FAILURE, output, trace);
     }
 
     public static OftTraceResult error(final String output) {
-        return new OftTraceResult(Status.ERROR, output);
+        return new OftTraceResult(Status.ERROR, output, null);
     }
 
     public static OftTraceResult invalidInput(final String output) {
-        return new OftTraceResult(Status.INVALID_INPUT, output);
+        return new OftTraceResult(Status.INVALID_INPUT, output, null);
     }
 
     public static OftTraceResult cancelled() {
-        return new OftTraceResult(Status.CANCELLED, "OpenFastTrace trace was cancelled.");
+        return new OftTraceResult(Status.CANCELLED, "OpenFastTrace trace was cancelled.", null);
     }
 
     boolean isSuccessful() {
@@ -49,6 +63,10 @@ public final class OftTraceResult {
 
     public String output() {
         return output;
+    }
+
+    public Optional<Trace> trace() {
+        return Optional.ofNullable(trace);
     }
 
     private enum Status {

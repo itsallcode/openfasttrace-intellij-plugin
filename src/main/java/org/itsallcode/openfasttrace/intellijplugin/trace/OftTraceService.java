@@ -66,7 +66,7 @@ public final class OftTraceService {
             progress.checkCanceled();
             final String output = buildTraceOutput(inputs, trace);
             progress.phase("Finished OpenFastTrace trace.", 1.0D);
-            return trace.hasNoDefects() ? OftTraceResult.success(output) : OftTraceResult.failure(output);
+            return trace.hasNoDefects() ? OftTraceResult.success(output, trace) : OftTraceResult.failure(output, trace);
         } catch (final ProcessCanceledException exception) {
             throw exception;
         } catch (final RuntimeException exception) {

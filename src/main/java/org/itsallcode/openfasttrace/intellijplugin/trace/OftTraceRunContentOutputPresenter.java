@@ -1,6 +1,5 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
-import com.intellij.execution.RunContentDescriptorId;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.impl.ConsoleViewImpl;
 import com.intellij.execution.ui.ConsoleView;
@@ -51,7 +50,7 @@ public final class OftTraceRunContentOutputPresenter implements OftTraceOutputPr
         }
         final RunContentDescriptor descriptor =
                 new RunContentDescriptor(console, null, console.getComponent(), contentTitle);
-        descriptor.setId(new OftRunContentDescriptorId(NEXT_DESCRIPTOR_ID.getAndIncrement()));
+        descriptor.setExecutionId(NEXT_DESCRIPTOR_ID.getAndIncrement());
         Disposer.register(descriptor, console);
         runContentShower.accept(project, descriptor);
     }
@@ -81,13 +80,6 @@ public final class OftTraceRunContentOutputPresenter implements OftTraceOutputPr
             System.clearProperty(IDEA_CYCLE_BUFFER_SIZE);
         } else {
             System.setProperty(IDEA_CYCLE_BUFFER_SIZE, previousBufferSize);
-        }
-    }
-
-    private record OftRunContentDescriptorId(int uid) implements RunContentDescriptorId {
-        @Override
-        public int getUid() {
-            return uid;
         }
     }
 }
