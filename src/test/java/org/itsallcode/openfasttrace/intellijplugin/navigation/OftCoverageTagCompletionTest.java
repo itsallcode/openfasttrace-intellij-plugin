@@ -101,6 +101,15 @@ public class OftCoverageTagCompletionTest extends AbstractOftPlatformTestCase {
         assertThat(lookupStrings(), hasItem("dsn~coverage-target~1"));
     }
 
+    public void testGivenCoverageTagTargetInXmlCommentWhenBasicCompletionInvokesThenItSuggestsDeclaredSpecificationIds() {
+        addTargetDeclaration();
+        myFixture.configureByText("project.xml", "<!-- " + tagTarget("dsn~coverage-target<caret>") + " -->");
+
+        myFixture.completeBasic();
+
+        assertThat(lookupStrings(), hasItem("dsn~coverage-target~1"));
+    }
+
     public void testGivenCoverageTagTargetInNewTagImporterExtensionWhenBasicCompletionInvokesThenItSuggestsDeclaredSpecificationIds() {
         addTargetDeclaration();
         myFixture.configureByText("suite.robot", "# " + tagTarget("dsn~coverage-target<caret>"));

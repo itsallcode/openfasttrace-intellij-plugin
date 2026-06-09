@@ -35,6 +35,7 @@ public final class OftSupportedFiles {
             "tf", "tfvars",
             "bat",
             "json",
+            "xml", "fxml",
             "toml",
             "html", "htm", "xhtml",
             "yaml", "yml",

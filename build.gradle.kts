@@ -17,10 +17,10 @@ plugins {
     id("java")
     id("jacoco")
     id("com.github.ben-manes.versions") version "0.54.0"
-    id("com.diffplug.spotless") version "8.4.0"
-    id("org.itsallcode.openfasttrace") version "3.1.1"
-    id("org.jetbrains.intellij.platform") version "2.15.0"
-    id("org.sonarqube") version "7.2.3.7755"
+    id("com.diffplug.spotless") version "8.6.0"
+    id("org.itsallcode.openfasttrace") version "3.1.2"
+    id("org.jetbrains.intellij.platform") version "2.16.0"
+    id("org.sonarqube") version "7.3.1.8318"
 }
 
 val pluginVersion = providers.gradleProperty("version")
@@ -74,17 +74,17 @@ repositories {
 }
 
 dependencies {
-    implementation("org.itsallcode.openfasttrace:openfasttrace:4.4.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace:4.5.0")
 
     intellijPlatform {
-        intellijIdea("2026.1")
+        intellijIdea("2026.1.3")
         bundledPlugin("com.intellij.java")
         testFramework(TestFrameworkType.Platform)
         pluginVerifier()
         zipSigner()
     }
 
-    testImplementation(platform("org.junit:junit-bom:5.14.1"))
+    testImplementation(platform("org.junit:junit-bom:6.1.0"))
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.platform:junit-platform-launcher")

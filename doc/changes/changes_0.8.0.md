@@ -24,4 +24,4 @@ The global `Tools | OpenFastTrace | Trace Project` action and new or previously 
 
 ## Build Maintenance
 
-#45: Add Gradle dependency locks and dependency version checks
+#45: Add Gradle dependency locks, dependency version checks, and dependency updates

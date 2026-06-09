@@ -4,10 +4,14 @@
 
 Make the Gradle build deterministic enough for SonarCloud by using committed
 dependency locks, and add an on-demand Gradle version check that reports newer
-dependency and plugin versions.
+dependency and plugin versions. After adding the update check, refresh the
+project's dependencies, Gradle plugins, IntelliJ Platform target, and Gradle
+wrapper to the latest resolvable stable releases.
 
 This is repository build maintenance only. It must not change IntelliJ plugin
-runtime behavior, user-facing requirements, or Java production code.
+runtime behavior or user-facing requirements except where a dependency update
+requires keeping plugin support aligned with the upstream OpenFastTrace
+contract.
 
 ## Scope
 
@@ -17,6 +21,9 @@ In scope:
 * generate and commit the Gradle lock files required by the chosen locking setup
 * add `com.github.ben-manes.versions` as the minimal-effort Gradle plugin for
   checking available dependency, plugin, and Gradle wrapper updates
+* update all project dependencies, Gradle plugins, the IntelliJ Platform target,
+  and the Gradle wrapper to the latest resolvable stable releases
+* refresh the committed lock metadata after intentional version changes
 * keep version declarations centralized and avoid dynamic dependency versions
 * update developer documentation for lock maintenance and version checks
 * keep CI build, tracing, packaging, and plugin verification compatible with the
@@ -27,8 +34,6 @@ Out of scope:
 * changing IntelliJ plugin runtime behavior or end-user IDE workflows
 * changing `doc/system_requirements.md`
 * broader dependency-management redesign beyond adding the Gradle Versions Plugin
-* automatically upgrading dependencies or Gradle plugins
-* adding Java production or test code
 * changing SonarCloud quality profiles, quality gates, or project permissions
 
 ## Design References
@@ -62,6 +67,13 @@ The user explicitly approved using the Gradle Versions Plugin as the
 minimal-effort dependency-update solution. Because this still adds a third-party
 build plugin, document the decision if the dependency policy requires an
 architecture decision for build plugins as well as runtime libraries.
+
+The user later requested updating all dependencies to the latest releases. Use
+the `dependencyUpdates` report as the source for version candidates, update only
+stable releases, and keep locked dependency resolution deterministic. If a
+reported version is not reachable through the project's Gradle coordinates,
+record that as an explicit unresolved update instead of forcing an invalid
+coordinate.
 
 ## Task List
 
@@ -102,6 +114,14 @@ architecture decision for build plugins as well as runtime libraries.
       the user later requests update checks as a scheduled/reporting workflow
 - [x] Inline build-only constants in `build.gradle.kts`, keep only the release
       version in `gradle.properties`, and avoid dynamic versions
+- [x] Update project dependencies, Gradle plugins, and the Gradle wrapper to the
+      latest stable versions reported by `dependencyUpdates` when the
+      corresponding Gradle coordinates are resolvable
+- [x] Update the IntelliJ Platform target to the latest resolvable IDEA release
+      available through the IntelliJ Platform Gradle Plugin repositories
+- [x] Keep coverage-tag file-extension support aligned with the default
+      extensions of the updated OpenFastTrace Tag Importer, including completion
+      registration for newly supported XML coverage-tag files
 - [x] Keep generated version-report output under `build/` or another ignored
       location so only source metadata and lock files are committed
 - [x] Keep `.github/workflows/build.yml` and `.github/workflows/release.yml`
@@ -133,19 +153,43 @@ architecture decision for build plugins as well as runtime libraries.
       added third-party artifact is the approved build plugin
 - [x] Keep the OpenFastTrace trace clean for the requirement and design artifact
       types in scope
+- [x] After the dependency refresh, rerun `./gradlew --write-locks dependencies`
+      and confirm the lock file matches the updated dependency graph
+- [x] After the dependency refresh, rerun `./gradlew --no-configuration-cache --no-parallel dependencyUpdates -Drevision=release`
+      and record any remaining unavailable or unresolved update candidates
+- [x] After the dependency refresh, rerun `./gradlew --warning-mode=all check buildPlugin`
+- [x] After the dependency refresh, rerun `./gradlew --warning-mode=all verifyPlugin`
+- [x] After the dependency refresh, rerun `./gradlew --no-configuration-cache sonar -Dsonar.skip=true`
 
-`./gradlew --write-locks dependencies` generated only `gradle.lockfile` as new
-source-controlled lock metadata.
+`./gradlew --write-locks dependencies` generated and refreshed `gradle.lockfile`
+as source-controlled lock metadata. After the dependency refresh, the lock file
+records OpenFastTrace `4.5.0`, IntelliJ IDEA `2026.1.3` / `IU-261.25134.95`,
+JUnit `6.1.0`, and the updated Gradle plugin dependency graph.
+
+`./gradlew wrapper --gradle-version 9.5.1` updated the Gradle wrapper
+distribution URL, wrapper jar, and wrapper scripts.
 
 `./gradlew dependencyInsight --dependency org.itsallcode.openfasttrace:openfasttrace --configuration runtimeClasspath`
-shows Gradle selecting `4.4.0` with the reason `Dependency version enforced by
+shows Gradle selecting `4.5.0` with the reason `Dependency version enforced by
 Dependency Locking`.
 
 `./gradlew --no-configuration-cache --no-parallel dependencyUpdates -Drevision=release`
-passes and reports dependency updates, Gradle plugin updates, and the Gradle
-`9.5.0` to `9.5.1` update. The task cannot determine latest versions for the
+passes after the refresh. It reports the declared project dependencies, Gradle
+plugins, and Gradle `9.5.1` wrapper as up to date, except for the IntelliJ
+Platform `test-framework` artifact where it reports `261.25134.95` to
+`262.7132.36`. Attempting to move the project target to `intellijIdea("2026.2")`
+failed because `idea:idea:2026.2` is not resolvable from the configured
+IntelliJ Platform repositories, so the build remains on the latest resolvable
+IDEA product coordinate `2026.1.3`. The task still cannot determine latest
+versions for the
 IntelliJ Platform pseudo-dependencies `bundledModule:intellij-platform-test-runtime`,
 `bundledPlugin:com.intellij.java`, and `idea:idea`.
+
+Updating OpenFastTrace to `4.5.0` added `xml` and `fxml` to the upstream Tag
+Importer's default extensions. The plugin's supported coverage-tag file
+extension list and its upstream-extension alignment test now include those
+extensions. XML coverage-tag completion is also registered in `plugin.xml` and
+covered by `OftCoverageTagCompletionTest`.
 
 `./gradlew --warning-mode=all traceRequirements` passes.
 
