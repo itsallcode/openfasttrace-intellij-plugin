@@ -72,15 +72,17 @@ For manual IDE testing, launch a sandbox IDE with the plugin:
 ./gradlew manualTestIde
 ```
 
+## Using the Plugin
+
 After the sandbox IDE opens a project, configure trace scope under `Settings | Tools | OpenFastTrace`. By default, `Trace Project` scans the whole opened project. If you switch to selected-resource tracing, the plugin includes IntelliJ source roots, IntelliJ test roots, and one default additional project-relative path entry, `doc/`, until you change it. Additional files or directories are entered one per line.
 
-Run an OFT trace from `Tools | OpenFastTrace | Trace Project`, use the default shortcut `Ctrl+Alt+Shift+O`, or create and run a dedicated `OpenFastTrace` run configuration from the IDE's run/debug toolbar. The plugin traces the configured inputs in the background and shows the plain text result in an IDE output tab with ANSI colors preserved. You can click specification item IDs in the report to jump to their declarations, including source-side items generated from coverage tags.
+## Run Configurations
 
-In an `OpenFastTrace` run configuration, keep `Plain text output` for the existing report view or select `IntelliJ Test Runner UI` to inspect the structured trace as source-file suites, specification-item tests, and trace-link sub-tests. Specification items are sorted inside each source file by artifact type, ID name, and revision, use their title as the tree label when available, and show status labels only for non-clean statuses. Passed and failed nodes reflect the OpenFastTrace trace status and show IDs in their details, and source navigation from suite, item, and link nodes opens the corresponding file, specification declaration, or source-side coverage tag.
+You can create and run a dedicated `OpenFastTrace` run configuration from the IDE's run/debug toolbar. The plugin traces the configured inputs in the background and shows the plain text result in an IDE output tab with ANSI colors preserved. You can click specification item IDs in the report to jump to their declarations, including source-side items generated from coverage tags.
+
+## Live-Templates Bundled With the Plugin
 
 The plugin also bundles an `OpenFastTrace` live-template group under `Settings | Editor | Live Templates`. Use abbreviations such as `feat`, `req`, `dsn`, and `scn` in a supported editing context, then press `Tab` to insert an OFT item skeleton. The `scn` template inserts a scenario stub with placeholders for `Given`, `When`, `Then`, and the covered requirement. While the caret is still in a template's covered-item field, use basic completion to select an existing specification item ID from the project index.
-
-When editing a `Covers:` section in a supported specification document, invoke basic completion on a partial specification item ID to get existing declarations from the project index. The same completion is available on the target side of likely coverage tags in files supported by the OpenFastTrace Tag Importer after the left-hand artifact type and arrow, for example `// [impl->dsn~partial]`. Suggestions prefer full-ID prefix matches first, then name-prefix matches, then name-substring matches, and finally artifact-type prefix matches.
 
 ## Installation
 ### Runtime Dependencies
