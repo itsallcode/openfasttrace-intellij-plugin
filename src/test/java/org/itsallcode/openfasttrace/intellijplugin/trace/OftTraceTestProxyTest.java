@@ -7,6 +7,7 @@ import org.hamcrest.Matchers;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.zip.CRC32;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -57,7 +58,7 @@ public class OftTraceTestProxyTest extends AbstractOftPlatformTestCase {
         );
         final OftTraceTestProxy proxy = new OftTraceTestProxy(
                 getProject(),
-                "<- " + generatedCoverageItemId + " (covered)",
+                "<- " + generatedCoverageItemId,
                 false,
                 generatedCoverageItemId
         );
@@ -66,6 +67,40 @@ public class OftTraceTestProxyTest extends AbstractOftPlatformTestCase {
         EdtTestUtil.runInEdtAndWait(() -> proxy.navigate(false));
 
         assertThat(selectedEditorFileName(), is("Main.java"));
+    }
+
+    // [itest->dsn~navigate-from-test-runner-source-files~1]
+    public void testGivenSourceFileSuiteNodeWhenNavigatingThenItOpensTheSourceFile() {
+        myFixture.addFileToProject("doc/source.md", """
+                req~runner_source_navigation~1
+                """);
+        final OftTraceTestProxy proxy = OftTraceTestProxy.sourceFileSuite(
+                getProject(),
+                "doc/source.md",
+                "doc/source.md"
+        );
+
+        assertThat(proxy.canNavigate(), is(true));
+        EdtTestUtil.runInEdtAndWait(() -> proxy.navigate(false));
+
+        assertThat(selectedEditorFileName(), is("source.md"));
+    }
+
+    // [itest->dsn~navigate-from-test-runner-source-files~1]
+    public void testGivenSourceFileSuiteNodeWithAbsoluteProjectPathWhenNavigatingThenItOpensTheSourceFile() {
+        myFixture.addFileToProject("doc/absolute-source.md", """
+                req~runner_absolute_source_navigation~1
+                """);
+        final OftTraceTestProxy proxy = OftTraceTestProxy.sourceFileSuite(
+                getProject(),
+                "doc/absolute-source.md",
+                Objects.requireNonNull(getProject().getBasePath()) + "/doc/absolute-source.md"
+        );
+
+        assertThat(proxy.canNavigate(), is(true));
+        EdtTestUtil.runInEdtAndWait(() -> proxy.navigate(false));
+
+        assertThat(selectedEditorFileName(), is("absolute-source.md"));
     }
 
     public void testGivenNodeWithoutNavigationTargetWhenCheckingNavigationThenItCannotNavigate() {

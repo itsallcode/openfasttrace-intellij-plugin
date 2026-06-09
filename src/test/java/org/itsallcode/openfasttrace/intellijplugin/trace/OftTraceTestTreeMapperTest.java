@@ -48,6 +48,7 @@ class OftTraceTestTreeMapperTest {
 
     // [itest->dsn~trace-test-runner-presentation~1]
     // [itest->dsn~show-trace-source-files-as-test-runner-suites~1]
+    // [itest->dsn~navigate-from-test-runner-source-files~1]
     @Test
     void testGivenAbsoluteTraceItemPathsBelowProjectWhenMappingThenItCreatesSuitesWithProjectLocalPaths() {
         final LinkedSpecificationItem requirement = item(
@@ -61,24 +62,32 @@ class OftTraceTestTreeMapperTest {
 
         final OftTraceTestTree tree = mapper.map(trace(requirement, implementation), PROJECT_BASE);
 
-        assertThat(
-                tree.suites().stream()
-                        .map(OftTraceSuiteNode::name)
-                        .toList(),
-                contains("doc/system_requirements.md", "src/main/java/Main.java")
+        Assertions.assertAll(
+                () -> assertThat(
+                        tree.suites().stream()
+                                .map(OftTraceSuiteNode::name)
+                                .toList(),
+                        contains("doc/system_requirements.md", "src/main/java/Main.java")
+                ),
+                () -> assertThat(
+                        suiteNamed(tree, "doc/system_requirements.md").sourcePath(),
+                        is(PROJECT_BASE + "/doc/system_requirements.md")
+                )
         );
     }
 
     // [itest->dsn~trace-test-runner-presentation~1]
     // [itest->dsn~show-trace-specification-items-as-test-runner-tests~1]
     // [itest->dsn~show-trace-links-as-test-runner-sub-tests~1]
-    // [itest->dsn~show-specification-item-title-in-test-runner-ui~1]
-    // [itest->dsn~show-specification-item-status-in-test-runner-ui~1]
-    // [itest->dsn~show-trace-link-status-in-test-runner-ui~1]
+    // [itest->dsn~show-specification-item-title-in-test-runner-ui~2]
+    // [itest->dsn~show-specification-item-id-in-test-runner-details~1]
+    // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
+    // [itest->dsn~show-trace-link-status-in-test-runner-ui~2]
     // [itest->dsn~show-trace-link-direction-in-test-runner-ui~1]
     // [itest->dsn~show-unicode-trace-link-direction-in-test-runner-ui~1]
     // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
     // [itest->dsn~map-trace-link-status-to-test-runner-status~1]
+    // [itest->dsn~show-trace-link-id-details-in-test-runner-ui~1]
     @Test
     void testGivenCoveredRequirementWithIncomingTraceLinkWhenMappingThenItCreatesPassedItemAndLinkNodes() {
         final LinkedSpecificationItem requirement = titledItem(
@@ -101,16 +110,58 @@ class OftTraceTestTreeMapperTest {
 
         Assertions.assertAll(
                 () -> assertThat(requirementNode.name(),
-                        is("Covered requirement \u2014 req~covered_requirement~1 (covered)")),
+                        is("Covered requirement")),
                 () -> assertThat(requirementNode.navigationId(), is("req~covered_requirement~1")),
                 () -> assertThat(requirementNode.failed(), is(false)),
+                () -> assertThat(requirementNode.details().detailText(),
+                        containsString("Specification item ID: req~covered_requirement~1")),
+                () -> assertThat(requirementNode.details().detailText(), containsString("Trace status: covered")),
                 () -> assertThat(requirementNode.testCount(), is(2)),
                 () -> assertThat(requirementNode.links(), hasSize(1)),
                 () -> assertThat(requirementNode.links().getFirst().name(),
-                        is("\u2190 Covered requirement test \u2014 tst~covered_requirement~1 (covered)")),
+                        is("\u2190 Covered requirement test")),
                 () -> assertThat(requirementNode.links().getFirst().navigationId(),
                         is("tst~covered_requirement~1")),
-                () -> assertThat(requirementNode.links().getFirst().failed(), is(false))
+                () -> assertThat(requirementNode.links().getFirst().failed(), is(false)),
+                () -> assertThat(requirementNode.links().getFirst().details().detailText(),
+                        containsString("Owning item ID: req~covered_requirement~1")),
+                () -> assertThat(requirementNode.links().getFirst().details().detailText(),
+                        containsString("Linked item ID: tst~covered_requirement~1")),
+                () -> assertThat(requirementNode.links().getFirst().details().detailText(),
+                        containsString("Direction: incoming")),
+                () -> assertThat(requirementNode.links().getFirst().details().detailText(),
+                        containsString("Trace-link status: covered"))
+        );
+    }
+
+    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~1]
+    // [itest->dsn~show-trace-link-direction-in-test-runner-ui~1]
+    // [itest->dsn~show-unicode-trace-link-direction-in-test-runner-ui~1]
+    @Test
+    void testGivenOnlyOutgoingTraceLinkWhenMappingThenItCreatesIncomingLinkOnLinkedItem() {
+        final LinkedSpecificationItem implementation = titledItem(
+                "impl~covered_requirement~1",
+                "src/CoveredRequirement.java",
+                "Covered requirement implementation"
+        );
+        final LinkedSpecificationItem requirement = titledItem(
+                "req~covered_requirement~1",
+                "doc/requirements.md",
+                "Covered requirement"
+        );
+        implementation.addLinkToItemWithStatus(requirement, LinkStatus.COVERS);
+
+        final OftTraceItemNode requirementNode = onlyItem(
+                mapper.map(trace(implementation, requirement)),
+                "doc/requirements.md"
+        );
+
+        assertThat(
+                requirementNode.links().stream()
+                        .map(OftTraceLinkNode::name)
+                        .toList(),
+                contains("\u2190 Covered requirement implementation")
         );
     }
 
@@ -131,18 +182,18 @@ class OftTraceTestTreeMapperTest {
                         .map(OftTraceItemNode::name)
                         .toList(),
                 contains(
-                        "feat~trace_results~1 (covered)",
-                        "impl~zeta_requirement~1 (covered)",
-                        "req~alpha_requirement~1 (covered)",
-                        "req~alpha_requirement~2 (covered)",
-                        "req~zeta_requirement~1 (covered)"
+                        "feat~trace_results~1",
+                        "impl~zeta_requirement~1",
+                        "req~alpha_requirement~1",
+                        "req~alpha_requirement~2",
+                        "req~zeta_requirement~1"
                 )
         );
     }
 
     // [itest->dsn~trace-test-runner-presentation~1]
     // [itest->dsn~show-trace-links-as-test-runner-sub-tests~1]
-    // [itest->dsn~show-trace-link-status-in-test-runner-ui~1]
+    // [itest->dsn~show-trace-link-status-in-test-runner-ui~2]
     // [itest->dsn~show-trace-link-direction-in-test-runner-ui~1]
     // [itest->dsn~show-unicode-trace-link-direction-in-test-runner-ui~1]
     // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
@@ -171,15 +222,15 @@ class OftTraceTestTreeMapperTest {
                 () -> assertThat(link.name(), is("\u2192 req~missing_requirement~1 (orphaned)")),
                 () -> assertThat(link.failed(), is(true)),
                 () -> assertThat(link.details().failureMessage(), is("Orphaned outgoing trace link.")),
-                () -> assertThat(link.details().detailText(), containsString("Owning item: impl~missing_requirement~1")),
-                () -> assertThat(link.details().detailText(), containsString("Linked item: req~missing_requirement~1")),
+                () -> assertThat(link.details().detailText(), containsString("Owning item ID: impl~missing_requirement~1")),
+                () -> assertThat(link.details().detailText(), containsString("Linked item ID: req~missing_requirement~1")),
                 () -> assertThat(link.details().detailText(), containsString("Direction: outgoing")),
                 () -> assertThat(link.details().detailText(), containsString("OpenFastTrace could not find"))
         );
     }
 
     // [itest->dsn~trace-test-runner-presentation~1]
-    // [itest->dsn~show-specification-item-status-in-test-runner-ui~1]
+    // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
     // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
     // [itest->dsn~show-specification-item-defect-details-in-test-runner-ui~1]
     @Test
@@ -197,7 +248,7 @@ class OftTraceTestTreeMapperTest {
                 () -> assertThat(requirementNode.details().failureMessage(),
                         is("Uncovered OpenFastTrace specification item.")),
                 () -> assertThat(requirementNode.details().detailText(),
-                        containsString("Specification item: req~uncovered_requirement~1")),
+                        containsString("Specification item ID: req~uncovered_requirement~1")),
                 () -> assertThat(requirementNode.details().detailText(),
                         containsString("Trace status: uncovered")),
                 () -> assertThat(requirementNode.details().detailText(),

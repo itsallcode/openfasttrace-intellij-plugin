@@ -1,10 +1,14 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
 import com.intellij.execution.executors.DefaultRunExecutor;
+import com.intellij.execution.filters.HyperlinkInfo;
+import com.intellij.execution.testframework.Printable;
+import com.intellij.execution.testframework.Printer;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties;
 import com.intellij.execution.testframework.sm.runner.SMTestProxy;
 import com.intellij.execution.testframework.sm.runner.ui.SMTRunnerConsoleView;
 import com.intellij.execution.testframework.sm.runner.ui.SMTestRunnerResultsForm;
+import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.EdtTestUtil;
 import org.itsallcode.openfasttrace.api.core.ItemStatus;
@@ -33,11 +37,17 @@ import static org.hamcrest.Matchers.notNullValue;
 public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTestCase {
     // [itest->dsn~show-trace-source-files-as-test-runner-suites~1]
     // [itest->dsn~show-trace-specification-items-as-test-runner-tests~1]
-    // [itest->dsn~show-specification-item-title-in-test-runner-ui~1]
+    // [itest->dsn~show-specification-item-title-in-test-runner-ui~2]
+    // [itest->dsn~show-specification-item-id-in-test-runner-details~1]
+    // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
+    // [itest->dsn~navigate-from-test-runner-source-files~1]
     // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
     // [itest->dsn~roll-up-source-file-suite-trace-status~1]
     // [itest->dsn~roll-up-top-level-trace-status~1]
     public void testGivenSuccessfulTraceResultWhenPresentedThenItCreatesPassedTestRunnerNodes() {
+        myFixture.addFileToProject("doc/requirements.md", """
+                req~clean_requirement~1
+                """);
         final LinkedSpecificationItem requirement = titledItem(
                 "req~clean_requirement~1",
                 projectLocalPath("doc/requirements.md"),
@@ -47,12 +57,15 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         final SMTestRunnerResultsForm resultsViewer = console.getResultsViewer();
 
         final SMTestProxy suite = childNamed(resultsViewer.getTestsRootNode(), "doc/requirements.md");
-        final SMTestProxy item = childNamed(suite, "Clean requirement \u2014 req~clean_requirement~1 (covered)");
+        final SMTestProxy item = childNamed(suite, "Clean requirement");
 
         assertThat(suite.isSuite(), is(true));
+        assertThat(suite.canNavigate(), is(true));
         assertThat(item.isSuite(), is(false));
-        assertThat(item.getPresentableName(), is("Clean requirement \u2014 req~clean_requirement~1 (covered)"));
+        assertThat(item.getPresentableName(), is("Clean requirement"));
         assertThat(item.isPassed(), is(true));
+        assertThat(ownOutput(item), containsString("Specification item ID: req~clean_requirement~1"));
+        assertThat(ownOutput(item), containsString("Trace status: covered"));
         assertThat(suite.isDefect(), is(false));
         assertThat(resultsViewer.getTestsRootNode().isDefect(), is(false));
         assertThat(resultsViewer.getTotalTestCount(), is(1));
@@ -62,6 +75,8 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
     // [itest->dsn~show-trace-source-files-as-test-runner-suites~1]
     // [itest->dsn~show-trace-specification-items-as-test-runner-tests~1]
     // [itest->dsn~show-trace-links-as-test-runner-sub-tests~1]
+    // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
+    // [itest->dsn~show-trace-link-status-in-test-runner-ui~2]
     // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
     // [itest->dsn~map-trace-link-status-to-test-runner-status~1]
     // [itest->dsn~roll-up-source-file-suite-trace-status~1]
@@ -84,11 +99,11 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         final SMTestProxy suite = childNamed(resultsViewer.getTestsRootNode(), "src/Main.java");
         final SMTestProxy item = childNamed(
                 suite,
-                "Missing requirement implementation \u2014 impl~missing_requirement~1 (defective)"
+                "Missing requirement implementation (defective)"
         );
         final SMTestProxy link = childNamed(
                 item,
-                "\u2192 Missing requirement \u2014 req~missing_requirement~1 (orphaned)"
+                "\u2192 Missing requirement (orphaned)"
         );
 
         assertThat(resultsViewer.getTestsRootNode().isDefect(), is(true));
@@ -99,13 +114,14 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         assertThat(suite.getErrorMessage(), is("OpenFastTrace defects in src/Main.java."));
         assertThat(resultsViewer.getTestsRootNode().getErrorMessage(), is("OpenFastTrace trace contains defects."));
         assertThat(item.getErrorMessage(), is("Defective OpenFastTrace specification item impl~missing_requirement~1."));
+        assertThat(item.getStacktrace(), containsString("Specification item ID: impl~missing_requirement~1"));
         assertThat(item.getStacktrace(), containsString("Trace status: defective"));
         assertThat(item.getStacktrace(), containsString("orphaned link to req~missing_requirement~1"));
         assertThat(link.getPresentableName(),
-                is("\u2192 Missing requirement \u2014 req~missing_requirement~1 (orphaned)"));
+                is("\u2192 Missing requirement (orphaned)"));
         assertThat(link.getErrorMessage(), is("Orphaned outgoing trace link."));
-        assertThat(link.getStacktrace(), containsString("Owning item: impl~missing_requirement~1"));
-        assertThat(link.getStacktrace(), containsString("Linked item: req~missing_requirement~1"));
+        assertThat(link.getStacktrace(), containsString("Owning item ID: impl~missing_requirement~1"));
+        assertThat(link.getStacktrace(), containsString("Linked item ID: req~missing_requirement~1"));
         assertThat(link.getStacktrace(), containsString("OpenFastTrace could not find"));
         assertThat(resultsViewer.getTotalTestCount(), is(2));
         assertThat(resultsViewer.getFailedTestCount(), is(2));
@@ -179,6 +195,30 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
                 .toList();
         assertThat(matchingChildren, hasSize(1));
         return matchingChildren.getFirst();
+    }
+
+    private static String ownOutput(final SMTestProxy proxy) {
+        final StringBuilder output = new StringBuilder();
+        proxy.printOwnPrintablesOn(new Printer() {
+            @Override
+            public void print(final String text, final ConsoleViewContentType contentType) {
+                output.append(text);
+            }
+
+            @Override
+            public void onNewAvailable(final Printable printable) {
+            }
+
+            @Override
+            public void printHyperlink(final String text, final HyperlinkInfo info) {
+                output.append(text);
+            }
+
+            @Override
+            public void mark() {
+            }
+        });
+        return output.toString();
     }
 
     private static Trace trace(final LinkedSpecificationItem... items) {

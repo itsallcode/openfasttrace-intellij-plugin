@@ -14,7 +14,7 @@ record OftTraceTestTree(List<OftTraceSuiteNode> suites) {
     }
 }
 
-record OftTraceSuiteNode(String name, List<OftTraceItemNode> items) {
+record OftTraceSuiteNode(String name, String sourcePath, List<OftTraceItemNode> items) {
     int testCount() {
         return items.stream()
                 .mapToInt(OftTraceItemNode::testCount)
@@ -43,6 +43,12 @@ record OftTraceItemNode(
 
     boolean failed() {
         return defective || links.stream().anyMatch(OftTraceLinkNode::failed);
+    }
+
+    OftTraceTestNodeDetails failureDetails() {
+        return defective
+                ? details
+                : OftTraceTestNodeDetails.specificationItemLinkFailure(navigationId);
     }
 }
 

@@ -544,14 +544,26 @@ Covers:
 Needs: impl, itest
 
 ### Show Specification Item Title in Test Runner UI
-`dsn~show-specification-item-title-in-test-runner-ui~1`
+`dsn~show-specification-item-title-in-test-runner-ui~2`
 
-**Given** the trace test-runner presentation creates a node whose visible name contains a specification item ID
-**When** the OpenFastTrace item for that visible ID has a non-blank title
-**Then** it prefixes the visible node name with the title, followed by ` — ` and the full specification item ID.
+**Given** the trace test-runner presentation creates a node for an OpenFastTrace specification item
+**When** the OpenFastTrace item has a non-blank title
+**Then** it uses the title as the visible node name and keeps the full specification item ID out of the tree label.
 
 Covers:
-- `scn~show-specification-item-title-in-test-runner-ui~1`
+- `scn~show-specification-item-title-in-test-runner-ui~2`
+
+Needs: impl, itest
+
+### Show Specification Item ID in Test Runner Details
+`dsn~show-specification-item-id-in-test-runner-details~1`
+
+**Given** the trace test-runner presentation creates a specification-item test node
+**When** it maps the OpenFastTrace item status to the SM test node
+**Then** it attaches details that identify the full specification item ID and trace status for passed and failed item nodes.
+
+Covers:
+- `scn~show-specification-item-id-in-test-runner-details~1`
 
 Needs: impl, itest
 
@@ -571,7 +583,7 @@ Needs: impl, itest
 `dsn~show-trace-links-as-test-runner-sub-tests~1`
 
 **Given** the trace test-runner presentation has created a specification-item test node
-**When** it maps that item's incoming and outgoing trace links
+**When** it maps incoming and outgoing trace links connected to that item from the structured trace
 **Then** it creates one SM sub-test node for each trace link below the specification-item test node.
 
 Covers:
@@ -580,26 +592,26 @@ Covers:
 Needs: impl, itest
 
 ### Show Specification Item Status in Test Runner UI
-`dsn~show-specification-item-status-in-test-runner-ui~1`
+`dsn~show-specification-item-status-in-test-runner-ui~2`
 
 **Given** the trace test-runner presentation creates a specification-item test node
 **When** it derives the node name from the OpenFastTrace trace result
-**Then** it appends the specification item's trace status in brackets to the visible node name.
+**Then** it appends the specification item's trace status in brackets to the visible node name only if the item status is not clean.
 
 Covers:
-- `scn~show-specification-item-status-in-test-runner-ui~1`
+- `scn~show-specification-item-status-in-test-runner-ui~2`
 
 Needs: impl, itest
 
 ### Show Trace Link Status in Test Runner UI
-`dsn~show-trace-link-status-in-test-runner-ui~1`
+`dsn~show-trace-link-status-in-test-runner-ui~2`
 
 **Given** the trace test-runner presentation creates a trace-link sub-test node
 **When** it derives the node name from the OpenFastTrace trace result
-**Then** it appends the trace link's status in brackets to the visible node name.
+**Then** it appends the trace link's status in brackets to the visible node name only if the link status is not clean.
 
 Covers:
-- `scn~show-trace-link-status-in-test-runner-ui~1`
+- `scn~show-trace-link-status-in-test-runner-ui~2`
 
 Needs: impl, itest
 
@@ -699,6 +711,18 @@ Covers:
 
 Needs: impl, itest
 
+### Show Trace Link ID Details in Test Runner UI
+`dsn~show-trace-link-id-details-in-test-runner-ui~1`
+
+**Given** the trace test-runner presentation creates a trace-link sub-test node
+**When** it maps the OpenFastTrace link status to the SM test node
+**Then** it attaches details that identify the owning specification item ID, linked specification item ID, link direction, and trace-link status for passed and failed link nodes.
+
+Covers:
+- `scn~show-trace-link-id-details-in-test-runner-ui~1`
+
+Needs: impl, itest
+
 ### Navigate from Test Runner Specification Items
 `dsn~navigate-from-test-runner-specification-items~1`
 
@@ -720,6 +744,18 @@ Needs: impl, itest
 
 Covers:
 - `scn~navigate-from-test-runner-trace-links~1`
+
+Needs: impl, itest
+
+### Navigate from Test Runner Source Files
+`dsn~navigate-from-test-runner-source-files~1`
+
+**Given** the trace test-runner presentation creates a source-file suite node
+**When** it attaches source navigation to that node
+**Then** it opens the corresponding source file in the editor.
+
+Covers:
+- `scn~navigate-from-test-runner-source-files~1`
 
 Needs: impl, itest
 

@@ -33,22 +33,55 @@ record OftTraceTestNodeDetails(String failureMessage, String detailText) {
         );
     }
 
+    // [impl->dsn~show-specification-item-id-in-test-runner-details~1]
+    static OftTraceTestNodeDetails specificationItem(
+            final LinkedSpecificationItem item,
+            final String visibleStatus
+    ) {
+        return new OftTraceTestNodeDetails(
+                "",
+                specificationItemDetailText(item, visibleStatus)
+        );
+    }
+
     // [impl->dsn~show-specification-item-defect-details-in-test-runner-ui~1]
+    // [impl->dsn~show-specification-item-id-in-test-runner-details~1]
     static OftTraceTestNodeDetails specificationItemFailure(
             final LinkedSpecificationItem item,
             final String visibleStatus
     ) {
         return new OftTraceTestNodeDetails(
                 itemFailureMessage(item, visibleStatus),
-                "Specification item: " + item.getId()
-                        + LINE_SEPARATOR
-                        + "Trace status: " + visibleStatus
+                specificationItemDetailText(item, visibleStatus)
                         + LINE_SEPARATOR
                         + itemFailureExplanation(item, visibleStatus)
         );
     }
 
+    static OftTraceTestNodeDetails specificationItemLinkFailure(final String specificationItemId) {
+        return new OftTraceTestNodeDetails(
+                "OpenFastTrace trace-link defect for specification item " + specificationItemId + ".",
+                "Specification item ID: " + specificationItemId
+                        + LINE_SEPARATOR
+                        + "At least one trace link below this specification item is failed."
+        );
+    }
+
+    // [impl->dsn~show-trace-link-id-details-in-test-runner-ui~1]
+    static OftTraceTestNodeDetails traceLink(
+            final String owningItemId,
+            final String linkedItemId,
+            final String directionLabel,
+            final String visibleStatus
+    ) {
+        return new OftTraceTestNodeDetails(
+                "",
+                traceLinkDetailText(owningItemId, linkedItemId, directionLabel, visibleStatus)
+        );
+    }
+
     // [impl->dsn~show-trace-link-defect-details-in-test-runner-ui~1]
+    // [impl->dsn~show-trace-link-id-details-in-test-runner-ui~1]
     static OftTraceTestNodeDetails traceLinkFailure(
             final String owningItemId,
             final String linkedItemId,
@@ -65,6 +98,34 @@ record OftTraceTestNodeDetails(String failureMessage, String detailText) {
                 result.statusMessage(),
                 result.output()
         );
+    }
+
+    boolean hasDetailText() {
+        return !detailText.isBlank();
+    }
+
+    private static String specificationItemDetailText(
+            final LinkedSpecificationItem item,
+            final String visibleStatus
+    ) {
+        return "Specification item ID: " + item.getId()
+                + LINE_SEPARATOR
+                + "Trace status: " + visibleStatus;
+    }
+
+    private static String traceLinkDetailText(
+            final String owningItemId,
+            final String linkedItemId,
+            final String directionLabel,
+            final String visibleStatus
+    ) {
+        return "Owning item ID: " + owningItemId
+                + LINE_SEPARATOR
+                + "Linked item ID: " + linkedItemId
+                + LINE_SEPARATOR
+                + "Direction: " + directionLabel
+                + LINE_SEPARATOR
+                + "Trace-link status: " + visibleStatus;
     }
 
     private static String itemFailureMessage(final LinkedSpecificationItem item, final String visibleStatus) {
@@ -170,13 +231,7 @@ record OftTraceTestNodeDetails(String failureMessage, String detailText) {
         ) {
             return new OftTraceTestNodeDetails(
                     failureMessage,
-                    "Owning item: " + owningItemId
-                            + LINE_SEPARATOR
-                            + "Linked item: " + linkedItemId
-                            + LINE_SEPARATOR
-                            + "Direction: " + directionLabel
-                            + LINE_SEPARATOR
-                            + "Trace-link status: " + visibleStatus
+                    traceLinkDetailText(owningItemId, linkedItemId, directionLabel, visibleStatus)
                             + LINE_SEPARATOR
                             + explanation
             );

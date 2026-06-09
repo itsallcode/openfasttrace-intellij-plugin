@@ -5,8 +5,10 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import org.itsallcode.openfasttrace.intellijplugin.OftSupportedFiles;
@@ -15,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.zip.CRC32;
 
@@ -30,6 +34,161 @@ final class OftTraceNavigationResolver {
     Optional<OftTraceNavigationTarget> resolve(final String specificationId) {
         return findDeclaredSpecificationTarget(specificationId)
                 .or(() -> findCoverageTagSourceTarget(specificationId));
+    }
+
+    // [impl->dsn~navigate-from-test-runner-source-files~1]
+    Optional<OftTraceNavigationTarget> resolveSourceFile(final String sourcePath) {
+        if (sourcePath == null || sourcePath.isBlank()) {
+            return Optional.empty();
+        }
+        final Path path = sourcePath(sourcePath);
+        if (path != null) {
+            final VirtualFile file = LocalFileSystem.getInstance().findFileByNioFile(path);
+            if (file != null) {
+                return Optional.of(new OftTraceNavigationTarget(file, 0));
+            }
+        }
+        return findIndexedSourceFile(sourcePath, path)
+                .or(() -> findProjectSourceFile(sourcePath, path));
+    }
+
+    private Path sourcePath(final String sourcePath) {
+        if (sourcePath == null || sourcePath.isBlank()) {
+            return null;
+        }
+        try {
+            final Path path = Path.of(sourcePath);
+            if (path.isAbsolute()) {
+                return path.normalize();
+            }
+            final String projectBasePath = project.getBasePath();
+            return projectBasePath == null || projectBasePath.isBlank()
+                    ? null
+                    : Path.of(projectBasePath).resolve(path).normalize();
+        } catch (final InvalidPathException exception) {
+            return null;
+        }
+    }
+
+    private Optional<OftTraceNavigationTarget> findIndexedSourceFile(
+            final String sourcePath,
+            final @Nullable Path path
+    ) {
+        final String fileName = sourceFileName(sourcePath, path);
+        if (fileName == null || fileName.isBlank()) {
+            return Optional.empty();
+        }
+        final String requestedPath = displayPath(sourcePath);
+        final String resolvedPath = path == null ? null : displayPath(path.toString());
+        final String projectRelativeSourcePath = projectRelativeSourcePath(path).orElse(requestedPath);
+        return FilenameIndex.getVirtualFilesByName(fileName, GlobalSearchScope.projectScope(project))
+                .stream()
+                .filter(file -> matchesSourcePath(file, requestedPath, resolvedPath, projectRelativeSourcePath))
+                .findFirst()
+                .map(file -> new OftTraceNavigationTarget(file, 0));
+    }
+
+    private @Nullable String sourceFileName(final String sourcePath, final @Nullable Path path) {
+        if (path != null) {
+            final Path fileName = path.getFileName();
+            if (fileName != null) {
+                return fileName.toString();
+            }
+        }
+        if (sourcePath == null || sourcePath.isBlank()) {
+            return null;
+        }
+        final String displayPath = displayPath(sourcePath);
+        final int lastSeparator = displayPath.lastIndexOf('/');
+        if (lastSeparator < 0) {
+            return displayPath;
+        }
+        return displayPath.substring(lastSeparator + 1);
+    }
+
+    private Optional<String> projectRelativeSourcePath(final @Nullable Path path) {
+        if (path == null || !path.isAbsolute()) {
+            return Optional.empty();
+        }
+        final String projectBasePath = project.getBasePath();
+        if (projectBasePath == null || projectBasePath.isBlank()) {
+            return Optional.empty();
+        }
+        final Path basePath = Path.of(projectBasePath).normalize();
+        if (!path.startsWith(basePath)) {
+            return Optional.empty();
+        }
+        return Optional.of(displayPath(basePath.relativize(path).toString()));
+    }
+
+    private Optional<OftTraceNavigationTarget> findProjectSourceFile(
+            final String sourcePath,
+            final @Nullable Path path
+    ) {
+        final String requestedPath = displayPath(sourcePath);
+        final String resolvedPath = path == null ? null : displayPath(path.toString());
+        final String projectRelativeSourcePath = projectRelativeSourcePath(path).orElse(requestedPath);
+        final OftTraceNavigationTarget[] target = new OftTraceNavigationTarget[1];
+        ProjectFileIndex.getInstance(project)
+                .iterateContent(file -> processProjectSourceFile(
+                        requestedPath,
+                        resolvedPath,
+                        projectRelativeSourcePath,
+                        target,
+                        file
+                ));
+        return Optional.ofNullable(target[0]);
+    }
+
+    private boolean processProjectSourceFile(
+            final String requestedPath,
+            final @Nullable String resolvedPath,
+            final String projectRelativeSourcePath,
+            final OftTraceNavigationTarget[] target,
+            final VirtualFile file
+    ) {
+        if (matchesSourcePath(file, requestedPath, resolvedPath, projectRelativeSourcePath)) {
+            target[0] = new OftTraceNavigationTarget(file, 0);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean matchesSourcePath(
+            final VirtualFile file,
+            final String requestedPath,
+            final @Nullable String resolvedPath,
+            final String projectRelativeSourcePath
+    ) {
+        final String filePath = displayPath(file.getPath());
+        return filePath.equals(requestedPath)
+                || filePath.equals(resolvedPath)
+                || projectRelativePath(file).filter(path -> requestedPath.equals(path)
+                        || projectRelativeSourcePath.equals(path)).isPresent()
+                || matchesRelativeSourcePath(filePath, projectRelativeSourcePath);
+    }
+
+    private boolean matchesRelativeSourcePath(final String filePath, final String requestedPath) {
+        return !requestedPath.startsWith("/")
+                && requestedPath.contains("/")
+                && filePath.endsWith("/" + requestedPath);
+    }
+
+    private Optional<String> projectRelativePath(final VirtualFile file) {
+        final String projectBasePath = project.getBasePath();
+        if (projectBasePath == null || projectBasePath.isBlank()) {
+            return Optional.empty();
+        }
+        final String basePath = displayPath(projectBasePath);
+        final String filePath = displayPath(file.getPath());
+        if (!filePath.startsWith(basePath + "/")) {
+            return Optional.empty();
+        }
+        return Optional.of(filePath.substring(basePath.length() + 1));
+    }
+
+    private static String displayPath(final String path) {
+        return path.replace('\\', '/');
     }
 
     private Optional<OftTraceNavigationTarget> findDeclaredSpecificationTarget(final String specificationId) {

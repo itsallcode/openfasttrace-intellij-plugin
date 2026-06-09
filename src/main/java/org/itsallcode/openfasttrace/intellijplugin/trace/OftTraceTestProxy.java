@@ -12,13 +12,30 @@ final class OftTraceTestProxy extends SMTestProxy {
     private static final long serialVersionUID = 1L;
 
     private final transient Project project;
-    private final String navigationId;
+    private final String specificationId;
+    private final String sourcePath;
     private final transient OftTraceNavigationResolver navigationResolver;
 
     OftTraceTestProxy(final Project project, final String name, final boolean suite, final String navigationId) {
+        this(project, name, suite, navigationId, null);
+    }
+
+    // [impl->dsn~navigate-from-test-runner-source-files~1]
+    static OftTraceTestProxy sourceFileSuite(final Project project, final String name, final String sourcePath) {
+        return new OftTraceTestProxy(project, name, true, null, sourcePath);
+    }
+
+    private OftTraceTestProxy(
+            final Project project,
+            final String name,
+            final boolean suite,
+            final String specificationId,
+            final String sourcePath
+    ) {
         super(name, suite, null, true);
         this.project = project;
-        this.navigationId = navigationId;
+        this.specificationId = specificationId;
+        this.sourcePath = sourcePath;
         this.navigationResolver = new OftTraceNavigationResolver(project);
     }
 
@@ -40,9 +57,15 @@ final class OftTraceTestProxy extends SMTestProxy {
     }
 
     private Optional<OftTraceNavigationTarget> resolveNavigationTarget() {
-        if (navigationId == null || navigationResolver == null || project == null) {
+        if (navigationResolver == null || project == null) {
             return Optional.empty();
         }
-        return navigationResolver.resolve(navigationId);
+        if (specificationId != null) {
+            return navigationResolver.resolve(specificationId);
+        }
+        if (sourcePath != null) {
+            return navigationResolver.resolveSourceFile(sourcePath);
+        }
+        return Optional.empty();
     }
 }

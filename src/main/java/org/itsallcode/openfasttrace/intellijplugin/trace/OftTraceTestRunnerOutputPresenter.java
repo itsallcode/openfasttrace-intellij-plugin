@@ -64,7 +64,7 @@ public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPr
             final SMTestProxy parent,
             final OftTraceSuiteNode suite
     ) {
-        final SMTestProxy suiteProxy = new OftTraceTestProxy(project, suite.name(), true, null);
+        final SMTestProxy suiteProxy = OftTraceTestProxy.sourceFileSuite(project, suite.name(), suite.sourcePath());
         parent.addChild(suiteProxy);
         suiteProxy.setSuiteStarted();
         resultsViewer.onSuiteStarted(suiteProxy);
@@ -95,9 +95,11 @@ public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPr
             resultsViewer.onTestStarted(itemProxy);
         }
         if (item.failed()) {
-            markFailed(itemProxy, item.details());
+            markFailed(itemProxy, item.failureDetails());
             // Expandable item nodes are suite-shaped, but the item status itself still counts as a test.
             resultsViewer.onTestFailed(itemProxy);
+        } else {
+            addPassedDetails(itemProxy, item.details());
         }
         for (final OftTraceLinkNode link : item.links()) {
             showLink(project, resultsViewer, itemProxy, link);
@@ -136,6 +138,8 @@ public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPr
         if (failed) {
             markFailed(testProxy, details);
             resultsViewer.onTestFailed(testProxy);
+        } else {
+            addPassedDetails(testProxy, details);
         }
         testProxy.setFinished();
         resultsViewer.onTestFinished(testProxy);
@@ -166,9 +170,17 @@ public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPr
     // [impl->dsn~roll-up-source-file-suite-trace-status~1]
     // [impl->dsn~roll-up-top-level-trace-status~1]
     // [impl->dsn~show-specification-item-defect-details-in-test-runner-ui~1]
+    // [impl->dsn~show-specification-item-id-in-test-runner-details~1]
     // [impl->dsn~show-trace-link-defect-details-in-test-runner-ui~1]
+    // [impl->dsn~show-trace-link-id-details-in-test-runner-ui~1]
     private static void markFailed(final SMTestProxy testProxy, final OftTraceTestNodeDetails details) {
         testProxy.setTestFailed(details.failureMessage(), details.detailText(), false);
+    }
+
+    private static void addPassedDetails(final SMTestProxy testProxy, final OftTraceTestNodeDetails details) {
+        if (details.hasDetailText()) {
+            testProxy.addStdOutput(details.detailText() + System.lineSeparator());
+        }
     }
 
     private record PresentationOutcome(boolean failed, OftTraceTestNodeDetails details) {

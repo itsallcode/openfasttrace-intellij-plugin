@@ -514,9 +514,19 @@ Covers:
 Needs: scn
 
 ### Show Specification Item Title in Test Runner UI
-`req~show-specification-item-title-in-test-runner-ui~1`
+`req~show-specification-item-title-in-test-runner-ui~2`
 
-The IntelliJ Test Runner UI result view prefixes a visible specification item ID with the item's title when the imported OpenFastTrace item provides a non-blank title. The title is followed by ` — ` and the full specification item ID. Items without a title show the full specification item ID without a title prefix.
+The IntelliJ Test Runner UI result view uses the item's title as the visible specification-item name when the imported OpenFastTrace item provides a non-blank title. Items without a title show the full specification item ID as the visible name.
+
+Covers:
+- `feat~oft-test-runner-trace-results~1`
+
+Needs: scn
+
+### Show Specification Item ID in Test Runner Details
+`req~show-specification-item-id-in-test-runner-details~1`
+
+The IntelliJ Test Runner UI result view shows the full specification item ID and trace status in the details for specification-item entries, even when the entry is passed.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
@@ -536,7 +546,7 @@ Needs: scn
 ### Show Trace Links as Test Runner Sub-Tests
 `req~show-trace-links-as-test-runner-sub-tests~1`
 
-The IntelliJ Test Runner UI result view shows each incoming or outgoing trace link as a sub-test below the specification item that owns that link.
+The IntelliJ Test Runner UI result view shows each incoming or outgoing trace link as a sub-test below the connected specification item for which the link is shown.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
@@ -544,9 +554,9 @@ Covers:
 Needs: scn
 
 ### Show Specification Item Status in Test Runner UI
-`req~show-specification-item-status-in-test-runner-ui~1`
+`req~show-specification-item-status-in-test-runner-ui~2`
 
-The IntelliJ Test Runner UI result view includes each specification item's trace status in brackets in the item entry, for example `(covered)`.
+The IntelliJ Test Runner UI result view includes a specification item's trace status in brackets in the item entry only when the item status is not clean, for example `(uncovered)` or `(defective)`.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
@@ -554,9 +564,9 @@ Covers:
 Needs: scn
 
 ### Show Trace Link Status in Test Runner UI
-`req~show-trace-link-status-in-test-runner-ui~1`
+`req~show-trace-link-status-in-test-runner-ui~2`
 
-The IntelliJ Test Runner UI result view includes each trace link's status in brackets in the link entry, for example `(orphaned)`.
+The IntelliJ Test Runner UI result view includes a trace link's status in brackets in the link entry only when the link status is not clean, for example `(orphaned)`.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
@@ -643,6 +653,16 @@ Covers:
 
 Needs: scn
 
+### Show Trace Link ID Details in Test Runner UI
+`req~show-trace-link-id-details-in-test-runner-ui~1`
+
+The IntelliJ Test Runner UI result view shows the owning specification item ID, linked specification item ID, link direction, and trace-link status in the details for trace-link entries, even when the entry is passed.
+
+Covers:
+- `feat~oft-test-runner-trace-results~1`
+
+Needs: scn
+
 ### Navigate from Test Runner Specification Items
 `req~navigate-from-test-runner-specification-items~1`
 
@@ -657,6 +677,16 @@ Needs: scn
 `req~navigate-from-test-runner-trace-links~1`
 
 Users can navigate from a trace-link entry in the IntelliJ Test Runner UI result view to the corresponding specification item declaration or source-side coverage tag in the opened project.
+
+Covers:
+- `feat~oft-test-runner-trace-results~1`
+
+Needs: scn
+
+### Navigate from Test Runner Source Files
+`req~navigate-from-test-runner-source-files~1`
+
+Users can navigate from a source-file suite entry in the IntelliJ Test Runner UI result view to the corresponding file in the opened project.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
@@ -1356,14 +1386,26 @@ Covers:
 Needs: dsn
 
 ### Show Specification Item Title in Test Runner UI
-`scn~show-specification-item-title-in-test-runner-ui~1`
+`scn~show-specification-item-title-in-test-runner-ui~2`
 
-**Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a visible specification item ID for an item with a title
+**Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a specification item with a title
 **When** the trace completes
-**Then** the test runner tree shows the title before the full specification item ID
+**Then** the test runner tree shows the title as the visible specification-item name and omits the full specification item ID from the tree label
 
 Covers:
-- `req~show-specification-item-title-in-test-runner-ui~1`
+- `req~show-specification-item-title-in-test-runner-ui~2`
+
+Needs: dsn
+
+### Show Specification Item ID in Test Runner Details
+`scn~show-specification-item-id-in-test-runner-details~1`
+
+**Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a specification item
+**When** the user selects that specification item in the test runner tree
+**Then** the detail view shows the full specification item ID and trace status
+
+Covers:
+- `req~show-specification-item-id-in-test-runner-details~1`
 
 Needs: dsn
 
@@ -1392,26 +1434,26 @@ Covers:
 Needs: dsn
 
 ### Show Specification Item Status in Test Runner UI
-`scn~show-specification-item-status-in-test-runner-ui~1`
+`scn~show-specification-item-status-in-test-runner-ui~2`
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a specification item
 **When** the trace completes
-**Then** the specification item entry shows the item's trace status in brackets
+**Then** the specification item entry shows the item's trace status in brackets only when the item status is not clean
 
 Covers:
-- `req~show-specification-item-status-in-test-runner-ui~1`
+- `req~show-specification-item-status-in-test-runner-ui~2`
 
 Needs: dsn
 
 ### Show Trace Link Status in Test Runner UI
-`scn~show-trace-link-status-in-test-runner-ui~1`
+`scn~show-trace-link-status-in-test-runner-ui~2`
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains an incoming or outgoing trace link
 **When** the trace completes
-**Then** the trace-link sub-test shows the link status in brackets
+**Then** the trace-link sub-test shows the link status in brackets only when the link status is not clean
 
 Covers:
-- `req~show-trace-link-status-in-test-runner-ui~1`
+- `req~show-trace-link-status-in-test-runner-ui~2`
 
 Needs: dsn
 
@@ -1511,6 +1553,18 @@ Covers:
 
 Needs: dsn
 
+### Show Trace Link ID Details in Test Runner UI
+`scn~show-trace-link-id-details-in-test-runner-ui~1`
+
+**Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a trace link
+**When** the user selects that trace link in the test runner tree
+**Then** the detail view shows the owning specification item ID, linked specification item ID, link direction, and trace-link status
+
+Covers:
+- `req~show-trace-link-id-details-in-test-runner-ui~1`
+
+Needs: dsn
+
 ### Navigate from Test Runner Specification Items
 `scn~navigate-from-test-runner-specification-items~1`
 
@@ -1532,5 +1586,17 @@ Needs: dsn
 
 Covers:
 - `req~navigate-from-test-runner-trace-links~1`
+
+Needs: dsn
+
+### Navigate from Test Runner Source Files
+`scn~navigate-from-test-runner-source-files~1`
+
+**Given** an IntelliJ project is open and the test runner tree shows an OpenFastTrace source-file suite entry from that project
+**When** a user activates source navigation for that source-file suite entry
+**Then** the IDE opens the corresponding source file in the editor
+
+Covers:
+- `req~navigate-from-test-runner-source-files~1`
 
 Needs: dsn

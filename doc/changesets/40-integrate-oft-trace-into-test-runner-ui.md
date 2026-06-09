@@ -16,9 +16,10 @@ In scope:
 * Implement an `OftTraceOutputPresenter` that feeds trace results into `SMTRunnerConsoleView`.
 * Build the test runner hierarchy by source file, specification item, and incoming or outgoing trace link.
 * Map clean specification items and links to passed tests and defective items or links to failed tests.
-* Show item and link status labels in brackets, for example `(covered)` and `(orphaned)`.
+* Show item and link status labels in brackets only for non-clean statuses, for example `(uncovered)` and `(orphaned)`.
+* Keep tree labels compact by showing item titles when available and moving IDs to node details.
 * Mark links as incoming or outgoing as required by GH-40.
-* Reuse `OftTraceNavigationResolver` so test runner nodes can navigate to specification declarations and source-side coverage tags.
+* Reuse `OftTraceNavigationResolver` so test runner nodes can navigate to source files, specification declarations, and source-side coverage tags.
 
 Out of scope:
 
@@ -52,16 +53,16 @@ Keep presentation selection at the run-configuration layer. The global `Trace Pr
 
 - [x] Update `doc/system_requirements.md` with a user requirement for selecting the trace result view in an `OpenFastTrace` run configuration.
 - [x] Add system scenarios for showing trace results in the test runner by source file, specification item, and trace link.
-- [x] Add system scenarios for test-runner pass/fail mapping, bracketed status labels, incoming/outgoing link markers, and navigation from result nodes to source.
+- [x] Add system scenarios for test-runner pass/fail mapping, non-clean status labels, incoming/outgoing link markers, and navigation from result nodes to source.
 - [x] Add system requirements and scenarios for source-file suite roll-up, top-level trace roll-up, Unicode direction arrows, and node defect details.
-- [x] Add system requirements and scenarios for title-prefixed specification item labels and deterministic per-file item ordering.
+- [x] Add system requirements and scenarios for title-aware compact specification item labels, ID details, and deterministic per-file item ordering.
 - [x] Keep the existing plain text trace-output requirements and scenarios valid for the global `Trace Project` action and default run-configuration behavior.
 - [x] Stop and ask user for a review of the system requirements.
 - [x] Update `doc/design/solution_strategy.md` to document reuse of IntelliJ's SM test runner infrastructure for structured trace result presentation.
 - [x] Update `doc/design/building_block_view.md` with a test-runner trace presentation building block and the run-configuration result-view option.
 - [x] Update `doc/design/runtime_view.md` with design items for presenter selection, test-runner hierarchy construction, status mapping, and navigation.
 - [x] Update the design with suite roll-up behavior, Unicode direction markers, and static trace-link defect detail templates.
-- [x] Update the design with title-aware item labels and source-file suite item ordering.
+- [x] Update the design with title-aware compact item labels, ID details, and source-file suite item ordering.
 - [x] Stop and ask user for a review of the design.
 
 ### Implementation
@@ -73,14 +74,15 @@ Keep presentation selection at the run-configuration layer. The global `Trace Pr
 - [x] Extend `OftTraceResult` so successful and defective trace runs retain the structured `Trace` in addition to the rendered text report.
 - [x] Update `OftTraceService` to return structured trace data without changing importer, linker, tracer, class-loader, filter, or text-rendering behavior.
 - [x] Implement a trace-to-test-tree mapper that groups results by source file, creates specification-item test nodes, and creates incoming and outgoing link sub-test nodes.
-- [x] Implement status-label derivation for specification items and links from OpenFastTrace trace data.
+- [x] Implement non-clean status-label derivation for specification items and links from OpenFastTrace trace data.
 - [x] Implement pass/fail mapping for clean and defective specification items and links.
 - [x] Implement `OftTraceTestRunnerOutputPresenter` using `SMTRunnerConsoleView` and `SMTestProxy`.
 - [x] Roll failed descendants up to source-file suites and the top-level trace suite.
 - [x] Replace ASCII trace-link direction markers with Unicode arrows.
-- [x] Add clear failed-node details for specification items and trace links, using static templates for link-status explanations.
-- [x] Display specification item titles before IDs when available and sort item entries per source file by artifact type, ID name, and revision.
+- [x] Add clear node details for specification items and trace links, using static templates for failed link-status explanations.
+- [x] Display compact specification item titles when available, keep IDs in details, and sort item entries per source file by artifact type, ID name, and revision.
 - [x] Connect test-runner node navigation through `OftTraceNavigationResolver`.
+- [x] Let source-file suite nodes navigate to their corresponding file.
 - [x] Present invalid input, cancellation, and unexpected errors coherently when the test-runner output mode is selected.
 - [x] Preserve existing ANSI-colored plain text output and console hyperlink behavior.
 - [x] Avoid adding third-party dependencies unless a separate design decision is approved.
@@ -90,10 +92,10 @@ Keep presentation selection at the run-configuration layer. The global `Trace Pr
 - [x] Add tests for run-configuration presentation-mode defaults, persistence, and backward-compatible XML reading.
 - [x] Add settings-editor tests for selecting and applying the result-view option.
 - [x] Add `OftTraceResult` and `OftTraceService` tests proving structured `Trace` data is retained for clean and defective runs and absent for invalid-input, cancelled, and unexpected-error results.
-- [x] Add focused mapper tests for source-file grouping, specification-item nodes, incoming/outgoing link nodes, bracketed status labels, and pass/fail status.
+- [x] Add focused mapper tests for source-file grouping, specification-item nodes, incoming/outgoing link nodes, non-clean status labels, and pass/fail status.
 - [x] Add presenter tests for `SMTRunnerConsoleView` creation and event emission for successful and defective traces.
 - [x] Add mapper and presenter tests for suite roll-up, top-level roll-up, Unicode arrows, and failed-node details.
-- [x] Add mapper and presenter tests for title-prefixed item labels and per-file item ordering.
+- [x] Add mapper and presenter tests for compact item labels, ID details, and per-file item ordering.
 - [x] Add run-profile tests proving plain text output remains the default and test-runner output is selected only when configured.
 - [x] Add navigation tests proving test-runner nodes navigate to specification declarations and source-side coverage tags through `OftTraceNavigationResolver`.
 - [x] Keep existing trace action, trace service, console presenter, run-configuration, and navigation tests green.
