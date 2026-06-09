@@ -273,17 +273,24 @@ Needs: impl, itest
 ### Trace Test Runner Presentation
 `dsn~trace-test-runner-presentation~1`
 
-The plugin provides a trace test-runner presentation component that maps the structured OpenFastTrace trace result to IntelliJ SM test runner nodes. It creates source-file suites, specification-item tests, and incoming or outgoing trace-link sub-tests; derives labels and pass/fail status from the OpenFastTrace trace status; and connects node navigation to the existing OpenFastTrace trace navigation support.
+The plugin provides a trace test-runner presentation component that maps the structured OpenFastTrace trace result to IntelliJ SM test runner nodes. It creates project-local source-file suites, sorted specification-item tests, and incoming or outgoing trace-link sub-tests; derives title-aware labels, Unicode direction markers, pass/fail status, status roll-up, and defect details from the OpenFastTrace trace status; and connects node navigation to the existing OpenFastTrace trace navigation support.
 
 Covers:
 - `scn~show-trace-source-files-as-test-runner-suites~1`
 - `scn~show-trace-specification-items-as-test-runner-tests~1`
+- `scn~show-specification-item-title-in-test-runner-ui~1`
+- `scn~sort-specification-items-in-test-runner-ui~1`
 - `scn~show-trace-links-as-test-runner-sub-tests~1`
 - `scn~show-specification-item-status-in-test-runner-ui~1`
 - `scn~show-trace-link-status-in-test-runner-ui~1`
 - `scn~show-trace-link-direction-in-test-runner-ui~1`
+- `scn~show-unicode-trace-link-direction-in-test-runner-ui~1`
 - `scn~map-specification-item-trace-status-to-test-runner-status~1`
 - `scn~map-trace-link-status-to-test-runner-status~1`
+- `scn~roll-up-source-file-suite-trace-status~1`
+- `scn~roll-up-top-level-trace-status~1`
+- `scn~show-specification-item-defect-details-in-test-runner-ui~1`
+- `scn~show-trace-link-defect-details-in-test-runner-ui~1`
 - `scn~navigate-from-test-runner-specification-items~1`
 - `scn~navigate-from-test-runner-trace-links~1`
 

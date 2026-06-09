@@ -53,11 +53,15 @@ Keep presentation selection at the run-configuration layer. The global `Trace Pr
 - [x] Update `doc/system_requirements.md` with a user requirement for selecting the trace result view in an `OpenFastTrace` run configuration.
 - [x] Add system scenarios for showing trace results in the test runner by source file, specification item, and trace link.
 - [x] Add system scenarios for test-runner pass/fail mapping, bracketed status labels, incoming/outgoing link markers, and navigation from result nodes to source.
+- [x] Add system requirements and scenarios for source-file suite roll-up, top-level trace roll-up, Unicode direction arrows, and node defect details.
+- [x] Add system requirements and scenarios for title-prefixed specification item labels and deterministic per-file item ordering.
 - [x] Keep the existing plain text trace-output requirements and scenarios valid for the global `Trace Project` action and default run-configuration behavior.
 - [x] Stop and ask user for a review of the system requirements.
 - [x] Update `doc/design/solution_strategy.md` to document reuse of IntelliJ's SM test runner infrastructure for structured trace result presentation.
 - [x] Update `doc/design/building_block_view.md` with a test-runner trace presentation building block and the run-configuration result-view option.
 - [x] Update `doc/design/runtime_view.md` with design items for presenter selection, test-runner hierarchy construction, status mapping, and navigation.
+- [x] Update the design with suite roll-up behavior, Unicode direction markers, and static trace-link defect detail templates.
+- [x] Update the design with title-aware item labels and source-file suite item ordering.
 - [x] Stop and ask user for a review of the design.
 
 ### Implementation
@@ -72,6 +76,10 @@ Keep presentation selection at the run-configuration layer. The global `Trace Pr
 - [x] Implement status-label derivation for specification items and links from OpenFastTrace trace data.
 - [x] Implement pass/fail mapping for clean and defective specification items and links.
 - [x] Implement `OftTraceTestRunnerOutputPresenter` using `SMTRunnerConsoleView` and `SMTestProxy`.
+- [x] Roll failed descendants up to source-file suites and the top-level trace suite.
+- [x] Replace ASCII trace-link direction markers with Unicode arrows.
+- [x] Add clear failed-node details for specification items and trace links, using static templates for link-status explanations.
+- [x] Display specification item titles before IDs when available and sort item entries per source file by artifact type, ID name, and revision.
 - [x] Connect test-runner node navigation through `OftTraceNavigationResolver`.
 - [x] Present invalid input, cancellation, and unexpected errors coherently when the test-runner output mode is selected.
 - [x] Preserve existing ANSI-colored plain text output and console hyperlink behavior.
@@ -84,6 +92,8 @@ Keep presentation selection at the run-configuration layer. The global `Trace Pr
 - [x] Add `OftTraceResult` and `OftTraceService` tests proving structured `Trace` data is retained for clean and defective runs and absent for invalid-input, cancelled, and unexpected-error results.
 - [x] Add focused mapper tests for source-file grouping, specification-item nodes, incoming/outgoing link nodes, bracketed status labels, and pass/fail status.
 - [x] Add presenter tests for `SMTRunnerConsoleView` creation and event emission for successful and defective traces.
+- [x] Add mapper and presenter tests for suite roll-up, top-level roll-up, Unicode arrows, and failed-node details.
+- [x] Add mapper and presenter tests for title-prefixed item labels and per-file item ordering.
 - [x] Add run-profile tests proving plain text output remains the default and test-runner output is selected only when configured.
 - [x] Add navigation tests proving test-runner nodes navigate to specification declarations and source-side coverage tags through `OftTraceNavigationResolver`.
 - [x] Keep existing trace action, trace service, console presenter, run-configuration, and navigation tests green.
