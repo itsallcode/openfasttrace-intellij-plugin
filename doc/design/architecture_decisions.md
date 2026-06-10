@@ -51,12 +51,48 @@ Needs: bld
 
 Tags: Build, Gradle
 
+### How Does The Build Render Marketplace Change Notes?
+
+The project needs readable source release notes and HTML change notes in the patched plugin descriptor. The conversion must be reliable enough for release automation while keeping the Gradle build script maintainable.
+
+This decision is architecture-relevant because it impacts:
+
+* build-tool prerequisites for local and CI packaging
+* long-term maintenance cost of release metadata generation
+* consistency between the maintained Markdown changelog and bundled descriptor
+  HTML
+
+We considered the following alternatives:
+
+1. Custom Markdown-to-HTML converter in the Gradle build script.
+
+   This avoids a separate executable dependency, but it makes the build own Markdown parsing behavior and grows custom logic for a format that already
+   has mature tooling.
+
+1. Use Pandoc as a build-time executable for Markdown-to-HTML rendering.
+
+   This keeps the source release notes in Markdown and delegates conversion to a maintained document conversion tool. The tradeoff is an explicit packaging prerequisite in local release environments and CI.
+
+#### Marketplace Change Notes Use Pandoc
+`dsn~marketplace-change-notes-use-pandoc~1`
+
+The Gradle build renders the active Markdown release notes to plugin descriptor HTML with Pandoc during descriptor patching and plugin packaging.
+
+Rationale:
+
+Pandoc reduces project-specific build logic and avoids maintaining a partial Markdown renderer in `build.gradle.kts`. The executable is a build-time tool only; it does not add a plugin runtime dependency.
+
+Comment:
+
+Local builds resolve `pandoc` from `PATH` by default and can use the `PANDOC` environment variable to point to a custom executable location. CI and release jobs install Pandoc before running Gradle packaging tasks.
+
+Needs: bld
+
+Tags: Build, Marketplace, Pandoc
+
 ### How Does the Project Keep Gradle Dependency Metadata Predictable?
 
-The project needs predictable Gradle dependency resolution for static analysis
-and reproducible local and CI builds. It also needs a lightweight way to check
-whether newer dependency, build-plugin, or Gradle versions are available without
-making ordinary builds fail when an update exists.
+The project needs predictable Gradle dependency resolution for static analysis and reproducible local and CI builds. It also needs a lightweight way to check whether newer dependency, build-plugin, or Gradle versions are available without making ordinary builds fail when an update exists.
 
 This decision is architecture-relevant because it impacts:
 
@@ -69,41 +105,29 @@ We considered the following alternatives:
 
 1. Use Gradle dependency verification metadata only.
 
-   This would verify artifact integrity, but it would require reviewing and
-   maintaining checksums for each resolved artifact. The project explicitly does
-   not want that review burden at this stage.
+   This would verify artifact integrity, but it would require reviewing and maintaining checksums for each resolved artifact. The project explicitly does not want that review burden at this stage.
 
-1. Use Gradle dependency locking and a custom version-check task.
+2. Use Gradle dependency locking and a custom version-check task.
 
-   This would keep the dependency set predictable, but a custom version-check
-   task would add project-specific Gradle logic for behavior that already has a
-   maintained plugin solution.
+   This would keep the dependency set predictable, but a custom version-check task would add project-specific Gradle logic for behavior that already has a maintained plugin solution.
 
-1. Use Gradle dependency locking and the Gradle Versions Plugin.
+3. Use Gradle dependency locking and the Gradle Versions Plugin.
 
-   This keeps normal dependency resolution locked through Gradle's built-in
-   mechanism and delegates update discovery to a maintained build plugin that
+   This keeps normal dependency resolution locked through Gradle's built-in mechanism and delegates update discovery to a maintained build plugin that
    can be run on demand by maintainers.
 
 #### Gradle Dependency Maintenance Uses Locks And Versions Plugin
 `dsn~gradle-dependency-maintenance-uses-locks-and-versions-plugin~1`
 
-The Gradle build uses dependency locking for predictable dependency resolution
-and the Gradle Versions Plugin for on-demand dependency, build-plugin, and
-Gradle wrapper update reports.
+The Gradle build uses dependency locking for predictable dependency resolution and the Gradle Versions Plugin for on-demand dependency, build-plugin, and Gradle wrapper update reports.
 
 Rationale:
 
-Gradle dependency locking satisfies the need for stable resolved dependency
-versions without enabling full dependency verification metadata. The Gradle
-Versions Plugin is an approved build-only dependency for GH-45 and avoids
-custom version-check logic in the build script.
+Gradle dependency locking satisfies the need for stable resolved dependency versions without enabling full dependency verification metadata. The Gradle Versions Plugin is an approved build-only dependency for GH-45 and avoids custom version-check logic in the build script.
 
 Comment:
 
-The version-check task is informational and stays outside the standard `check`
-lifecycle. Available updates change over time, so update discovery must not
-make normal local or CI builds unstable.
+The version-check task is informational and stays outside the standard `check` lifecycle. Available updates change over time, so update discovery must not make normal local or CI builds unstable.
 
 Needs: bld
 
@@ -125,11 +149,11 @@ We considered the following alternatives:
 
    This preserves immediate feedback, but OSS Index quota, authentication, and service availability issues can block development without revealing anything about the project's dependency security state.
 
-1. Keep OSS Index in the build but make audit failures non-fatal.
+2. Keep OSS Index in the build but make audit failures non-fatal.
 
    This avoids blocked builds, but it keeps a fragile build integration without a strict enforcement benefit.
 
-1. Remove OSS Index from the Gradle build and rely on GitHub Dependabot alerts.
+3. Remove OSS Index from the Gradle build and rely on GitHub Dependabot alerts.
 
    This removes the immediate build-time vulnerability gate, but it keeps vulnerability monitoring in GitHub without making every build depend on OSS Index availability.
 

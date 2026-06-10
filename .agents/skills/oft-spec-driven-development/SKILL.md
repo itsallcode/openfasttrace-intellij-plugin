@@ -187,11 +187,33 @@ Out of scope:
 - [ ] Decide if and which part of the version needs to be incremented. Use semantic versioning rules (breaking change updates major, feature updates minor, documentation, fixes and refactoring update fix number)
 - [ ] Raise the version to <semantic-version> (this is a <type-of-release> release)
 - [ ] Write the changelog entry for <semantic-version>
+- [ ] Determine the bundled OpenFastTrace library version from the Gradle dependency metadata
+- [ ] Write the bundled OpenFastTrace version into the fixed changelog location for <semantic-version>
 - [ ] Update release date to today
 - [ ] Ensure that issue list contains the GitHub issue number and title
 ```
 
 Keep verification items concrete. Do not leave them as generic "run tests" placeholders when the quality requirements demand more specific checks.
+
+## Changelog Rules
+
+Every release changelog must state the OpenFastTrace library version bundled
+with the plugin. Determine it from the resolved Gradle dependency for
+`org.itsallcode.openfasttrace:openfasttrace`, not from memory.
+
+Always write it in the same place: immediately after the release summary text
+and before the first issue-category section such as `## Features`,
+`## Documentation`, or `## Build Maintenance`. Use the heading
+`## Bundled OpenFastTrace` and the content `OpenFastTrace <version>`.
+
+When plugin descriptor metadata is in scope, prefer copying this changelog
+section into plugin `changeNotes`, because JetBrains displays change notes in
+Marketplace and in the Plugins settings dialog. Keep source release notes in
+Markdown; if plugin `changeNotes` require HTML, render the active release note
+to generated HTML with Pandoc during the build instead of storing the source
+changelog as HTML. Use the plugin `description` only if the maintainers want the bundled
+OpenFastTrace version visible as longer-lived installed-plugin overview text
+independent of the current release notes.
 
 ## Issue Intake Rules
 

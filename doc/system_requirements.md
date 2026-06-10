@@ -520,6 +520,17 @@ JetBrains plugin surfaces use packaged plugin logo resources to distinguish plug
 
 Needs: scn
 
+### Marketplace Metadata for JetBrains Plugin Surfaces
+`req~marketplace-metadata-for-jetbrains-plugin-surfaces~1`
+
+The plugin distribution includes Marketplace-facing descriptor metadata that IntelliJ Platform IDEs and JetBrains Marketplace can display for the plugin. Developers and other OpenFastTrace users can understand the plugin purpose, maintained project links, vendor identity, compatible IDE baseline, and current release notes before installing or updating the plugin.
+
+Rationale:
+
+JetBrains plugin surfaces extract key listing information from the packaged plugin descriptor. Clear and maintained metadata helps users judge whether the plugin fits their OpenFastTrace workflow without changing plugin runtime behavior.
+
+Needs: scn
+
 ### Run Configuration Presentation
 
 The following requirements refine how OpenFastTrace run configurations appear in the IDE run/debug UI.
@@ -1435,6 +1446,18 @@ Needs: dsn
 
 Covers:
 - `req~plugin-logo-for-jetbrains-plugin-surfaces~1`
+
+Needs: dsn
+
+### Show Marketplace Metadata in JetBrains Plugin Surfaces
+`scn~show-marketplace-metadata-in-jetbrains-plugin-surfaces~1`
+
+**Given** a maintainer builds the OpenFastTrace plugin distribution with the project Gradle build
+**When** an IntelliJ Platform IDE displays the built plugin in `Settings | Plugins`, or JetBrains Marketplace displays the plugin after publication
+**Then** the surface can display maintained Marketplace-facing plugin metadata from the packaged plugin descriptor
+
+Covers:
+- `req~marketplace-metadata-for-jetbrains-plugin-surfaces~1`
 
 Needs: dsn
 
