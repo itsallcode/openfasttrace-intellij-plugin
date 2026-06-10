@@ -111,7 +111,8 @@ To understand product intent and implementation scope, start with:
 * [Design](doc/design.md)
 * [Change Log](doc/changes/changelog.md)
 
-To run the automated checks for the trace action and the project trace itself:
+To run the local pre-release checks, including automated tests and IntelliJ
+Plugin Verifier compatibility checks:
 
 ```sh
 ./gradlew check verifyPlugin
