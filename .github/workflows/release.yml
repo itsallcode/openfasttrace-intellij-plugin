@@ -46,8 +46,8 @@ jobs:
       - name: Trace requirements
         run: ./gradlew --warning-mode=all traceRequirements
 
-      - name: Build plugin distribution
-        run: ./gradlew --stacktrace --warning-mode=all clean check buildPlugin -x traceRequirements
+      - name: Build and verify plugin distribution
+        run: ./gradlew --stacktrace --warning-mode=all clean check buildPlugin verifyPlugin -x traceRequirements
 
       - name: Create GitHub release
         run: ./.github/workflows/github_release.sh

@@ -6,6 +6,8 @@ The plugin description now focuses on the everyday OpenFastTrace workflows in Je
 
 The packaged plugin descriptor also carries the project website, `itsallcode.org` vendor metadata, compatibility baseline, and change notes rendered from the active release notes.
 
+The release workflow now verifies the packaged plugin with IntelliJ Plugin Verifier before creating the GitHub release artifact.
+
 ## Bundled OpenFastTrace
 
 OpenFastTrace 4.5.0
@@ -13,3 +15,7 @@ OpenFastTrace 4.5.0
 ## Documentation
 
 * #51: Complete Marketplace-facing plugin metadata
+
+## Build Maintenance
+
+* #49: Run plugin verification in the release workflow
