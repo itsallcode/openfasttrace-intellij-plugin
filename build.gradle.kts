@@ -1,61 +1,23 @@
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.api.tasks.Exec
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
-
-fun isNonStableVersion(version: String): Boolean {
-    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
-    val stableVersion = "^[0-9,.v-]+(-r)?$".toRegex().matches(version)
-    return !stableKeyword && !stableVersion
-}
 
 // [bld->dsn~plugin-build-uses-intellij-platform-gradle-plugin~1]
 plugins {
     id("java")
     id("jacoco")
-    id("com.github.ben-manes.versions") version "0.54.0"
-    id("com.diffplug.spotless") version "8.6.0"
-    id("org.itsallcode.openfasttrace") version "3.1.2"
-    id("org.jetbrains.intellij.platform") version "2.16.0"
-    id("org.sonarqube") version "7.3.1.8318"
+    id("com.diffplug.spotless") version "8.4.0"
+    id("org.itsallcode.openfasttrace") version "3.1.1"
+    id("org.jetbrains.intellij.platform") version "2.15.0"
+    id("org.sonarqube") version "7.2.3.7755"
+    id("org.sonatype.gradle.plugins.scan") version "3.1.5"
 }
 
-val pluginVersion = providers.gradleProperty("version")
-val marketplaceDescription = providers.fileContents(
-    layout.projectDirectory.file("doc/marketplace/description.html")
-).asText
-val activeReleaseNotes = layout.projectDirectory.file("doc/changes/changes_${pluginVersion.get()}.md")
-val marketplaceChangeNotesFile = layout.buildDirectory.file("generated/marketplace/change-notes-${pluginVersion.get()}.html")
-val pandocExecutable = providers.environmentVariable("PANDOC").orElse("pandoc")
-// [bld->dsn~marketplace-change-notes-use-pandoc~1]
-val renderMarketplaceChangeNotes = tasks.register<Exec>("renderMarketplaceChangeNotes") {
-    description = "Renders the active Markdown release notes to plugin descriptor HTML with Pandoc."
-    group = "build"
-    inputs.file(activeReleaseNotes).withPathSensitivity(PathSensitivity.RELATIVE)
-    outputs.file(marketplaceChangeNotesFile)
-    executable = pandocExecutable.get()
-    args(
-        "--from=markdown-auto_identifiers",
-        "--to=html",
-        "--wrap=none",
-        "--output=${marketplaceChangeNotesFile.get().asFile.absolutePath}",
-        activeReleaseNotes.asFile.absolutePath
-    )
-    doFirst {
-        outputs.files.singleFile.parentFile.mkdirs()
-    }
-}
-val marketplaceChangeNotes = providers.fileContents(
-    marketplaceChangeNotesFile
-).asText
-
-group = "org.itsallcode.openfasttrace"
-version = pluginVersion.get()
+group = providers.gradleProperty("group").get()
+version = providers.gradleProperty("version").get()
 
 java {
     toolchain {
@@ -65,11 +27,6 @@ java {
 
 jacoco {
     toolVersion = "0.8.13"
-}
-
-// [bld->dsn~gradle-dependency-maintenance-uses-locks-and-versions-plugin~1]
-dependencyLocking {
-    lockAllConfigurations()
 }
 
 sonar {
@@ -83,14 +40,31 @@ sonar {
     }
 }
 
+val ossIndexUsername = providers.gradleProperty("ossIndexUsername")
+    .orElse(providers.environmentVariable("OSSINDEX_USERNAME"))
+    .orNull
+val ossIndexToken = providers.gradleProperty("ossIndexToken")
+    .orElse(providers.environmentVariable("OSSINDEX_TOKEN"))
+    .orNull
+
+ossIndexAudit {
+    ossIndexUsername?.let { username = it }
+    ossIndexToken?.let { password = it }
+    isUseCache = true
+    isPrintBanner = false
+    isColorEnabled = false
+    isFailOnDetection = true
+}
+
 requirementTracing {
     failBuild = true
     inputDirectories = files("doc", "src/main/java", "src/test/java")
     tags {
         tag {
-            paths = fileTree("./").include("build.gradle.kts") as FileCollection?
-            tagArtifactType = "bld"
+            paths = files("build.gradle.kts")
             coveredItemArtifactType = "dsn"
+            tagArtifactType = "bld"
+            coveredItemNamePrefix = ""
         }
     }
 }
@@ -103,44 +77,40 @@ repositories {
 }
 
 dependencies {
-    implementation("org.itsallcode.openfasttrace:openfasttrace:4.5.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace:${providers.gradleProperty("openfasttraceVersion").get()}")
 
     intellijPlatform {
-        intellijIdea("2026.1.3")
+        intellijIdea(providers.gradleProperty("platformVersion"))
         bundledPlugin("com.intellij.java")
         testFramework(TestFrameworkType.Platform)
         pluginVerifier()
         zipSigner()
     }
 
-    testImplementation(platform("org.junit:junit-bom:6.1.0"))
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(platform("org.junit:junit-bom:${providers.gradleProperty("junitBomVersion").get()}"))
+    testImplementation("junit:junit:${providers.gradleProperty("junit4Version").get()}")
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.hamcrest:hamcrest:3.0")
-    testImplementation("org.opentest4j:opentest4j:1.3.0")
+    testImplementation("org.hamcrest:hamcrest:${providers.gradleProperty("hamcrestVersion").get()}")
+    testImplementation("org.opentest4j:opentest4j:${providers.gradleProperty("opentest4jVersion").get()}")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
 }
 
 intellijPlatform {
     buildSearchableOptions = false
 
-    // [bld->dsn~marketplace-plugin-metadata~1]
     pluginConfiguration {
-        id = "org.itsallcode.openfasttrace-intellij-plugin"
-        name = "OpenFastTrace"
-        version = pluginVersion
-        description = marketplaceDescription
-        changeNotes = marketplaceChangeNotes
+        id = providers.gradleProperty("pluginId")
+        name = providers.gradleProperty("pluginName")
+        version = providers.gradleProperty("version")
 
         vendor {
-            name = "itsallcode.org"
-            email = "opensource@itsallcode.org"
-            url = "https://itsallcode.org/"
+            name = providers.gradleProperty("pluginVendor")
+            email = providers.gradleProperty("pluginVendorEmail")
+            url = providers.gradleProperty("pluginVendorUrl")
         }
 
         ideaVersion {
-            sinceBuild = "261"
+            sinceBuild = providers.gradleProperty("platformSinceBuild")
         }
     }
 
@@ -170,21 +140,8 @@ tasks {
         options.encoding = "UTF-8"
     }
 
-    // [bld->dsn~packaged-plugin-logo-assets~1]
     named<Zip>("buildPlugin") {
-        archiveBaseName.set("OpenFastTrace")
-    }
-
-    named("patchPluginXml") {
-        dependsOn(renderMarketplaceChangeNotes)
-    }
-
-    withType<DependencyUpdatesTask>().configureEach {
-        revision = "release"
-        gradleReleaseChannel = "current"
-        rejectVersionIf {
-            isNonStableVersion(candidate.version) && !isNonStableVersion(currentVersion)
-        }
+        archiveBaseName.set(providers.gradleProperty("pluginName"))
     }
 
     test {

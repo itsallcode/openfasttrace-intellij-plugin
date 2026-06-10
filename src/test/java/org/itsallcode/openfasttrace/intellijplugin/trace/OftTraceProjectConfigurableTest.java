@@ -5,8 +5,6 @@ import com.intellij.openapi.project.Project;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 import org.junit.jupiter.api.Assertions;
 
-import javax.swing.JComponent;
-
 public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase {
     @Override
     protected void setUp() throws Exception {
@@ -22,10 +20,10 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
         configurable.reset();
 
         final OftTraceSettingsSnapshot settings = configurableSettings(configurable);
-        assertEquals(OftTraceSettingsSnapshot.DEFAULT.scopeMode(), settings.scopeMode());
-        assertEquals(OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots(), settings.includeSourceRoots());
-        assertEquals(OftTraceSettingsSnapshot.DEFAULT.includeTestRoots(), settings.includeTestRoots());
-        assertEquals(OftTraceSettingsSnapshot.DEFAULT.additionalPathsText(), settings.additionalPathsText());
+        assertEquals(OftTraceScopeMode.WHOLE_PROJECT, settings.scopeMode());
+        assertEquals(true, settings.includeSourceRoots());
+        assertEquals(true, settings.includeTestRoots());
+        assertEquals("doc/", settings.additionalPathsText());
     }
 
     public void testGivenDefaultSettingsWhenResettingConfigurableThenSelectedResourceControlsAreDisabled() {
@@ -45,9 +43,7 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
                 OftTraceScopeMode.SELECTED_RESOURCES,
                 true,
                 false,
-                "doc/\nspec/",
-                "",
-                ""
+                "doc/\nspec/"
         ));
 
         assertTrue(configurable.isModified());
@@ -55,8 +51,8 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
 
         final OftTraceSettingsSnapshot snapshot = OftTraceProjectSettings.getInstance(getProject()).snapshot();
         assertEquals(OftTraceScopeMode.SELECTED_RESOURCES, snapshot.scopeMode());
-        assertTrue(snapshot.includeSourceRoots());
-        assertFalse(snapshot.includeTestRoots());
+        assertEquals(true, snapshot.includeSourceRoots());
+        assertEquals(false, snapshot.includeTestRoots());
         assertEquals("doc/\nspec/", snapshot.additionalPathsText());
     }
 
@@ -67,50 +63,13 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
                 OftTraceScopeMode.SELECTED_RESOURCES,
                 true,
                 true,
-                "/absolute/path",
-                "",
-                ""
+                "/absolute/path"
         ));
 
         final ConfigurationException exception =
                 Assertions.assertThrows(ConfigurationException.class, configurable::apply);
 
         assertTrue(exception.getLocalizedMessage().contains("must be project-relative"));
-    }
-
-    public void testGivenInvalidAdditionalPathWhenApplyingConfigurableThenItRejectsTheSettings() {
-        final OftTraceProjectConfigurable configurable = new OftTraceProjectConfigurable(getProject());
-        configurable.createComponent();
-        component(configurable).setSettings(new OftTraceSettingsSnapshot(
-                OftTraceScopeMode.SELECTED_RESOURCES,
-                true,
-                true,
-                "bad\0path",
-                "",
-                ""
-        ));
-
-        final ConfigurationException exception =
-                Assertions.assertThrows(ConfigurationException.class, configurable::apply);
-
-        assertTrue(exception.getLocalizedMessage().contains("Additional trace path is invalid"));
-    }
-
-    public void testWhenReadingConfigurableMetadataThenItReturnsTheRegisteredName() {
-        final OftTraceProjectConfigurable configurable = new OftTraceProjectConfigurable(getProject());
-
-        assertEquals(OftTraceProjectConfigurable.ID, configurable.getId());
-        assertEquals("OpenFastTrace", configurable.getDisplayName());
-    }
-
-    public void testWhenDisposingConfigurableThenItReleasesTheComponent() {
-        final OftTraceProjectConfigurable configurable = new OftTraceProjectConfigurable(getProject());
-        final JComponent firstComponent = configurable.createComponent();
-
-        configurable.disposeUIResources();
-        final JComponent secondComponent = configurable.createComponent();
-
-        assertNotSame(firstComponent, secondComponent);
     }
 
     // [itest->dsn~show-per-line-validation-for-additional-trace-paths~1]
@@ -122,9 +81,7 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
                 OftTraceScopeMode.SELECTED_RESOURCES,
                 true,
                 true,
-                "doc/\nmissing",
-                "",
-                ""
+                "doc/\nmissing"
         ));
         final OftTraceProjectConfigurable configurable = new OftTraceProjectConfigurable(project);
         configurable.createComponent();
@@ -144,42 +101,6 @@ public class OftTraceProjectConfigurableTest extends AbstractOftPlatformTestCase
         configurable.createComponent();
 
         configurable.reset();
-
-        assertEquals("", component(configurable).resolvedRelativeToText());
-        assertEquals("", component(configurable).validationMessagesText());
-    }
-
-    public void testGivenBlankProjectBasePathWhenShowingSelectedResourceSettingsThenItDoesNotShowValidationRoot() {
-        final Project project = projectProxy(" ", "blank-root-project");
-        final OftTraceProjectConfigurable configurable = new OftTraceProjectConfigurable(project);
-        configurable.createComponent();
-
-        component(configurable).setSettings(new OftTraceSettingsSnapshot(
-                OftTraceScopeMode.SELECTED_RESOURCES,
-                OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots(),
-                OftTraceSettingsSnapshot.DEFAULT.includeTestRoots(),
-                OftTraceSettingsSnapshot.DEFAULT.additionalPathsText(),
-                OftTraceSettingsSnapshot.DEFAULT.artifactTypesText(),
-                OftTraceSettingsSnapshot.DEFAULT.tagsText()
-        ));
-
-        assertEquals("", component(configurable).resolvedRelativeToText());
-        assertEquals("", component(configurable).validationMessagesText());
-    }
-
-    public void testGivenInvalidProjectBasePathWhenShowingSelectedResourceSettingsThenItDoesNotShowValidationRoot() {
-        final Project project = projectProxy("bad\0path", "invalid-root-project");
-        final OftTraceProjectConfigurable configurable = new OftTraceProjectConfigurable(project);
-        configurable.createComponent();
-
-        component(configurable).setSettings(new OftTraceSettingsSnapshot(
-                OftTraceScopeMode.SELECTED_RESOURCES,
-                OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots(),
-                OftTraceSettingsSnapshot.DEFAULT.includeTestRoots(),
-                OftTraceSettingsSnapshot.DEFAULT.additionalPathsText(),
-                OftTraceSettingsSnapshot.DEFAULT.artifactTypesText(),
-                OftTraceSettingsSnapshot.DEFAULT.tagsText()
-        ));
 
         assertEquals("", component(configurable).resolvedRelativeToText());
         assertEquals("", component(configurable).validationMessagesText());

@@ -1,7 +1,5 @@
 # OpenFastTrace IntelliJ Plugin 0.2.1, released 2026-04-28
 
-Code name: Fix for importer detection
-
 ## Summary
 
 This bugfix release restores correct OpenFastTrace importer discovery when a trace is run from inside the IntelliJ plugin runtime.

@@ -1,6 +1,5 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
-import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -10,20 +9,13 @@ import org.jspecify.annotations.NonNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
-public final class OftTraceBackgroundRunner implements OftTraceRunner {
+final class OftTraceBackgroundRunner implements OftTraceRunner {
     private final OftTraceService traceService;
     private final OftTraceOutputPresenter outputPresenter;
-    private final ProcessHandler processHandler;
 
-    public OftTraceBackgroundRunner(
-            final OftTraceService traceService,
-            final OftTraceOutputPresenter outputPresenter,
-            final ProcessHandler processHandler
-    ) {
+    OftTraceBackgroundRunner(final OftTraceService traceService, final OftTraceOutputPresenter outputPresenter) {
         this.traceService = traceService;
         this.outputPresenter = outputPresenter;
-        this.processHandler = processHandler;
     }
 
     // [impl->dsn~run-trace-project-in-background~1]
@@ -61,33 +53,21 @@ public final class OftTraceBackgroundRunner implements OftTraceRunner {
 
         @Override
         public void onSuccess() {
-            try {
-                outputPresenter.show(getProject(), contentTitle, result);
-            } finally {
-                processHandler.detachProcess();
-            }
+            outputPresenter.show(getProject(), contentTitle, result);
         }
 
         @Override
         public void onCancel() {
-            try {
-                outputPresenter.show(getProject(), contentTitle, OftTraceResult.cancelled());
-            } finally {
-                processHandler.detachProcess();
-            }
+            outputPresenter.show(getProject(), contentTitle, OftTraceResult.cancelled());
         }
 
         @Override
         public void onThrowable(final @NonNull Throwable error) {
-            try {
-                if (error instanceof ProcessCanceledException) {
-                    outputPresenter.show(getProject(), contentTitle, OftTraceResult.cancelled());
-                    return;
-                }
-                outputPresenter.show(getProject(), contentTitle, OftTraceResult.error(formatThrowable(error)));
-            } finally {
-                processHandler.detachProcess();
+            if (error instanceof ProcessCanceledException) {
+                outputPresenter.show(getProject(), contentTitle, OftTraceResult.cancelled());
+                return;
             }
+            outputPresenter.show(getProject(), contentTitle, OftTraceResult.error(formatThrowable(error)));
         }
     }
 

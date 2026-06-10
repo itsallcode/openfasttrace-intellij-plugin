@@ -3,7 +3,6 @@ package org.itsallcode.openfasttrace.intellijplugin.trace;
 import org.itsallcode.openfasttrace.core.Oft;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -12,24 +11,22 @@ import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.net.URLClassLoader;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-// [itest->dsn~trace-execution-service~1]
 class OftTraceServiceTest {
     private static final Pattern ANSI_ESCAPE_SEQUENCE = Pattern.compile("\u001B\\[[;\\d]*m");
 
-    // [itest->dsn~show-successful-trace-output-in-ide-output-window~2]
+    // [itest->dsn~show-successful-trace-output-in-ide-output-window~1]
     @Test
     void testGivenCleanTraceInputWhenTracingThenItReturnsSuccessfulPlainTextOutput(@TempDir final Path temporaryDirectory)
             throws IOException {
         writeSuccessfulTraceProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
+                OftTraceInputs.wholeProject(temporaryDirectory),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
@@ -44,9 +41,7 @@ class OftTraceServiceTest {
                 ),
                 () -> assertThat(result.output(), Matchers.containsString("\u001B[")),
                 () -> assertThat(renderedOutput, Matchers.containsString("ok -")),
-                () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("not ok"))),
-                // [itest->dsn~trace-test-runner-presentation~1]
-                () -> assertThat(result.trace().isPresent(), is(true))
+                () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("not ok")))
         );
     }
 
@@ -63,7 +58,7 @@ class OftTraceServiceTest {
             currentThread.setContextClassLoader(foreignClassLoader);
 
             final OftTraceResult result = new OftTraceService().traceProject(
-                    OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
+                    OftTraceInputs.wholeProject(temporaryDirectory),
                     OftTraceProgress.NONE
             );
             final String renderedOutput = stripAnsi(result.output());
@@ -86,7 +81,7 @@ class OftTraceServiceTest {
         writeFailingTraceProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
+                OftTraceInputs.wholeProject(temporaryDirectory),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
@@ -101,9 +96,7 @@ class OftTraceServiceTest {
                 ),
                 () -> assertThat(renderedOutput, Matchers.containsString("not ok")),
                 () -> assertThat(renderedOutput, Matchers.containsString("req~trace_output_requirement~1")),
-                () -> assertThat(result.output(), Matchers.containsString("\u001B[")),
-                // [itest->dsn~trace-test-runner-presentation~1]
-                () -> assertThat(result.trace().isPresent(), is(true))
+                () -> assertThat(result.output(), Matchers.containsString("\u001B["))
         );
     }
 
@@ -116,7 +109,7 @@ class OftTraceServiceTest {
         writeSuccessfulTraceProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
+                OftTraceInputs.wholeProject(temporaryDirectory),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
@@ -143,7 +136,7 @@ class OftTraceServiceTest {
         writeUncleanTraceChainProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
+                OftTraceInputs.wholeProject(temporaryDirectory),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
@@ -176,7 +169,7 @@ class OftTraceServiceTest {
         };
 
         final OftTraceResult result = new OftTraceService(oft, renderer).traceProject(
-                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
+                OftTraceInputs.wholeProject(temporaryDirectory),
                 OftTraceProgress.NONE
         );
 
@@ -184,77 +177,8 @@ class OftTraceServiceTest {
                 () -> assertThat(result.isSuccessful(), is(false)),
                 () -> assertThat(result.statusMessage(), is("OpenFastTrace trace failed unexpectedly.")),
                 () -> assertThat(result.output(), Matchers.containsString("OpenFastTrace trace failed for input path")),
-                () -> assertThat(result.output(), Matchers.containsString("IllegalStateException: boom")),
-                // [itest->dsn~trace-test-runner-presentation~1]
-                () -> assertThat(result.trace().isEmpty(), is(true))
+                () -> assertThat(result.output(), Matchers.containsString("IllegalStateException: boom"))
         );
-    }
-
-    // [itest->dsn~filter-trace-by-artifact-types-and-tags~1]
-    @Test
-    void testGivenArtifactTypeFilterMatchingRequirementWhenTracingThenItIncludesTheRequirement(
-            @TempDir final Path temporaryDirectory
-    ) throws IOException {
-        writeSuccessfulTraceProject(temporaryDirectory);
-
-        final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.selectedResources(
-                        java.util.List.of(temporaryDirectory),
-                        java.util.List.of("feat", "req"),
-                        java.util.List.of()
-                ),
-                OftTraceProgress.NONE
-        );
-        final String renderedOutput = stripAnsi(result.output());
-        System.out.println(renderedOutput);
-        Assertions.assertAll(
-                () -> assertThat(result.isSuccessful(), is(true)),
-                () -> assertThat(renderedOutput, Matchers.containsString("ok - 2 total"))
-        );
-    }
-
-    @Disabled("Reanable after https://github.com/itsallcode/openfasttrace/issues/505 is fixed")
-    @Test
-    void testGivenTagFilterMatchingArtifactWhenTracingThenItIncludesTheArtifact(
-            @TempDir final Path temporaryDirectory
-    ) throws IOException {
-        final Path docDirectory = Files.createDirectories(temporaryDirectory.resolve("doc"));
-        Files.writeString(
-                docDirectory.resolve("tags.md"),
-                """
-                ### Tagged Requirement
-                `req~tagged_requirement~1`
-                
-                Tags: tagged
-                
-                Needs: impl
-                
-                ### Untagged Requirement
-                `req~untagged_requirement~1`
-                
-                Needs: impl
-                
-                ### Tagged Coverage
-                `impl~tagged_coverage~1`
-                
-                Covers:
-                - `req~tagged_requirement~1`
-                
-                Tags: tagged
-                """
-        );
-
-        final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.selectedResources(
-                        java.util.List.of(temporaryDirectory),
-                        java.util.List.of(),
-                        java.util.List.of("tagged")
-                ),
-                OftTraceProgress.NONE
-        );
-        final String renderedOutput = stripAnsi(result.output());
-
-        assertThat(renderedOutput, Matchers.containsString("ok - 2 total"));
     }
 
     private String stripAnsi(final String output) {
@@ -273,7 +197,7 @@ class OftTraceServiceTest {
         final Path docDirectory = temporaryDirectory.resolve("doc");
         final Path sourceDirectory = temporaryDirectory.resolve("src");
         final OftTraceResult result = new OftTraceService().traceProject(
-                OftTraceInputs.selectedResources(java.util.List.of(docDirectory, sourceDirectory), java.util.List.of(), java.util.List.of()),
+                OftTraceInputs.selectedResources(java.util.List.of(docDirectory, sourceDirectory)),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());

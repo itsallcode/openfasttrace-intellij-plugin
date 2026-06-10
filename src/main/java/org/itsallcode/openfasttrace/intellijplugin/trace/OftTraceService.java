@@ -3,7 +3,6 @@ package org.itsallcode.openfasttrace.intellijplugin.trace;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import org.itsallcode.openfasttrace.api.ColorScheme;
 import org.itsallcode.openfasttrace.api.DetailsSectionDisplay;
-import org.itsallcode.openfasttrace.api.FilterSettings;
 import org.itsallcode.openfasttrace.api.ReportSettings;
 import org.itsallcode.openfasttrace.api.core.LinkedSpecificationItem;
 import org.itsallcode.openfasttrace.api.core.SpecificationItem;
@@ -15,22 +14,18 @@ import org.itsallcode.openfasttrace.core.Oft;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-public final class OftTraceService {
-    @SuppressWarnings("java:S3032")
-    // OFT ServiceLoader discovery must use the plugin class loader, not an arbitrary caller context loader.
+final class OftTraceService {
     private static final ClassLoader PLUGIN_CLASS_LOADER = OftTraceService.class.getClassLoader();
 
     private final Oft oft;
     private final OftTraceReportRenderer reportRenderer;
 
     // [impl->dsn~trace-execution-service~1]
-    public OftTraceService() {
+    OftTraceService() {
         this(Oft.create(), new OftPlainTextTraceReportRenderer());
     }
 
@@ -39,20 +34,15 @@ public final class OftTraceService {
         this.reportRenderer = reportRenderer;
     }
 
-    // [impl->dsn~show-successful-trace-output-in-ide-output-window~2]
+    // [impl->dsn~show-successful-trace-output-in-ide-output-window~1]
     // [impl->dsn~show-scanned-base-directory-in-trace-output-window~1]
     // [impl->dsn~show-failing-trace-output-in-ide-output-window~1]
     // [impl->dsn~preserve-defect-count-for-unclean-trace-chain-in-output-window~1]
-    // [impl->dsn~filter-trace-by-artifact-types-and-tags~1]
-    public OftTraceResult traceProject(final OftTraceInputs inputs, final OftTraceProgress progress) {
+    OftTraceResult traceProject(final OftTraceInputs inputs, final OftTraceProgress progress) {
         try {
             progress.phase("Importing OpenFastTrace items...", 0.15D);
             progress.checkCanceled();
-            final FilterSettings filterSettings = FilterSettings.builder()
-                    .artifactTypes(Set.copyOf(inputs.artifactTypes()))
-                    .tags(Set.copyOf(inputs.tags()))
-                    .build();
-            final List<SpecificationItem> items = importItems(inputs.inputPaths(), filterSettings);
+            final List<SpecificationItem> items = importItems(inputs);
 
             progress.phase("Linking OpenFastTrace items...", 0.4D);
             progress.checkCanceled();
@@ -66,7 +56,7 @@ public final class OftTraceService {
             progress.checkCanceled();
             final String output = buildTraceOutput(inputs, trace);
             progress.phase("Finished OpenFastTrace trace.", 1.0D);
-            return trace.hasNoDefects() ? OftTraceResult.success(output, trace) : OftTraceResult.failure(output, trace);
+            return trace.hasNoDefects() ? OftTraceResult.success(output) : OftTraceResult.failure(output);
         } catch (final ProcessCanceledException exception) {
             throw exception;
         } catch (final RuntimeException exception) {
@@ -74,11 +64,9 @@ public final class OftTraceService {
         }
     }
 
-
-    private List<SpecificationItem> importItems(final List<Path> inputs, final FilterSettings filterSettings) {
+    private List<SpecificationItem> importItems(final OftTraceInputs inputs) {
         final ImportSettings settings = ImportSettings.builder()
-                .addInputs(inputs)
-                .filter(filterSettings)
+                .addInputs(inputs.inputPaths())
                 .build();
         return runWithPluginClassLoader(() -> oft.importItems(settings));
     }
@@ -87,7 +75,7 @@ public final class OftTraceService {
         return buildInputHeader(inputs) + renderTrace(trace);
     }
 
-    private static String buildInputHeader(final OftTraceInputs inputs) {
+    private String buildInputHeader(final OftTraceInputs inputs) {
         if (inputs.isWholeProject()) {
             return "Scanning base directory: " + inputs.inputPaths().getFirst().toAbsolutePath().normalize()
                     + System.lineSeparator()

@@ -39,7 +39,7 @@ When the user gives you a new issue link, derive the work plan from:
 4. the quality requirements document
 5. the current code and tests
 
-Do not jump straight to code. First, determine whether the issue changes:
+Do not jump straight to code. First determine whether the issue changes:
 
 - user-visible behavior
 - traced requirements or scenarios
@@ -95,7 +95,6 @@ Use that mapping to decide what must change:
 - If architecture or technical behavior changes, update or add `dsn` items and relevant arc42 design sections.
 - If a lower layer adds no new information, prefer OFT forwarding instead of redundant new items.
 - Ensure each runtime design item covers only one scenario unless forwarding is the better fit.
-- When you semantically change an existing requirement, increase the requirement revision number.
 
 ### 4. Treat Quality Requirements As Non-Negotiable
 
@@ -158,14 +157,10 @@ Out of scope:
 
 ## Task List
 
-- [ ] Create and checkout a new Git branch `<issue-type>/<issue-number>-<issue-title-lower-kebab-case>`
-
 ### Requirements And Design
 
-- [ ] <system requirements update>
-- [ ] Stop and ask user for a review of the system requirements
+- [ ] <requirements update>
 - [ ] <design update>
-- [ ] Stop and ask user for a review of the design
 
 ### Implementation
 
@@ -176,44 +171,9 @@ Out of scope:
 - [ ] <tests derived from quality requirements>
 - [ ] Keep the OpenFastTrace trace clean
 - [ ] Keep required build and plugin verification tasks green
-
-### Update user documentation
-
-- [ ] Update the end user documentation in README.md
-
-## Version and Changelog Update
-
-- [ ] Check if the current version mentioned in the build scripts and code parameters is the same as the latest GitHub release.
-- [ ] Decide if and which part of the version needs to be incremented. Use semantic versioning rules (breaking change updates major, feature updates minor, documentation, fixes and refactoring update fix number)
-- [ ] Raise the version to <semantic-version> (this is a <type-of-release> release)
-- [ ] Write the changelog entry for <semantic-version>
-- [ ] Determine the bundled OpenFastTrace library version from the Gradle dependency metadata
-- [ ] Write the bundled OpenFastTrace version into the fixed changelog location for <semantic-version>
-- [ ] Update release date to today
-- [ ] Ensure that issue list contains the GitHub issue number and title
 ```
 
 Keep verification items concrete. Do not leave them as generic "run tests" placeholders when the quality requirements demand more specific checks.
-
-## Changelog Rules
-
-Every release changelog must state the OpenFastTrace library version bundled
-with the plugin. Determine it from the resolved Gradle dependency for
-`org.itsallcode.openfasttrace:openfasttrace`, not from memory.
-
-Always write it in the same place: immediately after the release summary text
-and before the first issue-category section such as `## Features`,
-`## Documentation`, or `## Build Maintenance`. Use the heading
-`## Bundled OpenFastTrace` and the content `OpenFastTrace <version>`.
-
-When plugin descriptor metadata is in scope, prefer copying this changelog
-section into plugin `changeNotes`, because JetBrains displays change notes in
-Marketplace and in the Plugins settings dialog. Keep source release notes in
-Markdown; if plugin `changeNotes` require HTML, render the active release note
-to generated HTML with Pandoc during the build instead of storing the source
-changelog as HTML. Use the plugin `description` only if the maintainers want the bundled
-OpenFastTrace version visible as longer-lived installed-plugin overview text
-independent of the current release notes.
 
 ## Issue Intake Rules
 

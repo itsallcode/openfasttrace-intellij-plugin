@@ -1,122 +1,15 @@
-<idea-plugin url="https://github.com/itsallcode/openfasttrace-intellij-plugin">
+<idea-plugin>
     <depends>com.intellij.modules.platform</depends>
 
+    <description><![CDATA[
+        Authoring support for OpenFastTrace specification documents and coverage tags.
+    ]]></description>
+
     <extensions defaultExtensionNs="com.intellij">
-        <!-- [impl->dsn~live-template-integration~1] -->
-        <!-- [impl->dsn~show-oft-live-templates-in-live-template-settings~1] -->
-        <defaultLiveTemplates file="/liveTemplates/OpenFastTrace.xml"/>
         <fileBasedIndex implementation="org.itsallcode.openfasttrace.intellijplugin.indexing.OftSpecificationIndex"/>
         <gotoSymbolContributor implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftChooseByNameContributor"/>
         <gotoDeclarationHandler implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftGotoDeclarationHandler"/>
         <definitionsScopedSearch implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftDefinitionsScopedSearch"/>
-        <completion.contributor
-                language="Markdown"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="TEXT"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="JAVA"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Shell Script"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Ada"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Batch"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="C"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="C++"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="ObjectiveC"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="C#"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="SQL"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Ini"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Gherkin"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Go"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Groovy"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="JSON"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="XML"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="HTML"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="yaml"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Clojure"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="kotlin"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Scala"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="JavaScript"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="TypeScript"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Lua"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="PHP"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Perl5"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Python"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Robot"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="PlantUML"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="R"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Rust"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="SystemVerilog"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="Swift"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="TOML"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
-        <completion.contributor
-                language="HCL"
-                implementationClass="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationCompletionProvider"/>
         <psi.referenceContributor
                 implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftSpecificationReferenceContributor"/>
         <psi.referenceContributor
@@ -135,7 +28,6 @@
                 id="org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceProjectConfigurable"
                 displayName="OpenFastTrace"
                 nonDefaultProject="true"/>
-        <configurationType implementation="org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationType"/>
     </extensions>
 
     <actions>

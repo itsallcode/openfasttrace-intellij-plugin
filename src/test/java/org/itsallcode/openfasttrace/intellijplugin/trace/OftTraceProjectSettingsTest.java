@@ -15,11 +15,10 @@ public class OftTraceProjectSettingsTest extends AbstractOftPlatformTestCase {
     public void testGivenFreshProjectSettingsWhenReadingThenItReturnsTheDocumentedDefaults() {
         final OftTraceSettingsSnapshot snapshot = OftTraceProjectSettings.getInstance(getProject()).snapshot();
 
-        assertThat(snapshot.scopeMode(), is(OftTraceSettingsSnapshot.DEFAULT.scopeMode()));
-        assertThat(snapshot.includeSourceRoots(), is(OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots()));
-        assertThat(snapshot.includeTestRoots(), is(OftTraceSettingsSnapshot.DEFAULT.includeTestRoots()));
-        assertThat(snapshot.additionalPathsText(), is(OftTraceSettingsSnapshot.DEFAULT.additionalPathsText()));
-        assertThat(snapshot.resultView(), is(OftTraceSettingsSnapshot.DEFAULT.resultView()));
+        assertThat(snapshot.scopeMode(), is(OftTraceScopeMode.WHOLE_PROJECT));
+        assertThat(snapshot.includeSourceRoots(), is(true));
+        assertThat(snapshot.includeTestRoots(), is(true));
+        assertThat(snapshot.additionalPathsText(), is("doc/"));
     }
 
     public void testGivenStoredStateWhenLoadingThenItNormalizesTheSnapshot() {

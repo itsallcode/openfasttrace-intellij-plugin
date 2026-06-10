@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.lang.reflect.Proxy;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,7 +32,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 
-// [itest->dsn~trace-action-integration~2]
 public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
     // [itest->dsn~show-trace-project-action-in-tools-menu~1]
     public void testGivenPluginIsLoadedWhenToolsMenuActionIsQueriedThenTheTraceActionAndGroupAreRegistered() {
@@ -76,14 +74,6 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
         assertThat(presentation.isEnabled(), is(true));
     }
 
-    // [itest->dsn~show-trace-project-in-test-runner-ui-by-default~1]
-    public void testGivenDefaultActionWhenCreatingDefaultPresenterThenItUsesTestRunnerRunContentPresenter() {
-        assertThat(
-                OftTraceProjectAction.createDefaultOutputPresenter(),
-                instanceOf(OftTraceTestRunnerRunContentOutputPresenter.class)
-        );
-    }
-
     // [itest->dsn~disable-trace-project-action-without-open-project~1]
     public void testGivenNoProjectWhenActionUpdatesThenPresentationIsDisabled() {
         final OftTraceProjectAction action = new OftTraceProjectAction();
@@ -101,7 +91,7 @@ public class OftTraceProjectActionTest extends AbstractOftPlatformTestCase {
         final Path projectRoot = createManagedTestArtifactDirectory("trace-project-action-input");
         final Project project = projectProxy(projectRoot.toString(), "valid-project");
         final OftTraceProjectAction action = new OftTraceProjectAction(
-                testProject -> OftTraceInputResolution.valid(OftTraceInputs.wholeProject(projectRoot, List.of(), List.of())),
+                testProject -> OftTraceInputResolution.valid(OftTraceInputs.wholeProject(projectRoot)),
                 (runnerProject, inputs, contentTitle) ->
                         runnerCall.set(new RunnerCall(runnerProject, inputs, contentTitle)),
                 (presentedProject, contentTitle, result) ->

@@ -40,7 +40,7 @@ The likely fault line is the OpenFastTrace library's use of `ServiceLoader` for 
 
 ### Requirements And Design
 
-- [x] Confirm that GH-17 is fully covered by the existing `feat~run-oft-trace~2`, `req~trace-open-project-from-project-root~1`, `req~show-trace-output-in-ide-output-window~2`, and related trace scenarios, so no user-facing requirement changes are needed
+- [x] Confirm that GH-17 is fully covered by the existing `feat~run-oft-trace~1`, `req~trace-open-project-from-project-root~1`, `req~show-trace-output-in-ide-output-window~1`, and related trace scenarios, so no user-facing requirement changes are needed
 - [x] Update the design documentation to record the OFT importer/reporter discovery constraint in the plugin runtime, including that trace execution must use the plugin class loader for `ServiceLoader`-based OFT extension lookup
 - [x] Link the design clarification to the existing trace-execution design items instead of introducing redundant new runtime requirements
 

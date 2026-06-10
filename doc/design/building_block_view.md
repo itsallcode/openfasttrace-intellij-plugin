@@ -11,11 +11,9 @@ skinparam componentStyle rectangle
 package "JetBrains IDE / IntelliJ Platform" {
   component "Editor and PSI\nInfrastructure" as IdeEditor
   component "Symbol Search and\nNavigation Infrastructure" as IdeNavigation
-  component "Live Template\nInfrastructure" as IdeLiveTemplates
   component "Action System" as IdeActions
   component "Background Task and\nProgress Infrastructure" as IdeTasks
   component "Output View and\nRun Content Infrastructure" as IdeOutput
-  component "SM Test Runner\nInfrastructure" as IdeTestRunner
   component "Help Menu and\nWeb View Infrastructure" as IdeHelp
 }
 
@@ -36,13 +34,10 @@ package "OpenFastTrace Plugin" {
   component "Coverage Tag\nSupport" as CoverageSupport
   component "Specification Item\nIndex" as SpecIndex
   component "Specification Item\nNavigation" as NavigationSupport
-  component "Specification Item\nCompletion" as CompletionSupport
-  component "Live Template\nIntegration" as LiveTemplateSupport
   component "Trace Configuration\nIntegration" as TraceConfigurationSupport
   component "Trace Action\nIntegration" as TraceActionSupport
   component "Trace Execution\nService" as TraceExecutionSupport
   component "Trace Output\nPresentation" as TraceOutputSupport
-  component "Trace Test Runner\nPresentation" as TraceTestRunnerSupport
   component "User Guide\nIntegration" as UserGuideSupport
 }
 
@@ -53,23 +48,16 @@ SpecIndex --> OftSyntax
 NavigationSupport --> SpecIndex
 TraceActionSupport --> TraceExecutionSupport
 TraceExecutionSupport --> TraceOutputSupport
-TraceExecutionSupport --> TraceTestRunnerSupport
 
 MarkdownSupport --> IdeEditor
 RstSupport --> IdeEditor
 CoverageSupport --> IdeEditor
 SpecIndex --> IdeEditor
 NavigationSupport --> IdeNavigation
-CompletionSupport --> SpecIndex
-CompletionSupport --> IdeEditor
-LiveTemplateSupport --> IdeLiveTemplates
-LiveTemplateSupport --> IdeEditor
 TraceConfigurationSupport --> IdeActions
 TraceActionSupport --> IdeActions
 TraceExecutionSupport --> IdeTasks
 TraceOutputSupport --> IdeOutput
-TraceTestRunnerSupport --> IdeTestRunner
-TraceTestRunnerSupport --> NavigationSupport
 UserGuideSupport --> IdeHelp
 
 TraceActionSupport --> TraceConfigurationSupport
@@ -179,21 +167,6 @@ Covers:
 
 Needs: impl
 
-### Specification Item Completion
-`dsn~specification-item-completion~1`
-
-The plugin provides a specification-item completion component that activates IntelliJ basic completion for supported OFT reference authoring contexts, reads declared specification item IDs from the project-local declaration index, and presents those IDs in a deterministic order based on full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches. Supported contexts include OFT item references under `Covers:` in supported specification documents, completion requests started from an active live-template placeholder when the placeholder expands inside a `Covers:` entry, and the target side of likely OFT coverage tags in source-code comments for the default file extensions supported by the upstream OpenFastTrace Tag Importer after a left-hand artifact type and arrow.
-
-Covers:
-- `scn~complete-specification-item-id-in-covers-section~1`
-- `scn~complete-specification-item-id-in-active-live-template-covers-field~1`
-- `scn~complete-specification-item-id-in-coverage-tag-target~1`
-- `scn~complete-specification-item-id-in-spaced-coverage-tag-target~1`
-- `scn~complete-specification-item-id-in-incomplete-coverage-tag-target~1`
-- `scn~suppress-coverage-tag-target-completion-outside-target-context~1`
-
-Needs: impl, utest
-
 ### User Guide Integration
 `dsn~user-guide-integration~1`
 
@@ -205,69 +178,38 @@ Covers:
 
 Needs: impl
 
-### Live Template Integration
-`dsn~live-template-integration~1`
-
-The plugin provides a live-template integration component that packages a repository-owned OpenFastTrace live-template XML resource, registers that resource with IntelliJ's default live-template extension point, and keeps the bundled template set aligned with the imported upstream OFT templates plus the plugin-local scenario template. Template variables that represent covered specification item IDs stay editable while the template is active so the specification-item completion component can serve user-invoked completion in those fields.
-
-Covers:
-- `scn~show-oft-live-templates-in-live-template-settings~1`
-- `scn~insert-oft-scenario-live-template~1`
-- `scn~complete-specification-item-id-in-active-live-template-covers-field~1`
-
-Needs: impl
-
-### Plugin Distribution Resources
-`dsn~packaged-plugin-logo-assets~1`
-
-The plugin distribution resources include JetBrains plugin logo SVG assets in the plugin main JAR under `META-INF`. The default logo resource is `META-INF/pluginIcon.svg`; if the default logo is not sufficiently visible on dark backgrounds, the distribution also includes `META-INF/pluginIcon_dark.svg`. The logo assets use a 40x40 SVG size, keep transparent padding around the visible OpenFastTrace branding, and remain recognizable at JetBrains Plugin Manager and Marketplace display sizes.
-
-Covers:
-- `scn~show-plugin-logo-in-jetbrains-plugin-surfaces~1`
-
-Needs: bld, itest
-
-### Marketplace Plugin Metadata
-`dsn~marketplace-plugin-metadata~1`
-
-The plugin distribution metadata is produced into the patched `META-INF/plugin.xml` descriptor during the Gradle build. Build configuration owns Gradle-supported descriptor fields such as plugin name, version, vendor, compatibility baseline, description, and change notes, while the source descriptor owns static fields that the IntelliJ Platform Gradle Plugin does not patch. Description text stays sober and developer-first, and change notes are rendered to HTML with Pandoc from the maintained Markdown release changelog for the active project version.
-
-Covers:
-- `scn~show-marketplace-metadata-in-jetbrains-plugin-surfaces~1`
-
-Needs: bld, itest
-
 ### Trace Configuration Integration
 `dsn~trace-configuration-integration~1`
 
-The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project and through dedicated run configurations. It exposes those settings through project configuration UI and the run configuration editor, resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria, stores the run-configuration result-view selection, treats the IntelliJ Test Runner UI as the result-view default when no selection is stored, and owns the plugin resource used as the OpenFastTrace run-configuration icon.
+The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project, exposes those settings through project configuration UI, and resolves the selected-resource options into a normalized OpenFastTrace input set assembled from IntelliJ source roots, IntelliJ test roots, and additional project-relative paths.
 
 Covers:
-- `scn~test-runner-as-default-run-configuration-result-view~1`
-- `scn~select-plain-text-trace-result-view~1`
-- `scn~select-test-runner-trace-result-view~1`
-- `scn~show-openfasttrace-icon-for-run-configurations~1`
+- `scn~configure-trace-scope-in-project-settings~1`
+- `scn~trace-selected-project-resources~1`
+- `scn~include-intellij-source-directories-in-selected-resource-trace~1`
+- `scn~include-intellij-test-directories-in-selected-resource-trace~1`
+- `scn~add-project-relative-paths-to-selected-resource-trace~1`
+- `scn~show-per-line-validation-for-additional-trace-paths~1`
 
-Needs: impl, itest
+Needs: impl
 
 ### Trace Action Integration
-`dsn~trace-action-integration~2`
+`dsn~trace-action-integration~1`
 
-The plugin provides a trace-action component that contributes an `OpenFastTrace` action group with a `Trace Project` action under the global `Tools` menu. This component is responsible for exposing the entry only in an opened project context and for handing the action invocation to trace-configuration resolution, trace execution, and the default IntelliJ Test Runner UI presentation.
+The plugin provides a trace-action component that contributes an `OpenFastTrace` action group with a `Trace Project` action under the global `Tools` menu. This component is responsible for exposing the entry only in an opened project context and for handing the action invocation to trace-configuration resolution and trace execution.
 
 Covers:
 - `scn~show-trace-project-action-in-tools-menu~1`
 - `scn~disable-trace-project-action-without-open-project~1`
 - `scn~run-trace-project-in-background~1`
-- `scn~show-trace-project-in-test-runner-ui-by-default~1`
 - `scn~reject-trace-project-without-valid-project-path~1`
 
-Needs: impl, itest
+Needs: impl
 
 ### Trace Execution Service
 `dsn~trace-execution-service~1`
 
-The plugin provides a trace-execution service that accepts the effective OpenFastTrace input set resolved for the current project, validates that input set before starting work, invokes the OpenFastTrace library in a background task, supports cancellation through IntelliJ progress infrastructure, and produces a trace result containing the structured OpenFastTrace `Trace`, the rendered text report, and the final success or failure status.
+The plugin provides a trace-execution service that accepts the effective OpenFastTrace input set resolved for the current project, validates that input set before starting work, invokes the OpenFastTrace library in a background task, supports cancellation through IntelliJ progress infrastructure, and captures the textual trace output together with the final success or failure status.
 
 Because OpenFastTrace discovers importers and reporters through Java `ServiceLoader`, this service executes OFT import and report-rendering calls with the plugin class loader as the thread context class loader and restores the previous context loader afterward.
 
@@ -275,11 +217,11 @@ Covers:
 - `scn~run-trace-project-in-background~1`
 - `scn~trace-selected-project-resources~1`
 - `scn~reject-trace-project-without-valid-project-path~1`
-- `scn~show-successful-trace-output-in-ide-output-window~2`
+- `scn~show-successful-trace-output-in-ide-output-window~1`
 - `scn~show-resolved-trace-inputs-in-trace-output-window~1`
 - `scn~show-failing-trace-output-in-ide-output-window~1`
 
-Needs: impl, itest
+Needs: impl
 
 ### Trace Output Presentation
 `dsn~trace-output-presentation~1`
@@ -287,99 +229,8 @@ Needs: impl, itest
 The plugin provides a trace-output presentation component that opens an IDE output sub-window for each trace run, assigns a clear trace-specific content title, renders both successful and failing OpenFastTrace text output through the same IDE-visible flow, and adds declaration hyperlinks for OFT specification item IDs shown in that output when the corresponding items exist in the opened project.
 
 Covers:
-- `scn~show-successful-trace-output-in-ide-output-window~2`
+- `scn~show-successful-trace-output-in-ide-output-window~1`
 - `scn~show-failing-trace-output-in-ide-output-window~1`
 - `scn~open-specification-item-from-trace-output-window~1`
 
-Needs: impl, itest
-
-### Trace Test Runner Presentation
-`dsn~trace-test-runner-presentation~1`
-
-The plugin provides a trace test-runner presentation component that maps the structured OpenFastTrace trace result to IntelliJ SM test runner nodes. It creates project-local source-file suites, sorted specification-item tests, and incoming or outgoing trace-link sub-tests; derives compact title-aware labels, Unicode direction markers, pass/fail status, status roll-up, and item/link details from the OpenFastTrace trace status; and connects source-file, item, and link node navigation to the existing OpenFastTrace trace navigation support.
-
-Covers:
-- `scn~show-trace-source-files-as-test-runner-suites~1`
-- `scn~show-trace-specification-items-as-test-runner-tests~1`
-- `scn~show-specification-item-title-in-test-runner-ui~2`
-- `scn~show-specification-item-id-in-test-runner-details~1`
-- `scn~sort-specification-items-in-test-runner-ui~1`
-- `scn~show-trace-links-as-test-runner-sub-tests~1`
-- `scn~show-specification-item-status-in-test-runner-ui~2`
-- `scn~show-trace-link-status-in-test-runner-ui~2`
-- `scn~show-trace-link-direction-in-test-runner-ui~1`
-- `scn~show-unicode-trace-link-direction-in-test-runner-ui~1`
-- `scn~map-specification-item-trace-status-to-test-runner-status~1`
-- `scn~map-trace-link-status-to-test-runner-status~1`
-- `scn~roll-up-source-file-suite-trace-status~1`
-- `scn~roll-up-top-level-trace-status~1`
-- `scn~show-specification-item-defect-details-in-test-runner-ui~1`
-- `scn~show-trace-link-defect-details-in-test-runner-ui~1`
-- `scn~show-trace-link-id-details-in-test-runner-ui~1`
-- `scn~navigate-from-test-runner-specification-items~1`
-- `scn~navigate-from-test-runner-trace-links~1`
-- `scn~navigate-from-test-runner-source-files~1`
-
-Needs: impl, itest
-
-## GUI Mockups
-
-#### Run Configuration Editor UI Mockup
-
-```plantuml
-@startsalt
-title OFT Trace — Run Configuration Editor
-scale 2
-{+
-  {T
-    + <&folder> OpenFastTrace
-    ++ <&media-skip-forward> Trace All
-    ++ <&media-skip-forward> Trace User Requirements
-    ++ <&media-skip-forward> <b>Trace Design
-  } |
-  {
-    {
-        .
-        Name: | "Trace Design                    "
-        .
-    }
-    {
-        .
-        <b>Trace Scope
-        .
-        ()  Whole project         |  (X) Selected resources
-        .                         | .
-        Include paths             | [X] Source roots
-        .                         | [X] Test roots
-        .                         | .
-        Additional paths          | {SI
-                                     doc/spec/
-
-                                     .
-                                     "                     "
-                                    }
-        .
-      }
-      ---
-      {
-        .
-        <b>Filters      | .
-        .               | .
-        Artifact types: | "dsn, constr               "
-        .               | <i>(comma-separated, empty = all)
-        .               | .
-        Tags:           | "mvp                       "
-        .               | <i>(comma-separated, empty = all)
-        .               | .
-        Result view:    | ()  Plain text output
-        .               | (X) IntelliJ Test Runner UI
-        .               | .
-    }
-
-    {
-      [Apply] | [Run]
-    }
-  }
-}
-@endsalt
-```
+Needs: impl
