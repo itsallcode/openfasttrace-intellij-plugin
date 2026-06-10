@@ -1,9 +1,5 @@
-<idea-plugin>
+<idea-plugin url="https://github.com/itsallcode/openfasttrace-intellij-plugin">
     <depends>com.intellij.modules.platform</depends>
-
-    <description><![CDATA[
-        Authoring support for OpenFastTrace specification documents and coverage tags.
-    ]]></description>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- [impl->dsn~live-template-integration~1] -->

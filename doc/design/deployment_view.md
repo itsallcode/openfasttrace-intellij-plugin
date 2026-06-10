@@ -42,3 +42,5 @@ Network access is not part of the normal processing path. In the MVP, network ac
 ## Packaged Plugin Resources
 
 The plugin distribution includes JetBrains plugin logo SVG assets in the plugin main JAR under `META-INF`. The default logo resource is `META-INF/pluginIcon.svg`; if the default logo is not sufficiently visible on dark backgrounds, the distribution also includes `META-INF/pluginIcon_dark.svg`.
+
+The plugin distribution also contains Marketplace-facing metadata in the patched `META-INF/plugin.xml` descriptor. The Gradle build keeps the descriptor version, vendor, compatibility baseline, description, and Pandoc-rendered change notes aligned with the project metadata and release documentation. Static descriptor fields remain in `src/main/resources/META-INF/plugin.xml` when the IntelliJ Platform Gradle Plugin does not provide a supported patching property for them.

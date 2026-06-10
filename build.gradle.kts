@@ -1,7 +1,9 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.api.tasks.bundling.Zip
+import org.gradle.api.tasks.Exec
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
@@ -24,6 +26,33 @@ plugins {
 }
 
 val pluginVersion = providers.gradleProperty("version")
+val marketplaceDescription = providers.fileContents(
+    layout.projectDirectory.file("doc/marketplace/description.html")
+).asText
+val activeReleaseNotes = layout.projectDirectory.file("doc/changes/changes_${pluginVersion.get()}.md")
+val marketplaceChangeNotesFile = layout.buildDirectory.file("generated/marketplace/change-notes-${pluginVersion.get()}.html")
+val pandocExecutable = providers.environmentVariable("PANDOC").orElse("pandoc")
+// [bld->dsn~marketplace-change-notes-use-pandoc~1]
+val renderMarketplaceChangeNotes = tasks.register<Exec>("renderMarketplaceChangeNotes") {
+    description = "Renders the active Markdown release notes to plugin descriptor HTML with Pandoc."
+    group = "build"
+    inputs.file(activeReleaseNotes).withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.file(marketplaceChangeNotesFile)
+    executable = pandocExecutable.get()
+    args(
+        "--from=markdown-auto_identifiers",
+        "--to=html",
+        "--wrap=none",
+        "--output=${marketplaceChangeNotesFile.get().asFile.absolutePath}",
+        activeReleaseNotes.asFile.absolutePath
+    )
+    doFirst {
+        outputs.files.singleFile.parentFile.mkdirs()
+    }
+}
+val marketplaceChangeNotes = providers.fileContents(
+    marketplaceChangeNotesFile
+).asText
 
 group = "org.itsallcode.openfasttrace"
 version = pluginVersion.get()
@@ -96,13 +125,16 @@ dependencies {
 intellijPlatform {
     buildSearchableOptions = false
 
+    // [bld->dsn~marketplace-plugin-metadata~1]
     pluginConfiguration {
         id = "org.itsallcode.openfasttrace-intellij-plugin"
         name = "OpenFastTrace"
         version = pluginVersion
+        description = marketplaceDescription
+        changeNotes = marketplaceChangeNotes
 
         vendor {
-            name = "Itsallcode.org"
+            name = "itsallcode.org"
             email = "opensource@itsallcode.org"
             url = "https://itsallcode.org/"
         }
@@ -141,6 +173,10 @@ tasks {
     // [bld->dsn~packaged-plugin-logo-assets~1]
     named<Zip>("buildPlugin") {
         archiveBaseName.set("OpenFastTrace")
+    }
+
+    named("patchPluginXml") {
+        dependsOn(renderMarketplaceChangeNotes)
     }
 
     withType<DependencyUpdatesTask>().configureEach {

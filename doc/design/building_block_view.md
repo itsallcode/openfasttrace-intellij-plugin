@@ -227,6 +227,16 @@ Covers:
 
 Needs: bld, itest
 
+### Marketplace Plugin Metadata
+`dsn~marketplace-plugin-metadata~1`
+
+The plugin distribution metadata is produced into the patched `META-INF/plugin.xml` descriptor during the Gradle build. Build configuration owns Gradle-supported descriptor fields such as plugin name, version, vendor, compatibility baseline, description, and change notes, while the source descriptor owns static fields that the IntelliJ Platform Gradle Plugin does not patch. Description text stays sober and developer-first, and change notes are rendered to HTML with Pandoc from the maintained Markdown release changelog for the active project version.
+
+Covers:
+- `scn~show-marketplace-metadata-in-jetbrains-plugin-surfaces~1`
+
+Needs: bld, itest
+
 ### Trace Configuration Integration
 `dsn~trace-configuration-integration~1`
 

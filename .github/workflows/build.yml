@@ -30,6 +30,11 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - name: Install Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes pandoc
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
         with:

@@ -96,6 +96,8 @@ You need a JetBrains IDE based on the IntelliJ Platform (for example, IntelliJ I
 
 ### Development Dependencies
 To build and test from source, use the project’s configured Gradle wrapper and a compatible JDK.
+To package the plugin with generated Marketplace change notes, install Pandoc
+on `PATH` or set `PANDOC` to the executable path.
 
 ## Icon Assets
 
@@ -125,6 +127,10 @@ committed Gradle lock file:
 ```sh
 ./gradlew --write-locks dependencies
 ```
+
+Marketplace-facing descriptor metadata is maintained in
+[doc/marketplace](doc/marketplace), with Pandoc generating change-note HTML
+from the active Markdown entry under [doc/changes](doc/changes/changelog.md).
 
 Example OFT files for manual testing are available under `examples/` in this project.
 For a guided live demonstration, use the script in [doc/demo/plugin-demo.md](doc/demo/plugin-demo.md) with the isolated example project in [doc/demo/example](doc/demo/example).
