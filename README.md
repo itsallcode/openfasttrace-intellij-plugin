@@ -3,6 +3,8 @@
 ## What is OpenFastTrace IntelliJ Plugin?
 The OpenFastTrace IntelliJ Plugin adds editor and navigation support for OpenFastTrace (OFT) artifacts directly in JetBrains IDEs based on the IntelliJ Platform.
 
+![IDE Window With the Plugin](doc/images/intellij-window-with-plugin.png)
+
 It helps users work with OFT specification items and trace links in the same environment where they already edit code and documentation.
 
 ![OFT Logo](doc/images/openfasttrace_logo.svg)
