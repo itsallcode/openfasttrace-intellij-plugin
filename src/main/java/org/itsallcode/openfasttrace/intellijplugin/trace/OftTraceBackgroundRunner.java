@@ -27,6 +27,7 @@ public final class OftTraceBackgroundRunner implements OftTraceRunner {
     }
 
     // [impl->dsn~run-trace-project-in-background~2]
+    // [impl->dsn~trace-action-integration~3]
     @Override
     public void run(final Project project, final OftTraceInputs inputs, final String contentTitle) {
         ProgressManager.getInstance().run(new TraceTask(project, inputs, contentTitle));

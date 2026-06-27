@@ -136,7 +136,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
 
         assertThat(Arrays.asList(factoryNames), containsInAnyOrder(
                 "User requirements",
-                "Design and down",
+                "Design and above",
                 "Typical project",
                 "Unfiltered"
         ));
@@ -156,7 +156,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
     }
 
     public void testGivenDesignAndDownTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
-        final OftRunConfiguration configuration = createConfigurationFromTemplate("Design and down");
+        final OftRunConfiguration configuration = createConfigurationFromTemplate("Design and above");
         final OftTraceSettingsSnapshot snapshot = configuration.snapshot();
 
         Assertions.assertAll(
@@ -206,6 +206,9 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 .filter(f -> f.getName().equals(templateName))
                 .findFirst()
                 .orElseThrow();
-        return (OftRunConfiguration) factory.createTemplateConfiguration(getProject());
+        final OftRunConfiguration configuration = (OftRunConfiguration) factory.createTemplateConfiguration(getProject());
+        configuration.setGeneratedName();
+        assertThat(configuration.getName(), is(templateName));
+        return configuration;
     }
 }

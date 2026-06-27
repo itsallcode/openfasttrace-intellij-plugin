@@ -38,7 +38,7 @@ public final class OftTraceTestRunnerRunContentOutputPresenter implements OftTra
         this.runContentShower = runContentShower;
     }
 
-    // [impl->dsn~show-trace-project-in-test-runner-ui-by-default~1]
+    // [impl->dsn~show-trace-result-in-test-runner-ui-by-default~2]
     @Override
     public void show(final Project project, final String contentTitle, final OftTraceResult result) {
         final AtomicReference<SMTRunnerConsoleView> consoleRef = new AtomicReference<>();

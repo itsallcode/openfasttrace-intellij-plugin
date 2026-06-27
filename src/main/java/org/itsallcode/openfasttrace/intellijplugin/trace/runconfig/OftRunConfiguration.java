@@ -63,6 +63,11 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
     }
 
     @Override
+    public String suggestedName() {
+        return getFactory().getName();
+    }
+
+    @Override
     public void readExternal(@NotNull final Element element) throws InvalidDataException {
         super.readExternal(element);
         XmlSerializer.deserializeInto(state, element);

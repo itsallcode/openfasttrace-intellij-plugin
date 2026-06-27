@@ -28,7 +28,7 @@ public final class OftRunConfigurationType extends ConfigurationTypeBase {
             config.updateFrom(snapshot);
         }));
 
-        addFactory(new OftRunConfigurationFactory(this, "Design and down", config -> {
+        addFactory(new OftRunConfigurationFactory(this, "Design and above", config -> {
             final OftTraceSettingsSnapshot snapshot = new OftTraceSettingsSnapshot(
                     OftTraceScopeMode.SELECTED_RESOURCES,
                     false,

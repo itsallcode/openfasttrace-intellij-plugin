@@ -30,7 +30,7 @@ public final class OftRunConfigurationFactory extends ConfigurationFactory {
 
     @Override
     public @NotNull RunConfiguration createTemplateConfiguration(@NotNull final Project project) {
-        final OftRunConfiguration configuration = new OftRunConfiguration(project, this, "OpenFastTrace");
+        final OftRunConfiguration configuration = new OftRunConfiguration(project, this, getName());
         this.initializer.accept(configuration);
         return configuration;
     }

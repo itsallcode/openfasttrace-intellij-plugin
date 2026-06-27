@@ -11,7 +11,7 @@ In scope:
 * Remove the 'Trace Project' action and its associated 'OpenFastTrace' menu group from the IntelliJ 'Tools' menu.
 * Introduce the following pre-configured run configuration templates:
     - **User requirements**: Scans `doc/`, excludes source directories, filters for artifact types: `feat, req, scn, bconstr`.
-    - **Design and down**: Scans `doc/`, excludes source directories, filters for artifact types: `feat, req, scn, bconstr, arch, dsn, constr, bld`.
+    - **Design and above**: Scans `doc/`, excludes source directories, filters for artifact types: `feat, req, scn, bconstr, arch, dsn, constr, bld`.
     - **Typical project**: Scans `doc/` and all project source directories, with no artifact type filtering.
     - **Unfiltered**: Scans the entire project (`.`) with no filters.
 * Leverage the IntelliJ `ConfigurationFactory` mechanism to provide these templates as sub-items in the "Add New Configuration" menu.

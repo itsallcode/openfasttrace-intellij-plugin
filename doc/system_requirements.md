@@ -451,7 +451,7 @@ Needs: scn
 
 The plugin provides pre-configured templates when creating new OpenFastTrace run configurations. These templates allow users to quickly set up common scanning scenarios. The following templates are available:
 - **User requirements**: Scans `doc/`, excludes source directories, filters for artifact types: `feat, req, scn, bconstr`.
-- **Design and down**: Scans `doc/`, excludes source directories, filters for artifact types: `feat, req, scn, bconstr, arch, dsn, constr`.
+- **Design and above**: Scans `doc/`, excludes source directories, filters for artifact types: `feat, req, scn, bconstr, arch, dsn, constr`.
 - **Typical project**: Scans `doc/` and all project source directories, with no artifact type filtering.
 - **Unfiltered**: Scans the entire project (`.`) with no filters.
 

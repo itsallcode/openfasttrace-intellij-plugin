@@ -4,7 +4,7 @@ Version 0.9.0 introduces specialized run configuration templates and simplifies 
 
 Users can now quickly set up common OpenFastTrace scanning scenarios using pre-configured templates when creating a new run configuration:
 * **User requirements**: Scans `doc/` for core artifact types (`feat, req, scn, bconstr`).
-* **Design and down**: Scans `doc/` for all artifact types, including design and build artifacts.
+* **Design and above**: Scans `doc/` for all artifact types, including design and build artifacts.
 * **Typical project**: Scans `doc/` and all project source directories.
 * **Unfiltered**: Scans the entire project without any filters.
 

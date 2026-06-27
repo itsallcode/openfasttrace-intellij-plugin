@@ -44,6 +44,7 @@ public final class OftRunProfileState implements RunProfileState {
         final String contentTitle = "OpenFastTrace Trace: " + environment.getRunProfile().getName();
         final ExecutionPresentation executionPresentation = createExecutionPresentation(project, executor);
 
+        // [impl->dsn~trace-action-integration~3]
         if (!resolution.isValid()) {
             executionPresentation.outputPresenter()
                     .show(project, contentTitle, OftTraceResult.invalidInput(resolution.errorMessage()));
