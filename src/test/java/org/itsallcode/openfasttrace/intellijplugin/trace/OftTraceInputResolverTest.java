@@ -128,6 +128,23 @@ class OftTraceInputResolverTest {
     }
 
     @Test
+    void testGivenWholeProjectResolveWhenUsingDefaultSettingsThenItUsesTheProjectBasePath(
+            @TempDir final Path temporaryDirectory
+    ) {
+        final Project project = projectProxy(temporaryDirectory.toString(), null, "trace-project");
+
+        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(project);
+
+        Assertions.assertAll(
+                () -> assertThat(resolution.isValid(), is(true)),
+                () -> assertThat(resolution.inputs().isWholeProject(), is(true)),
+                () -> assertThat(resolution.inputs().inputPaths(), contains(temporaryDirectory)),
+                () -> assertThat(resolution.inputs().artifactTypes(), is(java.util.List.of())),
+                () -> assertThat(resolution.inputs().tags(), is(java.util.List.of()))
+        );
+    }
+
+    @Test
     void testGivenInvalidBasePathAndValidProjectFilePathWhenResolvingThenItUsesTheProjectFileParent(
             @TempDir final Path temporaryDirectory
     ) throws IOException {
