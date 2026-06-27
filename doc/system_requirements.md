@@ -88,6 +88,13 @@ The plugin lets users search specification items by name across the project and 
 
 Needs: req
 
+### Rename OpenFastTrace Specification Item ID
+`feat~rename-oft-specification-item~1`
+
+The plugin lets users rename a declared OpenFastTrace specification item ID through IntelliJ's native rename refactoring. Users can change the item ID from its declaration and keep the project's OFT references aligned with that rename.
+
+Needs: req
+
 ### Open OFT User Guide
 `feat~open-oft-user-guide~1`
 
@@ -255,6 +262,20 @@ The plugin opens the covered OpenFastTrace specification item when a user invoke
 
 Covers:
 - `feat~go-to-specification-item~1`
+
+Needs: scn
+
+### Rename OpenFastTrace Specification Item ID
+`req~rename-oft-specification-item-with-intellij-refactoring~1`
+
+The plugin integrates OpenFastTrace specification item declarations with IntelliJ's rename refactoring so users can rename a declaration's OpenFastTrace item ID through the IDE's standard rename action.
+
+Rationale:
+
+Users should be able to rely on IntelliJ's ordinary rename workflow instead of a custom OFT-specific rename dialog or refactoring action.
+
+Covers:
+- `feat~rename-oft-specification-item~1`
 
 Needs: scn
 
@@ -999,6 +1020,42 @@ Needs: dsn
 
 Covers:
 - `req~show-covering-occurrences-from-specification-item-declaration~1`
+
+Needs: dsn
+
+### Rename OpenFastTrace Specification Item Declaration ID
+`scn~rename-oft-specification-item-declaration~1`
+
+**Given** a project contains a declared OpenFastTrace specification item `req~old_name~1`
+**When** a user invokes the IDE's standard rename refactoring on the declaration header and changes the item ID to `req~new_name~1`
+**Then** the editor updates the declaration to `req~new_name~1`
+
+Covers:
+- `req~rename-oft-specification-item-with-intellij-refactoring~1`
+
+Needs: dsn
+
+### Update OpenFastTrace References After Rename
+`scn~update-oft-references-after-rename~1`
+
+**Given** a project contains the declared specification item `req~old_name~1` and OFT references to it in `Covers:` entries and coverage tags
+**When** a user renames the declaration's OpenFastTrace item ID to `req~new_name~1` through IntelliJ's native rename workflow
+**Then** the IDE updates the resolved OFT references so they point to `req~new_name~1`
+
+Covers:
+- `req~rename-oft-specification-item-with-intellij-refactoring~1`
+
+Needs: dsn
+
+### Show Renamed OpenFastTrace Item in Navigation
+`scn~show-renamed-oft-item-in-navigation~1`
+
+**Given** a project contained `req~old_name~1` and a user renames that declaration's OpenFastTrace item ID to `req~new_name~1`
+**When** the user searches for `req~new_name~1` through `Go to Symbol` or `Search Everywhere`
+**Then** the IDE shows `req~new_name~1` as the indexed declaration and does not show `req~old_name~1` as an index-driven navigation result
+
+Covers:
+- `req~rename-oft-specification-item-with-intellij-refactoring~1`
 
 Needs: dsn
 
