@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import javax.swing.JComponent;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -85,6 +86,22 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
                 () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
+    }
+
+    // [itest->dsn~show-per-line-validation-for-additional-trace-paths~1]
+    public void testGivenEditorWithMissingAdditionalPathWhenUpdatingSettingsThenItShowsPerLineValidation() {
+        editor.createEditor(); // Initialize component
+        editor.component.setSettings(new OftTraceSettingsSnapshot(
+                OftTraceScopeMode.SELECTED_RESOURCES,
+                true,
+                true,
+                "missing",
+                "",
+                "",
+                OftTraceResultView.TEST_RUNNER
+        ));
+
+        assertThat(editor.component.validationMessagesText(), containsString("Line 1: 'missing' not found"));
     }
 
     private OftRunConfiguration createConfiguration(final String name) {

@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,12 +63,20 @@ public class OftTraceInputResolverPlatformTest extends AbstractOftPlatformTestCa
         assertThat(resolution.map(OftTraceInputResolution::isValid).orElse(true), is(true));
     }
 
-    public void testWhenResolvingProjectThenItUsesProjectSettings() {
-        OftTraceProjectSettings.getInstance(getProject()).loadState(new OftTraceProjectSettings.State());
+    public void testWhenResolvingProjectThenItUsesDefaultSettings()
+            throws IOException, ReflectiveOperationException {
+        final Path projectRoot = createManagedTestArtifactDirectory("trace-input-resolver-project-root");
+        final OftTraceInputResolution resolution = resolveFromProjectRoot(
+                getProject(),
+                projectRoot,
+                OftTraceSettingsSnapshot.DEFAULT
+        );
 
-        final OftTraceInputResolution resolution = OftTraceInputResolver.resolve(getProject());
-
-        assertNotNull(resolution);
+        assertThat(resolution.isValid(), is(true));
+        assertThat(
+                resolution.inputs().inputPaths(),
+                contains(projectRoot)
+        );
     }
 
     private void configureModuleRoots(final Path contentRoot, final Path sourceDirectory, final Path testDirectory) {

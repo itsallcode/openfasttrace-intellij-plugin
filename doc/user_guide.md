@@ -127,31 +127,7 @@ Run a project trace from the main menu:
 The default keyboard shortcut is `Ctrl+Alt+Shift+O`.
 
 By default, the action traces the whole opened project and displays results in the IntelliJ Test Runner UI.
-
-## Configure The Trace Project Action
-
-Open `Settings | Tools | OpenFastTrace` to configure the global `Trace Project` action.
-
-![OpenFastTrace trace settings in the IDE settings dialog](user_guide/images/trace-setting.png)
-
-Choose one trace scope:
-
-* `Trace the whole project` scans the opened project root.
-* `Trace selected resources` scans only the selected source directories, test directories, and additional paths.
-
-For selected-resource traces, configure these inputs:
-
-* `Include IntelliJ source directories`
-* `Include IntelliJ test directories`
-* `Additional project-relative files or directories (one per line)`
-
-The default additional path is `doc/`. Paths are resolved relative to the opened project root. The settings page validates the entered paths and shows the base directory used for resolution.
-
-Use `Artifact types:` to limit a trace to comma-separated artifact types such as `feat,req,scn,dsn`.
-
-Use `Tags:` to limit a trace to comma-separated OFT tags.
-
-Leave `Artifact types:` or `Tags:` empty to include all artifact types or tags.
+Use a run configuration when you need selected-resource tracing, artifact-type filters, tag filters, or plain text output.
 
 ## Create OpenFastTrace Run Configurations
 
@@ -163,7 +139,7 @@ Use OpenFastTrace run configurations when you need multiple repeatable trace set
 4. Configure the trace scope, artifact types, tags, and result view.
 5. Save and run the configuration from the IDE toolbar.
 
-Run configurations use the same trace-scope controls as `Settings | Tools | OpenFastTrace`.
+Run configurations provide the same trace-scope controls in the configuration editor.
 
 They also let you choose the result view:
 
@@ -222,7 +198,7 @@ For coverage-tag completion, invoke completion on the target side after the arro
 
 ### Trace Project Scans Too Much Or Too Little
 
-Open `Settings | Tools | OpenFastTrace` and switch between `Trace the whole project` and `Trace selected resources`.
+Open the `OpenFastTrace` run configuration editor and switch between `Trace the whole project` and `Trace selected resources`.
 
 For selected resources, verify the source-root checkboxes and the `Additional project-relative files or directories (one per line)` field. The field accepts one file or directory per line.
 

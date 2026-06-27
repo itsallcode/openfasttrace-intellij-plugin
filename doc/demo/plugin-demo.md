@@ -7,15 +7,15 @@ This script is for a short live demonstration of the plugin using the isolated e
 1. Install the IntelliJ Presenter Plugin.
 2. Install the OpenFastTrace IntelliJ plugin from the latest GitHub release as described below, or launch a sandbox IDE with `./gradlew manualTestIde`.
 3. Open `doc/demo/example` as the IntelliJ project for the demo.
-4. Open `Settings | Tools | OpenFastTrace`, select `Trace selected resources`, clear `Include IntelliJ source directories` and `Include IntelliJ test directories`, and set `Additional project-relative files or directories (one per line)` to:
+4. Open `Run | Edit Configurations...`, add an `OpenFastTrace` configuration, select `Trace selected resources`, clear `Include IntelliJ source directories` and `Include IntelliJ test directories`, and set `Additional project-relative files or directories (one per line)` to:
 
    ```text
    doc/demo/example
    ```
 
-   Apply the settings. The validation area should show no errors.
+   Apply the configuration. The validation area should show no errors.
 5. Open `excuse-of-the-day.md` and `excuse-of-the-day.sh`.
-6. Run `Tools | OpenFastTrace | Trace Project` once. The starting demo project should trace green.
+6. Run the `OpenFastTrace` configuration once. The starting demo project should trace green.
 
 ## Installing the Plugin from GitHub
 
@@ -37,11 +37,11 @@ For a local development build or rehearsal without installing a release artifact
 
 > Today we are going to make one tiny change to a tiny project and let the IDE keep track of the requirement trace chain while we work.
 > We use OpenFastTrace and the IntelliJ plugin to make our life easier.
-> The example is deliberately small. But the concepts of working with requirement tracing translates nicely to larger projects.
+> The example is deliberately small. But the concept of working with requirement tracing translates nicely to larger projects.
 
 ### 1. Show Trace Scope Configuration
 
-Open `Settings | Tools | OpenFastTrace` and show the selected-resource configuration from the preparation: `Trace selected resources`, both IntelliJ directory checkboxes cleared, and the additional paths set to `doc/demo/example`.
+Open the `OpenFastTrace` run configuration editor and show the selected-resource configuration from the preparation: `Trace selected resources`, both IntelliJ directory checkboxes cleared, and the additional paths set to `doc/demo/example`.
 
 > The demonstration has a narrow scope. A Markdown specification and the shell implementation, both found under a `doc/demo/example` in this project.
 > Every trace run now checks only the files we want in this example.
@@ -50,7 +50,7 @@ Open `Settings | Tools | OpenFastTrace` and show the selected-resource configura
 
 Open `excuse-of-the-day.md` and point out the highlighted OFT item IDs, `Needs:`, and `Covers:` entries.
 
-> Let's first take look at a specification file.
+> Let's first take a look at a specification file.
 > This is still plain Markdown. The IDE just stops treating the trace parts like wallpaper, which is helpful to identify OFT specification items in text.
 
 ### 3. Find the Existing Feature
@@ -100,7 +100,7 @@ Run `Tools | OpenFastTrace | Trace Project`. The trace should be red because `ds
 
 In `excuse-of-the-day.sh`, add the coverage tag `# [impl->dsn~homework-excuse~1]`. Type the target side partially and invoke completion after `impl->` to select `dsn~homework-excuse~1`, then point out the highlighted tag.
 
-> The script stays ordinary shell. The OFT tag is a comment for Bash and evidence for the trace.
+> The script stays an ordinary shell. The OFT tag is a comment for Bash and evidence for the trace.
 
 ### 11. Run the Green Trace and Open the Guide
 

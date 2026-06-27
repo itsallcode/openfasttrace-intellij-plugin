@@ -240,7 +240,7 @@ Needs: bld, itest
 ### Trace Configuration Integration
 `dsn~trace-configuration-integration~2`
 
-The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project and through dedicated run configurations. It provides pre-configured templates for common scanning scenarios. It exposes those settings through project configuration UI and the run configuration editor, resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria, stores the run-configuration result-view selection, treats the IntelliJ Test Runner UI as the result-view default when no selection is stored, and owns the plugin resource used as the OpenFastTrace run-configuration icon.
+The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings through dedicated run configurations. It provides pre-configured templates for common scanning scenarios. It exposes those settings through the run configuration editor, resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria, stores the run-configuration result-view selection, treats the IntelliJ Test Runner UI as the result-view default when no selection is stored, and owns the plugin resource used as the OpenFastTrace run-configuration icon.
 
 Covers:
 - `scn~test-runner-as-default-run-configuration-result-view~1`
@@ -248,16 +248,6 @@ Covers:
 - `scn~select-test-runner-trace-result-view~1`
 - `scn~show-openfasttrace-icon-for-run-configurations~1`
 - `scn~use-run-configuration-templates~1`
-
-Needs: impl, itest
-
-### Configure Trace Scope in Project Settings
-`dsn~configure-trace-scope-in-project-settings~1`
-
-The plugin provides a project-level settings page for OpenFastTrace that allows users to configure the default trace scope for the project. Users can choose between whole-project tracing and selected-resource tracing. For selected-resource tracing, the settings provide a multi-line text field for additional project-relative paths, initialized with a default `doc/` entry.
-
-Covers:
-- `scn~configure-trace-scope-in-project-settings~1`
 
 Needs: impl, itest
 

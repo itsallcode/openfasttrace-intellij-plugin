@@ -25,7 +25,7 @@ public final class OftTraceInputResolver {
     }
 
     public static OftTraceInputResolution resolve(final Project project) {
-        return resolve(project, OftTraceProjectSettings.getInstance(project).snapshot());
+        return resolve(project, OftTraceSettingsSnapshot.DEFAULT);
     }
 
     public static OftTraceInputResolution resolve(final Project project, final OftTraceSettingsSnapshot settings) {

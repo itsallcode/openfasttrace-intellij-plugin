@@ -20,6 +20,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.io.Serializable;
 
+// [impl->dsn~trace-configuration-integration~2]
 public final class OftRunConfiguration extends LocatableConfigurationBase<OftRunProfileState> {
     private final State state = new State();
 

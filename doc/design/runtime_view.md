@@ -379,7 +379,7 @@ Needs: impl, itest
 ### Trace Selected Project Resources
 `dsn~trace-selected-project-resources~2`
 
-**Given** an IntelliJ project is open and OpenFastTrace project settings or run configuration are configured for selected-resource tracing
+**Given** an IntelliJ project is open and an OpenFastTrace run configuration is configured for selected-resource tracing
 **When** a user starts an OpenFastTrace trace
 **Then** the trace-configuration component resolves only the configured source roots, test roots, and additional project-relative paths and the trace-execution service passes only those inputs to OpenFastTrace.
 
@@ -415,7 +415,7 @@ Needs: impl, itest
 ### Add Project-Relative Paths to Selected-Resource Trace
 `dsn~add-project-relative-paths-to-selected-resource-trace~1`
 
-**Given** selected-resource tracing is active and the OpenFastTrace project settings contain additional project-relative paths
+**Given** selected-resource tracing is active, and the OpenFastTrace run configuration contains additional project-relative paths
 **When** the trace-configuration component resolves the effective OpenFastTrace inputs for the opened project
 **Then** it resolves those paths against the project directory, keeps the valid files and directories as trace inputs, and rejects invalid configured paths before the trace starts.
 
@@ -427,7 +427,7 @@ Needs: impl, itest
 ### Show Per-Line Validation for Additional Trace Paths
 `dsn~show-per-line-validation-for-additional-trace-paths~1`
 
-**Given** selected-resource tracing is active and the user edits the multi-line field for additional project-relative trace paths
+**Given** selected-resource tracing is active and the user edits the run-configuration field for additional project-relative trace paths
 **When** the trace-configuration component validates the configured lines against the opened project directory
 **Then** it keeps the field editable, ignores empty lines, and shows a non-blocking validation hint below the field for each non-empty line that does not resolve to a valid file or directory.
 

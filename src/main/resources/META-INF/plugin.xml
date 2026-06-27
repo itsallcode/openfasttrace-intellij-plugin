@@ -129,12 +129,6 @@
                 language="TEXT"
                 implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftCoverageTagReferenceContributor"/>
         <highlightingPassFactory implementation="org.itsallcode.openfasttrace.intellijplugin.highlighting.OftHighlightingPassRegistrar"/>
-        <projectConfigurable
-                parentId="tools"
-                instance="org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceProjectConfigurable"
-                id="org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceProjectConfigurable"
-                displayName="OpenFastTrace"
-                nonDefaultProject="true"/>
         <configurationType implementation="org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationType"/>
     </extensions>
 

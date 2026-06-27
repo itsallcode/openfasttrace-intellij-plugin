@@ -128,6 +128,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
         );
     }
 
+    // [itest->dsn~use-run-configuration-templates~1]
     public void testGivenRunConfigurationTypeWhenCheckingFactoriesThenItContainsAllTemplates() {
         final OftRunConfigurationType type = new OftRunConfigurationType();
         final String[] factoryNames = Arrays.stream(type.getConfigurationFactories())

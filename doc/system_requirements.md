@@ -344,16 +344,6 @@ Covers:
 
 Needs: scn
 
-### Configure Trace Scope in Project Settings
-`req~configure-trace-scope-in-project-settings~1`
-
-The plugin integrates OpenFastTrace trace-scope settings into IntelliJ project configuration. Users can configure whether a trace uses the whole project or only selected resources and can edit the selected-resource paths directly in the IDE settings workflow.
-
-Covers:
-- `feat~run-oft-trace~3`
-
-Needs: scn
-
 ### Trace Selected Project Resources
 `req~trace-selected-project-resources~1`
 
@@ -387,7 +377,7 @@ Needs: scn
 ### Add Project-Relative Paths to Selected-Resource Trace
 `req~add-project-relative-paths-to-selected-resource-trace~1`
 
-When selected-resource tracing is active, the plugin lets users add additional trace inputs through a multi-line text field in the project settings. Each non-empty line specifies one file or directory path relative to the opened project directory that OpenFastTrace should scan. If the user has not changed that setting, the field contains exactly one default entry: `doc/`.
+When selected-resource tracing is active, the plugin lets users add additional trace inputs through a multi-line text field in the run configuration editor. Each non-empty line specifies one file or directory path relative to the opened project directory that OpenFastTrace should scan. If the user has not changed that setting, the field contains exactly one default entry: `doc/`.
 
 Covers:
 - `feat~run-oft-trace~3`
@@ -1173,22 +1163,10 @@ Covers:
 
 Needs: dsn
 
-### Configure Trace Scope in Project Settings
-`scn~configure-trace-scope-in-project-settings~1`
-
-**Given** an IntelliJ project is open
-**When** a user opens the project settings for the OpenFastTrace plugin
-**Then** the user can choose whether the default trace scope uses the whole project or only selected resources and, for selected-resource tracing, can edit the additional trace paths in a multi-line project-settings field that contains exactly one default entry, `doc/`, until the user changes it
-
-Covers:
-- `req~configure-trace-scope-in-project-settings~1`
-
-Needs: dsn
-
 ### Trace Selected Project Resources
 `scn~trace-selected-project-resources~1`
 
-**Given** an IntelliJ project is open and the OpenFastTrace project settings or run configuration are configured for selected-resource tracing
+**Given** an IntelliJ project is open and the OpenFastTrace run configuration is configured for selected-resource tracing
 **When** a user starts an OpenFastTrace trace
 **Then** the plugin starts the trace by passing only the resolved selected resources to OpenFastTrace instead of the whole project directory
 
@@ -1225,7 +1203,7 @@ Needs: dsn
 ### Add Project-Relative Paths to Selected-Resource Trace
 `scn~add-project-relative-paths-to-selected-resource-trace~1`
 
-**Given** an IntelliJ project is open, selected-resource tracing is active, and the OpenFastTrace project settings or run configuration contains additional project-relative file or directory paths
+**Given** an IntelliJ project is open, selected-resource tracing is active, and the OpenFastTrace run configuration contains additional project-relative file or directory paths
 **When** a user starts an OpenFastTrace trace
 **Then** the plugin resolves those project-relative files and directories against the opened project and includes them in the effective OpenFastTrace input set
 
@@ -1239,7 +1217,7 @@ Needs: dsn
 
 **Given** an IntelliJ project is open, selected-resource tracing is active, and the user edits the multi-line field for additional project-relative trace paths
 **When** one or more non-empty lines do not resolve to valid files or directories below the opened project directory
-**Then** the project settings show a non-blocking validation hint for each invalid line below the field so the user can see which configured paths are not found.
+**Then** the run configuration shows a non-blocking validation hint for each invalid line below the field so the user can see which configured paths are not found.
 
 Covers:
 - `req~add-project-relative-paths-to-selected-resource-trace~1`

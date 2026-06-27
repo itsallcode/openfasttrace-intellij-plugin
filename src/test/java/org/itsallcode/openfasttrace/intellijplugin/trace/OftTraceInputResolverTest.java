@@ -110,7 +110,7 @@ class OftTraceInputResolverTest {
     }
 
     @Test
-    void testGivenWholeProjectSettingsWhenResolvingThenItUsesTheProjectBasePath(
+    void testGivenWholeProjectConfigWhenResolvingThenItUsesTheProjectBasePath(
             @TempDir final Path temporaryDirectory
     ) {
         final Project project = projectProxy(temporaryDirectory.toString(), null, "trace-project");
