@@ -54,7 +54,7 @@ The plugin currently focuses on:
 * navigation support (`Go To Declaration`, symbol search, and related navigation paths)
 * completion for existing specification item IDs while editing `Covers:` entries in supported specification documents and coverage-tag targets in files supported by the OpenFastTrace Tag Importer
 * bundled OFT live templates for common specification items, including a scenario template
-* project-wide or selected-resource OFT tracing from `Tools | OpenFastTrace | Trace Project` or through custom OpenFastTrace run configurations
+* project-wide or selected-resource OFT tracing through custom OpenFastTrace run configurations, including pre-configured templates
 * clickable specification item IDs directly from the trace output window, including generated IDs created from coverage tags
 * IntelliJ Test Runner UI output for OpenFastTrace traces by default, grouped by source file, specification item, and trace link
 * quick access to the OpenFastTrace user guide from the IDE help menu
@@ -80,11 +80,11 @@ For manual IDE testing, launch a sandbox IDE with the plugin:
 
 ## Trace Settings
 
-After the sandbox IDE opens a project, configure trace scope under `Settings | Tools | OpenFastTrace`. By default, `Trace Project` scans the whole opened project. If you switch to selected-resource tracing, the plugin includes IntelliJ source roots, IntelliJ test roots, and one default additional project-relative path entry, `doc/`, until you change it. Additional files or directories are entered one per line.
+After the sandbox IDE opens a project, configure trace scope under `Settings | Tools | OpenFastTrace`. The plugin includes IntelliJ source roots, IntelliJ test roots, and one default additional project-relative path entry, `doc/`, until you change it. Additional files or directories are entered one per line.
 
 ## Run Configurations
 
-You can create and run a dedicated `OpenFastTrace` run configuration from the IDE's run/debug toolbar. The plugin traces the configured inputs in the background and shows the result in IntelliJ's Test Runner UI by default. The result tree groups source files, specification items, and trace links with pass/fail status and navigation back to source.
+You can create and run a dedicated `OpenFastTrace` run configuration from the IDE's run/debug toolbar. The plugin provides pre-configured templates (e.g., "User requirements", "Design and above", "Typical project", "Unfiltered") to quickly set up common scanning scenarios. The plugin traces the configured inputs in the background and shows the result in IntelliJ's Test Runner UI by default. The result tree groups source files, specification items, and trace links with pass/fail status and navigation back to source.
 
 Run configurations can select plain text output instead. In that mode, the plugin shows the text report in an IDE output tab with ANSI colors preserved. You can click specification item IDs in the report to jump to their declarations, including source-side items generated from coverage tags.
 

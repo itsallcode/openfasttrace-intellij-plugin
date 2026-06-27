@@ -238,29 +238,28 @@ Covers:
 Needs: bld, itest
 
 ### Trace Configuration Integration
-`dsn~trace-configuration-integration~1`
+`dsn~trace-configuration-integration~2`
 
-The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings per IntelliJ project and through dedicated run configurations. It exposes those settings through project configuration UI and the run configuration editor, resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria, stores the run-configuration result-view selection, treats the IntelliJ Test Runner UI as the result-view default when no selection is stored, and owns the plugin resource used as the OpenFastTrace run-configuration icon.
+The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings through dedicated run configurations. It provides pre-configured templates for common scanning scenarios. It exposes those settings through the run configuration editor, resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria, stores the run-configuration result-view selection, treats the IntelliJ Test Runner UI as the result-view default when no selection is stored, and owns the plugin resource used as the OpenFastTrace run-configuration icon.
 
 Covers:
 - `scn~test-runner-as-default-run-configuration-result-view~1`
 - `scn~select-plain-text-trace-result-view~1`
 - `scn~select-test-runner-trace-result-view~1`
 - `scn~show-openfasttrace-icon-for-run-configurations~1`
+- `scn~use-run-configuration-templates~1`
 
 Needs: impl, itest
 
 ### Trace Action Integration
-`dsn~trace-action-integration~2`
+`dsn~trace-action-integration~3`
 
-The plugin provides a trace-action component that contributes an `OpenFastTrace` action group with a `Trace Project` action under the global `Tools` menu. This component is responsible for exposing the entry only in an opened project context and for handing the action invocation to trace-configuration resolution, trace execution, and the default IntelliJ Test Runner UI presentation.
+The plugin provides a trace-action component that is responsible for handing the trace invocation to trace-configuration resolution, trace execution, and the default IntelliJ Test Runner UI presentation.
 
 Covers:
-- `scn~show-trace-project-action-in-tools-menu~1`
-- `scn~disable-trace-project-action-without-open-project~1`
-- `scn~run-trace-project-in-background~1`
-- `scn~show-trace-project-in-test-runner-ui-by-default~1`
-- `scn~reject-trace-project-without-valid-project-path~1`
+- `scn~run-trace-project-in-background~2`
+- `scn~show-trace-result-in-test-runner-ui-by-default~2`
+- `scn~reject-trace-without-valid-project-path~1`
 
 Needs: impl, itest
 
@@ -272,9 +271,9 @@ The plugin provides a trace-execution service that accepts the effective OpenFas
 Because OpenFastTrace discovers importers and reporters through Java `ServiceLoader`, this service executes OFT import and report-rendering calls with the plugin class loader as the thread context class loader and restores the previous context loader afterward.
 
 Covers:
-- `scn~run-trace-project-in-background~1`
+- `scn~run-trace-project-in-background~2`
 - `scn~trace-selected-project-resources~1`
-- `scn~reject-trace-project-without-valid-project-path~1`
+- `scn~reject-trace-without-valid-project-path~1`
 - `scn~show-successful-trace-output-in-ide-output-window~2`
 - `scn~show-resolved-trace-inputs-in-trace-output-window~1`
 - `scn~show-failing-trace-output-in-ide-output-window~1`

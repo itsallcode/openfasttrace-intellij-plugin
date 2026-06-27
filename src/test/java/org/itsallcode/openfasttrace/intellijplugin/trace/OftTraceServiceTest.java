@@ -261,7 +261,7 @@ class OftTraceServiceTest {
         return ANSI_ESCAPE_SEQUENCE.matcher(output).replaceAll("");
     }
 
-    // [itest->dsn~trace-selected-project-resources~1]
+    // [itest->dsn~trace-selected-project-resources~2]
     // [itest->dsn~show-resolved-trace-inputs-in-trace-output-window~1]
     @Test
     void testGivenSelectedResourceInputsWhenTracingThenItListsConfiguredInputsAndIgnoresOutOfScopeArtifacts(

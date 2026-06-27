@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class OftTraceTestRunnerRunContentOutputPresenterTest extends AbstractOftPlatformTestCase {
-    // [itest->dsn~show-trace-project-in-test-runner-ui-by-default~1]
+    // [itest->dsn~show-trace-result-in-test-runner-ui-by-default~2]
     public void testGivenTraceResultWhenPresentedThenItShowsTestRunnerRunContent() {
         final AtomicReference<SMTRunnerConsoleView> consoleRef = new AtomicReference<>();
         final AtomicReference<RunContentDescriptor> descriptorRef = new AtomicReference<>();

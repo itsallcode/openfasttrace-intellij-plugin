@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 public class OftRunProfileStateTest extends AbstractOftPlatformTestCase {
+    // [itest->dsn~trace-action-integration~3]
     public void testExecuteReturnsNotNull() throws Exception {
         final ExecutionEnvironment environment = createEnvironment();
         final OftRunProfileState state = new OftRunProfileState(

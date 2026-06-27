@@ -129,30 +129,10 @@
                 language="TEXT"
                 implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftCoverageTagReferenceContributor"/>
         <highlightingPassFactory implementation="org.itsallcode.openfasttrace.intellijplugin.highlighting.OftHighlightingPassRegistrar"/>
-        <projectConfigurable
-                parentId="tools"
-                instance="org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceProjectConfigurable"
-                id="org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceProjectConfigurable"
-                displayName="OpenFastTrace"
-                nonDefaultProject="true"/>
         <configurationType implementation="org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationType"/>
     </extensions>
 
     <actions>
-        <group
-                id="Oft.ToolsMenu"
-                text="OpenFastTrace"
-                popup="true"
-                description="OpenFastTrace project actions.">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <action
-                    id="Oft.TraceProject.ToolsMenu"
-                    class="org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceProjectAction"
-                    text="Trace Project"
-                    description="Run an OpenFastTrace trace for the current project and show the text output.">
-                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift O"/>
-            </action>
-        </group>
         <action
                 id="Oft.OpenUserGuide.HelpMenu"
                 class="org.itsallcode.openfasttrace.intellijplugin.help.OpenFastTraceUserGuideAction"

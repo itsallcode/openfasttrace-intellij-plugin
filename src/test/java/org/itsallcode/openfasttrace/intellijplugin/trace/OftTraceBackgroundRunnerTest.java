@@ -25,6 +25,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 class OftTraceBackgroundRunnerTest {
+    // [itest->dsn~run-trace-project-in-background~2]
+    // [itest->dsn~trace-action-integration~3]
     @Test
     void testGivenTraceTaskWhenRunningThenItUpdatesProgressAndPresentsSuccessfulResult(@TempDir final Path temporaryDirectory)
             throws Exception {

@@ -25,7 +25,7 @@ public final class OftTraceInputResolver {
     }
 
     public static OftTraceInputResolution resolve(final Project project) {
-        return resolve(project, OftTraceProjectSettings.getInstance(project).snapshot());
+        return resolve(project, OftTraceSettingsSnapshot.DEFAULT);
     }
 
     public static OftTraceInputResolution resolve(final Project project, final OftTraceSettingsSnapshot settings) {
@@ -110,7 +110,7 @@ public final class OftTraceInputResolver {
         ));
     }
 
-    // [impl->dsn~trace-selected-project-resources~1]
+    // [impl->dsn~trace-selected-project-resources~2]
     // [impl->dsn~include-intellij-source-directories-in-selected-resource-trace~1]
     // [impl->dsn~include-intellij-test-directories-in-selected-resource-trace~1]
     // [impl->dsn~add-project-relative-paths-to-selected-resource-trace~1]
