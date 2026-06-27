@@ -26,6 +26,8 @@ Reference authoring assistance for `Covers:` entries and coverage-tag targets li
 
 This strategy reduces custom code, lowers maintenance effort, and improves cross-IDE compatibility because the implementation stays aligned with the platform abstractions that JetBrains supports across products.
 
+Rename refactoring follows the same principle. The plugin treats the declaration-side OFT item ID as the rename target and relies on IntelliJ's built-in rename refactoring flow to discover and update usages. Because `Covers:` entries and coverage tags already resolve through the declaration/reference model, rename can reuse that same PSI and index machinery instead of introducing a separate OFT-specific rename engine. This keeps the user workflow close to IntelliJ's ordinary symbol rename behavior while still updating the canonical OFT item ID and its resolved references consistently.
+
 ## OFT Specification Item Index
 
 The index distinguishes rigorously between OpenFastTrace declarations and OpenFastTrace coverage occurrences. That distinction is the foundation for correct IDE navigation.
@@ -44,6 +46,8 @@ The OFT to JetBrains mapping is therefore as follows:
 - An occurrence of an OFT item ID under `Covers:` in a specification document is a reference from one item to another declared item.
 - An occurrence of an OFT item ID inside an OFT coverage tag in source code is also a reference from that source location to a declared item.
 - A `Go to Symbol` result is produced from indexed declarations only. Coverage occurrences are not separate symbol results.
+
+That same mapping also applies to rename. The declaration-side OFT item ID is the symbol that users rename; coverage occurrences remain references that the platform can update through standard refactoring usage tracking. The index must therefore continue to key declarations by the canonical full OFT item ID after rename, so search and navigation expose the renamed item and the previous ID no longer appears as a declaration result.
 
 This mapping also clarifies what the index stores. The symbol-facing index stores declarations keyed by the canonical full OFT item ID. Additional lookup keys such as the name part may be stored as aliases for search convenience, but they do not replace the canonical identity. The artifact type prefix such as `req`, `dsn`, or `impl` is part of that identity and may additionally be surfaced as presentation metadata, grouping information, or a type label in result lists.
 

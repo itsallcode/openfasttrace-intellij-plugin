@@ -200,6 +200,31 @@ Covers:
 
 Needs: impl, itest
 
+### Rename Specification Item ID
+`dsn~rename-specification-item-id~1`
+
+**Given** a user places the caret on the declared OFT item ID in the header of its own specification item
+**When** the user invokes IntelliJ's standard rename refactoring and enters a new full OFT item ID
+**Then** the rename infrastructure treats that declaration-side item ID as the symbol to rename, updates the declaration text to the new ID, and updates resolved `Covers:` entries and coverage-tag references that point to the renamed declaration
+
+Covers:
+- `scn~rename-oft-specification-item-declaration~1`
+- `scn~update-oft-references-after-rename~1`
+
+Needs: impl, itest
+
+### Show Renamed Specification Item ID in Navigation
+`dsn~show-renamed-specification-item-id-in-navigation~1`
+
+**Given** a project contained a declared OFT item ID `req~old_name~1` and the user renamed it to `req~new_name~1`
+**When** the user searches for the renamed ID through `Go to Symbol` or `Search Everywhere`
+**Then** the specification item index returns `req~new_name~1` as the declaration result and no longer returns `req~old_name~1` as an indexed declaration
+
+Covers:
+- `scn~show-renamed-oft-item-in-navigation~1`
+
+Needs: impl, itest
+
 ### Open Specification Item from Coverage Tag Left Side
 `dsn~open-specification-item-from-coverage-tag-left-side~1`
 

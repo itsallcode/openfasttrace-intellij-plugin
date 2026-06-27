@@ -37,6 +37,7 @@ package "OpenFastTrace Plugin" {
   component "Specification Item\nIndex" as SpecIndex
   component "Specification Item\nNavigation" as NavigationSupport
   component "Specification Item\nCompletion" as CompletionSupport
+  component "Specification Item\nRename" as RenameSupport
   component "Live Template\nIntegration" as LiveTemplateSupport
   component "Trace Configuration\nIntegration" as TraceConfigurationSupport
   component "Trace Action\nIntegration" as TraceActionSupport
@@ -62,6 +63,9 @@ SpecIndex --> IdeEditor
 NavigationSupport --> IdeNavigation
 CompletionSupport --> SpecIndex
 CompletionSupport --> IdeEditor
+RenameSupport --> SpecIndex
+RenameSupport --> IdeEditor
+RenameSupport --> IdeActions
 LiveTemplateSupport --> IdeLiveTemplates
 LiveTemplateSupport --> IdeEditor
 TraceConfigurationSupport --> IdeActions
@@ -193,6 +197,18 @@ Covers:
 - `scn~suppress-coverage-tag-target-completion-outside-target-context~1`
 
 Needs: impl, utest
+
+### Specification Item Rename
+`dsn~specification-item-rename~1`
+
+The plugin provides a rename component that integrates OpenFastTrace specification item IDs with IntelliJ's built-in rename refactoring. The component treats the declaration-side item ID as the rename source, uses the existing declaration index and PSI reference model to discover usages, and allows IntelliJ to update matching `Covers:` entries and coverage tags as part of the native refactoring flow.
+
+Covers:
+- `scn~rename-oft-specification-item-declaration~1`
+- `scn~update-oft-references-after-rename~1`
+- `scn~show-renamed-oft-item-in-navigation~1`
+
+Needs: impl
 
 ### User Guide Integration
 `dsn~user-guide-integration~1`
