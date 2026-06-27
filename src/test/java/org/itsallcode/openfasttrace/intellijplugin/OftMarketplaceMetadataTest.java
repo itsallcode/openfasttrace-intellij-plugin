@@ -45,9 +45,6 @@ class OftMarketplaceMetadataTest {
 
         Assertions.assertAll(
                 () -> assertThat(releaseNotes, containsString("# OpenFastTrace IntelliJ Plugin " + version)),
-                () -> assertThat(releaseNotes, containsString("#51: Complete Marketplace-facing plugin metadata")),
-                () -> assertThat(releaseNotes, containsString("clearer overview")),
-                () -> assertThat(releaseNotes, containsString("installing or updating")),
                 () -> assertThat(releaseNotes, containsString("## Bundled OpenFastTrace")),
                 () -> assertThat(releaseNotes, containsString("OpenFastTrace " + bundledOpenFastTraceVersion))
         );

@@ -42,12 +42,12 @@ public final class OftSpecificationReferenceContributor extends PsiReferenceCont
             final CharSequence fileText = element.getContainingFile().getViewProvider().getContents();
             final List<PsiReference> references = new ArrayList<>();
             for (OftSpecificationItemMatch match : OftDeclarationResolver.findCoveredSpecificationItems(fileText)) {
-                addReferenceIfCovered(references, element, elementRange, match);
+                addCoverageReferenceIfOverlapping(references, element, elementRange, match);
             }
             return references.toArray(PsiReference[]::new);
         }
 
-        private static void addReferenceIfCovered(
+        private static void addCoverageReferenceIfOverlapping(
                 final List<PsiReference> references,
                 final PsiElement element,
                 final TextRange elementRange,
@@ -62,7 +62,8 @@ public final class OftSpecificationReferenceContributor extends PsiReferenceCont
             references.add(new OftCoverageTagReference(
                     element,
                     new TextRange(start - elementRange.getStartOffset(), end - elementRange.getStartOffset()),
-                    match.item()
+                    match.item(),
+                    true
             ));
         }
 

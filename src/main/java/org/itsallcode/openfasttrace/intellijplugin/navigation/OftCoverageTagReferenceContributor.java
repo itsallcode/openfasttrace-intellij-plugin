@@ -46,14 +46,16 @@ public final class OftCoverageTagReferenceContributor extends PsiReferenceContri
                         element,
                         elementRange,
                         match.sourceSpan(),
-                        match.tag().effectiveSource()
+                        match.tag().effectiveSource(),
+                        isFullSpecificationId(fileText, match.sourceSpan())
                 );
                 addReferenceIfCovered(
                         references,
                         element,
                         elementRange,
                         match.targetSpan(),
-                        match.tag().target()
+                        match.tag().target(),
+                        true
                 );
             }
             return references.toArray(PsiReference[]::new);
@@ -64,7 +66,8 @@ public final class OftCoverageTagReferenceContributor extends PsiReferenceContri
                 final PsiElement element,
                 final TextRange elementRange,
                 final OftTextSpan referenceSpan,
-                final OftSpecificationItem target
+                final OftSpecificationItem target,
+                final boolean renameable
         ) {
             final int start = Math.max(elementRange.getStartOffset(), referenceSpan.startOffset());
             final int end = Math.min(elementRange.getEndOffset(), referenceSpan.endOffset());
@@ -74,8 +77,19 @@ public final class OftCoverageTagReferenceContributor extends PsiReferenceContri
             references.add(new OftCoverageTagReference(
                     element,
                     new TextRange(start - elementRange.getStartOffset(), end - elementRange.getStartOffset()),
-                    target
+                    target,
+                    renameable
             ));
+        }
+
+        private static boolean isFullSpecificationId(final CharSequence fileText, final OftTextSpan span) {
+            if (span.startOffset() < 0 || span.endOffset() > fileText.length()
+                    || span.startOffset() >= span.endOffset()) {
+                return false;
+            }
+            return OftSyntaxCore.classifySpecificationItem(fileText.subSequence(span.startOffset(),
+                    span.endOffset()).toString())
+                    == org.itsallcode.openfasttrace.intellijplugin.syntax.OftFragmentStatus.VALID;
         }
         private static boolean isCoverageTagElement(final PsiElement element) {
             return element.getContainingFile() != null

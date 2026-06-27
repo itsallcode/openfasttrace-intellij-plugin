@@ -14,6 +14,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.progress.util.ProgressIndicatorBase;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiPolyVariantReference;
@@ -37,6 +38,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.containsString;
 
 public class OftNavigationTest extends AbstractOftPlatformTestCase {
     private int searchContextCounter;
@@ -432,6 +434,43 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
         assertThat(handlerResults, is(List.of()));
     }
 
+    // [itest->dsn~rename-specification-item-id~1]
+    public void testGivenSpecificationItemWhenRenamedThenTheDeclarationReferencesAndIndexUpdate() {
+        final PsiFile declarationFile = myFixture.addFileToProject("doc/spec.md", """
+                req~<caret>old_name~1
+                Needs: dsn
+                """);
+        final PsiFile referencingFile = myFixture.addFileToProject("doc/design.md", """
+                dsn~rename_target~1
+                Covers:
+                - req~old_name~1
+                """);
+        final PsiFile coverageFile = myFixture.addFileToProject("src/Main.java", """
+                // [impl~rename_target~1->req~old_name~1]
+                class Main {
+                }
+                """);
+        myFixture.configureFromExistingVirtualFile(declarationFile.getVirtualFile());
+
+        EdtTestUtil.runInEdtAndWait(() -> WriteCommandAction.runWriteCommandAction(
+                getProject(),
+                () -> new OftRenamePsiElementProcessor().renameElement(
+                        myFixture.getFile(),
+                        "req~new_name~1",
+                        null,
+                        null
+                )
+        ));
+
+        assertAll(
+                () -> assertThat(myFixture.getFile().getText(), containsString("req~new_name~1")),
+                () -> assertThat(documentText(referencingFile), containsString("req~new_name~1")),
+                () -> assertThat(documentText(coverageFile), containsString("req~new_name~1")),
+                () -> assertThat(searchSymbolMatches("req~new_name~1"), contains("req~new_name~1")),
+                () -> assertThat(searchSymbolMatches("req~old_name~1"), is(List.of()))
+        );
+    }
+
     private List<String> searchSymbolMatches(final String pattern) {
         return searchSymbolItems(pattern).stream()
                 .map(item -> ((OftNavigationItem) item).getSpecification().id())
@@ -540,6 +579,14 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
                 Objects.requireNonNull(FileDocumentManager.getInstance().getFile(Objects.requireNonNull(selectedEditor).getDocument())).getName(),
                 selectedEditor.getCaretModel().getOffset()
         );
+    }
+
+    private String documentText(final PsiFile file) {
+        final var document = FileDocumentManager.getInstance().getDocument(file.getVirtualFile());
+        if (document == null) {
+            throw new IllegalStateException("Missing document for " + file.getVirtualFile().getPath());
+        }
+        return document.getText();
     }
 
     private List<String> implementationTargetFilesAtCaret() {

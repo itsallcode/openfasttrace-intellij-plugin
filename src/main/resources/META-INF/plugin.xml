@@ -128,6 +128,7 @@
         <psi.referenceContributor
                 language="TEXT"
                 implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftCoverageTagReferenceContributor"/>
+        <renamePsiElementProcessor implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftRenamePsiElementProcessor"/>
         <highlightingPassFactory implementation="org.itsallcode.openfasttrace.intellijplugin.highlighting.OftHighlightingPassRegistrar"/>
         <configurationType implementation="org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationType"/>
     </extensions>

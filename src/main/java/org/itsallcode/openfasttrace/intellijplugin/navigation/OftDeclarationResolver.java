@@ -2,6 +2,7 @@ package org.itsallcode.openfasttrace.intellijplugin.navigation;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiFile;
@@ -48,7 +49,11 @@ final class OftDeclarationResolver {
         if (virtualFile == null || !OftSupportedFiles.isSpecificationFile(virtualFile)) {
             return Optional.empty();
         }
-        final int offset = element.getTextRange().getStartOffset();
+        final TextRange textRange = element.getTextRange();
+        if (textRange == null) {
+            return Optional.empty();
+        }
+        final int offset = textRange.getStartOffset();
         return OftSyntaxCore.findDefinitionSpecificationItems(
                         element.getContainingFile().getViewProvider().getContents()
                 ).stream()
