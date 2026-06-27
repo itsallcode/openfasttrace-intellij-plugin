@@ -11,6 +11,10 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
 import org.jdom.Element;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Arrays;
 
@@ -22,6 +26,16 @@ import static org.hamcrest.Matchers.sameInstance;
 
 // [itest->dsn~openfasttrace-run-configuration~2]
 public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
+    @BeforeEach
+    void initPlatformFixture() throws Exception {
+        super.setUp();
+    }
+
+    @AfterEach
+    void releasePlatformFixture() throws Exception {
+        super.tearDown();
+    }
+
     // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
     // [itest->dsn~trace-configuration-integration~2]
     public void testGivenNewRunConfigurationWhenReadingSnapshotThenItDefaultsToTestRunner() {
@@ -143,55 +157,32 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
         ));
     }
 
-    public void testGivenUserRequirementsTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
-        final OftRunConfiguration configuration = createConfigurationFromTemplate("User requirements");
+    @ParameterizedTest(name = "{0}")
+    @CsvSource({
+            "'User requirements', false, false, false, 'doc/', 'feat, req, scn, bconstr'",
+            "'Design and above', false, false, false, 'doc/', 'feat, req, scn, bconstr, arch, dsn, constr, bld'",
+            "'Typical project', false, true, true, 'doc/', ''",
+            "'Unfiltered', true, false, false, '.', ''"
+    })
+    void testGivenRunConfigurationTemplateWhenCreatingConfigurationThenItHasCorrectSettings(
+            final String templateName,
+            final boolean wholeProject,
+            final boolean includeSourceRoots,
+            final boolean includeTestRoots,
+            final String additionalPathsText,
+            final String artifactTypesText
+    ) {
+        final OftRunConfiguration configuration = createConfigurationFromTemplate(templateName);
         final OftTraceSettingsSnapshot snapshot = configuration.snapshot();
 
         Assertions.assertAll(
-                () -> assertThat(snapshot.scopeMode(), is(OftTraceScopeMode.SELECTED_RESOURCES)),
-                () -> assertThat(snapshot.includeSourceRoots(), is(false)),
-                () -> assertThat(snapshot.includeTestRoots(), is(false)),
-                () -> assertThat(snapshot.additionalPathsText(), is("doc/")),
-                () -> assertThat(snapshot.artifactTypesText(), is("feat, req, scn, bconstr"))
-        );
-    }
-
-    public void testGivenDesignAndDownTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
-        final OftRunConfiguration configuration = createConfigurationFromTemplate("Design and above");
-        final OftTraceSettingsSnapshot snapshot = configuration.snapshot();
-
-        Assertions.assertAll(
-                () -> assertThat(snapshot.scopeMode(), is(OftTraceScopeMode.SELECTED_RESOURCES)),
-                () -> assertThat(snapshot.includeSourceRoots(), is(false)),
-                () -> assertThat(snapshot.includeTestRoots(), is(false)),
-                () -> assertThat(snapshot.additionalPathsText(), is("doc/")),
-                () -> assertThat(snapshot.artifactTypesText(), is("feat, req, scn, bconstr, arch, dsn, constr, bld"))
-        );
-    }
-
-    public void testGivenTypicalProjectTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
-        final OftRunConfiguration configuration = createConfigurationFromTemplate("Typical project");
-        final OftTraceSettingsSnapshot snapshot = configuration.snapshot();
-
-        Assertions.assertAll(
-                () -> assertThat(snapshot.scopeMode(), is(OftTraceScopeMode.SELECTED_RESOURCES)),
-                () -> assertThat(snapshot.includeSourceRoots(), is(true)),
-                () -> assertThat(snapshot.includeTestRoots(), is(true)),
-                () -> assertThat(snapshot.additionalPathsText(), is("doc/")),
-                () -> assertThat(snapshot.artifactTypesText(), is(""))
-        );
-    }
-
-    public void testGivenUnfilteredTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
-        final OftRunConfiguration configuration = createConfigurationFromTemplate("Unfiltered");
-        final OftTraceSettingsSnapshot snapshot = configuration.snapshot();
-
-        Assertions.assertAll(
-                () -> assertThat(snapshot.scopeMode(), is(OftTraceScopeMode.WHOLE_PROJECT)),
-                () -> assertThat(snapshot.includeSourceRoots(), is(false)),
-                () -> assertThat(snapshot.includeTestRoots(), is(false)),
-                () -> assertThat(snapshot.additionalPathsText(), is(".")),
-                () -> assertThat(snapshot.artifactTypesText(), is(""))
+                () -> assertThat(snapshot.scopeMode(), is(wholeProject
+                        ? OftTraceScopeMode.WHOLE_PROJECT
+                        : OftTraceScopeMode.SELECTED_RESOURCES)),
+                () -> assertThat(snapshot.includeSourceRoots(), is(includeSourceRoots)),
+                () -> assertThat(snapshot.includeTestRoots(), is(includeTestRoots)),
+                () -> assertThat(snapshot.additionalPathsText(), is(additionalPathsText)),
+                () -> assertThat(snapshot.artifactTypesText(), is(artifactTypesText))
         );
     }
 
