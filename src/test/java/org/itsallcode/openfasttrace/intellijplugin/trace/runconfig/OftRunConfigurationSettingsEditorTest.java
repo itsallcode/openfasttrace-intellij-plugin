@@ -27,7 +27,7 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
     }
 
     // [itest->dsn~select-test-runner-trace-result-view~1]
-    // [itest->dsn~trace-configuration-integration~1]
+    // [itest->dsn~trace-configuration-integration~2]
     public void testGivenEditorWhenResettingFromConfigurationThenItUpdatesUI() {
         editor.createEditor(); // Initialize component
         final OftRunConfiguration configuration = createConfiguration("Test");
@@ -58,7 +58,7 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
     }
 
     // [itest->dsn~select-test-runner-trace-result-view~1]
-    // [itest->dsn~trace-configuration-integration~1]
+    // [itest->dsn~trace-configuration-integration~2]
     public void testGivenEditorWhenApplyingToConfigurationThenItUpdatesConfiguration() {
         editor.createEditor(); // Initialize component
         final OftTraceSettingsSnapshot snapshot = new OftTraceSettingsSnapshot(

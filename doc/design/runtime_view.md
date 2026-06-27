@@ -376,18 +376,6 @@ Covers:
 
 Needs: impl, itest
 
-### Configure Trace Scope in Project Settings
-`dsn~configure-trace-scope-in-project-settings~2`
-
-**Given** an IntelliJ project is open
-**When** a user opens the OpenFastTrace project settings
-**Then** the trace-configuration component loads the persisted trace-scope mode and lets the user switch between whole-project tracing and selected-resource tracing for that project.
-
-Covers:
-- `scn~configure-trace-scope-in-project-settings~1`
-
-Needs: impl, itest
-
 ### Trace Selected Project Resources
 `dsn~trace-selected-project-resources~2`
 
@@ -445,18 +433,6 @@ Needs: impl, itest
 
 Covers:
 - `scn~show-per-line-validation-for-additional-trace-paths~1`
-
-Needs: impl, itest
-
-### Reject Trace without Valid Project Path
-`dsn~reject-trace-without-valid-project-path~1`
-
-**Given** an IntelliJ project is open but its base directory is missing, invalid, or not usable as a local OpenFastTrace input path
-**When** a user starts an OpenFastTrace trace
-**Then** the trace flow stops before starting the background trace run and reports the invalid project-path or configured-input condition through the IDE-visible trace flow.
-
-Covers:
-- `scn~reject-trace-without-valid-project-path~1`
 
 Needs: impl, itest
 

@@ -11,7 +11,7 @@ import com.intellij.openapi.project.Project;
         name = "org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceProjectSettings",
         storages = @Storage("openfasttrace.xml")
 )
-// [impl->dsn~trace-configuration-integration~1]
+// [impl->dsn~trace-configuration-integration~2]
 final class OftTraceProjectSettings implements PersistentStateComponent<OftTraceProjectSettings.State> {
     private State state = new State();
 

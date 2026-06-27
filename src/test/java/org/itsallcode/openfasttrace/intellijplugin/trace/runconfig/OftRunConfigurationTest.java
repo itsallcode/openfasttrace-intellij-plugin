@@ -1,5 +1,6 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace.runconfig;
 
+import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
@@ -11,15 +12,18 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapsho
 import org.jdom.Element;
 import org.junit.jupiter.api.Assertions;
 
+import java.util.Arrays;
+
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 
-// [itest->dsn~openfasttrace-run-configuration~1]
+// [itest->dsn~openfasttrace-run-configuration~2]
 public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
     // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
-    // [itest->dsn~trace-configuration-integration~1]
+    // [itest->dsn~trace-configuration-integration~2]
     public void testGivenNewRunConfigurationWhenReadingSnapshotThenItDefaultsToTestRunner() {
         final OftRunConfiguration configuration = createConfiguration("Test");
 
@@ -27,7 +31,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
     }
 
     // [itest->dsn~select-test-runner-trace-result-view~1]
-    // [itest->dsn~trace-configuration-integration~1]
+    // [itest->dsn~trace-configuration-integration~2]
     public void testGivenRunConfigurationWhenUpdatingFromSnapshotThenItStoresTheSettings() {
         final OftRunConfiguration configuration = createConfiguration("Test");
         final OftTraceSettingsSnapshot snapshot = new OftTraceSettingsSnapshot(
@@ -55,7 +59,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
     }
 
     // [itest->dsn~select-test-runner-trace-result-view~1]
-    // [itest->dsn~trace-configuration-integration~1]
+    // [itest->dsn~trace-configuration-integration~2]
     public void testGivenRunConfigurationWithSettingsWhenWritingAndReadingExternalThenItPreservesSettings()
             throws WriteExternalException, InvalidDataException {
         final OftRunConfiguration configuration = createConfiguration("Test");
@@ -89,7 +93,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
     }
 
     // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
-    // [itest->dsn~trace-configuration-integration~1]
+    // [itest->dsn~trace-configuration-integration~2]
     public void testGivenRunConfigurationWithNoStoredResultViewWhenReadingExternalThenItDefaultsToTestRunner()
             throws InvalidDataException {
         final OftRunConfiguration configuration = createConfiguration("Test");
@@ -100,7 +104,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
     }
 
     // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
-    // [itest->dsn~trace-configuration-integration~1]
+    // [itest->dsn~trace-configuration-integration~2]
     public void testGivenRunConfigurationWithInvalidStoredResultViewWhenReadingExternalThenItDefaultsToTestRunner()
             throws InvalidDataException {
         final Element element = new Element("configuration");
@@ -124,9 +128,84 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
         );
     }
 
+    public void testGivenRunConfigurationTypeWhenCheckingFactoriesThenItContainsAllTemplates() {
+        final OftRunConfigurationType type = new OftRunConfigurationType();
+        final String[] factoryNames = Arrays.stream(type.getConfigurationFactories())
+                .map(ConfigurationFactory::getName)
+                .toArray(String[]::new);
+
+        assertThat(Arrays.asList(factoryNames), containsInAnyOrder(
+                "User requirements",
+                "Design and down",
+                "Typical project",
+                "Unfiltered"
+        ));
+    }
+
+    public void testGivenUserRequirementsTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
+        final OftRunConfiguration configuration = createConfigurationFromTemplate("User requirements");
+        final OftTraceSettingsSnapshot snapshot = configuration.snapshot();
+
+        Assertions.assertAll(
+                () -> assertThat(snapshot.scopeMode(), is(OftTraceScopeMode.SELECTED_RESOURCES)),
+                () -> assertThat(snapshot.includeSourceRoots(), is(false)),
+                () -> assertThat(snapshot.includeTestRoots(), is(false)),
+                () -> assertThat(snapshot.additionalPathsText(), is("doc/")),
+                () -> assertThat(snapshot.artifactTypesText(), is("feat, req, scn, bconstr"))
+        );
+    }
+
+    public void testGivenDesignAndDownTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
+        final OftRunConfiguration configuration = createConfigurationFromTemplate("Design and down");
+        final OftTraceSettingsSnapshot snapshot = configuration.snapshot();
+
+        Assertions.assertAll(
+                () -> assertThat(snapshot.scopeMode(), is(OftTraceScopeMode.SELECTED_RESOURCES)),
+                () -> assertThat(snapshot.includeSourceRoots(), is(false)),
+                () -> assertThat(snapshot.includeTestRoots(), is(false)),
+                () -> assertThat(snapshot.additionalPathsText(), is("doc/")),
+                () -> assertThat(snapshot.artifactTypesText(), is("feat, req, scn, bconstr, arch, dsn, constr, bld"))
+        );
+    }
+
+    public void testGivenTypicalProjectTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
+        final OftRunConfiguration configuration = createConfigurationFromTemplate("Typical project");
+        final OftTraceSettingsSnapshot snapshot = configuration.snapshot();
+
+        Assertions.assertAll(
+                () -> assertThat(snapshot.scopeMode(), is(OftTraceScopeMode.SELECTED_RESOURCES)),
+                () -> assertThat(snapshot.includeSourceRoots(), is(true)),
+                () -> assertThat(snapshot.includeTestRoots(), is(true)),
+                () -> assertThat(snapshot.additionalPathsText(), is("doc/")),
+                () -> assertThat(snapshot.artifactTypesText(), is(""))
+        );
+    }
+
+    public void testGivenUnfilteredTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
+        final OftRunConfiguration configuration = createConfigurationFromTemplate("Unfiltered");
+        final OftTraceSettingsSnapshot snapshot = configuration.snapshot();
+
+        Assertions.assertAll(
+                () -> assertThat(snapshot.scopeMode(), is(OftTraceScopeMode.WHOLE_PROJECT)),
+                () -> assertThat(snapshot.includeSourceRoots(), is(false)),
+                () -> assertThat(snapshot.includeTestRoots(), is(false)),
+                () -> assertThat(snapshot.additionalPathsText(), is(".")),
+                () -> assertThat(snapshot.artifactTypesText(), is(""))
+        );
+    }
+
     private OftRunConfiguration createConfiguration(final String name) {
         final OftRunConfigurationType type = new OftRunConfigurationType();
         final OftRunConfigurationFactory factory = (OftRunConfigurationFactory) type.getConfigurationFactories()[0];
         return new OftRunConfiguration(getProject(), factory, name);
+    }
+
+    private OftRunConfiguration createConfigurationFromTemplate(final String templateName) {
+        final OftRunConfigurationType type = new OftRunConfigurationType();
+        final OftRunConfigurationFactory factory = (OftRunConfigurationFactory) Arrays.stream(type.getConfigurationFactories())
+                .filter(f -> f.getName().equals(templateName))
+                .findFirst()
+                .orElseThrow();
+        return (OftRunConfiguration) factory.createTemplateConfiguration(getProject());
     }
 }
