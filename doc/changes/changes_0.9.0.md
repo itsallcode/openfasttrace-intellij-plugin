@@ -1,6 +1,6 @@
 # OpenFastTrace IntelliJ Plugin 0.9.0, released 2026-06-27
 
-Version 0.9.0 introduces specialized run configuration templates and simplifies the plugin UI by removing the redundant global trace menu.
+Version 0.9.0 introduces specialized run configuration templates and improves the metadata shown by JetBrains plugin surfaces. Before installing or updating the plugin, users can now see a clearer overview of what OpenFastTrace support does in the IDE and read the current release notes from the maintained project changelog.
 
 Users can now quickly set up common OpenFastTrace scanning scenarios using pre-configured templates when creating a new run configuration:
 * **User requirements**: Scans `doc/` for core artifact types (`feat, req, scn, bconstr`).
@@ -17,3 +17,7 @@ OpenFastTrace 4.5.0
 ## Features
 
 * #61: Replace global OFT scan with specialized run configuration templates
+
+## Documentation
+
+* #51: Complete Marketplace-facing plugin metadata
