@@ -350,58 +350,34 @@ Covers:
 
 Needs: impl, itest
 
-## Trace Project
-
-### Show Trace Project Action in Tools Menu
-`dsn~show-trace-project-action-in-tools-menu~1`
-
-**Given** the plugin is loaded into the IDE and an IntelliJ project is open
-**When** the IDE builds the global `Tools` menu
-**Then** the plugin contributes an `OpenFastTrace` action group that contains the `Trace Project` action.
-
-Covers:
-- `scn~show-trace-project-action-in-tools-menu~1`
-
-Needs: impl, itest
-
-### Disable Trace Project Action without Open Project
-`dsn~disable-trace-project-action-without-open-project~1`
-
-**Given** the plugin is loaded into the IDE and no IntelliJ project is open
-**When** the IDE updates the presentation of the `Trace Project` action
-**Then** the trace-action component disables that action instead of offering a runnable trace command.
-
-Covers:
-- `scn~disable-trace-project-action-without-open-project~1`
-
-Needs: impl, itest
+## Trace Execution
 
 ### Run Trace Project in Background
-`dsn~run-trace-project-in-background~1`
+`dsn~run-trace-project-in-background~2`
 
 **Given** an IntelliJ project is open and its base directory resolves to a valid local file-system path
-**When** a user invokes `Tools | OpenFastTrace | Trace Project`
-**Then** the trace-action component starts a background task, the trace-configuration component resolves the effective OpenFastTrace inputs for the project, the trace-execution service invokes the OpenFastTrace library for those inputs, and the IDE keeps the editor UI responsive while showing progress for the running trace.
+**When** a user starts an OpenFastTrace trace
+**Then** the trace component starts a background task, the trace-configuration component resolves the effective OpenFastTrace inputs for the project, the trace-execution service invokes the OpenFastTrace library for those inputs, and the IDE keeps the editor UI responsive while showing progress for the running trace.
 
 Covers:
-- `scn~run-trace-project-in-background~1`
+- `scn~run-trace-project-in-background~2`
 
 Needs: impl, itest
 
-### Show Trace Project in Test Runner UI by Default
-`dsn~show-trace-project-in-test-runner-ui-by-default~1`
+### Show Trace Result in Test Runner UI by Default
+`dsn~show-trace-result-in-test-runner-ui-by-default~2`
 
-**Given** the global `Trace Project` action receives a valid OpenFastTrace trace result
-**When** the trace-action flow presents that result
-**Then** it creates an IntelliJ Test Runner UI console, maps the structured OpenFastTrace trace to SM test runner nodes, and shows that console as the default run content for the action.
+**Given** an OpenFastTrace trace receives a valid trace result
+**When** the trace flow presents that result
+**Then** it creates an IntelliJ Test Runner UI console, maps the structured OpenFastTrace trace to SM test runner nodes, and shows that console as the default run content.
 
 Covers:
-- `scn~show-trace-project-in-test-runner-ui-by-default~1`
+- `scn~show-trace-result-in-test-runner-ui-by-default~2`
 
 Needs: impl, itest
 
 ### Configure Trace Scope in Project Settings
-`dsn~configure-trace-scope-in-project-settings~1`
+`dsn~configure-trace-scope-in-project-settings~2`
 
 **Given** an IntelliJ project is open
 **When** a user opens the OpenFastTrace project settings
@@ -413,10 +389,10 @@ Covers:
 Needs: impl, itest
 
 ### Trace Selected Project Resources
-`dsn~trace-selected-project-resources~1`
+`dsn~trace-selected-project-resources~2`
 
-**Given** an IntelliJ project is open and OpenFastTrace project settings are configured for selected-resource tracing
-**When** a user invokes `Tools | OpenFastTrace | Trace Project`
+**Given** an IntelliJ project is open and OpenFastTrace project settings or run configuration are configured for selected-resource tracing
+**When** a user starts an OpenFastTrace trace
 **Then** the trace-configuration component resolves only the configured source roots, test roots, and additional project-relative paths and the trace-execution service passes only those inputs to OpenFastTrace.
 
 Covers:
@@ -472,23 +448,34 @@ Covers:
 
 Needs: impl, itest
 
-### Reject Trace Project without Valid Project Path
-`dsn~reject-trace-project-without-valid-project-path~2`
+### Reject Trace without Valid Project Path
+`dsn~reject-trace-without-valid-project-path~1`
 
 **Given** an IntelliJ project is open but its base directory is missing, invalid, or not usable as a local OpenFastTrace input path
-**When** a user invokes `Tools | OpenFastTrace | Trace Project`
-**Then** the trace-action flow stops before starting the background trace run and reports the invalid project-path or configured-input condition through the IDE-visible trace flow.
+**When** a user starts an OpenFastTrace trace
+**Then** the trace flow stops before starting the background trace run and reports the invalid project-path or configured-input condition through the IDE-visible trace flow.
 
 Covers:
-- `scn~reject-trace-project-without-valid-project-path~1`
+- `scn~reject-trace-without-valid-project-path~1`
+
+Needs: impl, itest
+
+### Use Run Configuration Templates
+`dsn~use-run-configuration-templates~1`
+
+**When** a user creates a new OpenFastTrace run configuration from a template
+**Then** the `OftRunConfigurationFactory` that matches the selected template creates a new `OftRunConfiguration` and initializes it with the pre-defined template settings.
+
+Covers:
+- `scn~use-run-configuration-templates~1`
 
 Needs: impl, itest
 
 ### OpenFastTrace Run Configuration
-`dsn~openfasttrace-run-configuration~1`
+`dsn~openfasttrace-run-configuration~2`
 
 **When** a user creates or edits an OpenFastTrace run configuration
-**Then** the plugin uses the IntelliJ Run Configuration API (type, factory, configuration) to persist the name, scope, additional paths, artifact type filters, and tag filters.
+**Then** the plugin uses the IntelliJ Run Configuration API (type, factory, configuration) to persist the name, scope, additional paths, artifact type filters, and tag filters. The plugin registers multiple factories to provide pre-configured templates for common scanning scenarios.
 
 Covers:
 - `scn~create-and-run-openfasttrace-run-configuration~1`
