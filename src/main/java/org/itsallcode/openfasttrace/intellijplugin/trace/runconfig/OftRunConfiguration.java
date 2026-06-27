@@ -19,6 +19,7 @@ import org.jdom.Element;
 import org.jspecify.annotations.NonNull;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 // [impl->dsn~trace-configuration-integration~2]
 public final class OftRunConfiguration extends LocatableConfigurationBase<OftRunProfileState> {
@@ -65,7 +66,7 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
 
     @Override
     public String suggestedName() {
-        return getFactory().getName();
+        return Objects.requireNonNull(getFactory()).getName();
     }
 
     @Override
