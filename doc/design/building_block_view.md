@@ -251,6 +251,16 @@ Covers:
 
 Needs: impl, itest
 
+### Configure Trace Scope in Project Settings
+`dsn~configure-trace-scope-in-project-settings~1`
+
+The plugin provides a project-level settings page for OpenFastTrace that allows users to configure the default trace scope for the project. Users can choose between whole-project tracing and selected-resource tracing. For selected-resource tracing, the settings provide a multi-line text field for additional project-relative paths, initialized with a default `doc/` entry.
+
+Covers:
+- `scn~configure-trace-scope-in-project-settings~1`
+
+Needs: impl, itest
+
 ### Trace Action Integration
 `dsn~trace-action-integration~3`
 
