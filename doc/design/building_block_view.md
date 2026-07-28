@@ -2,31 +2,24 @@
 
 This chapter describes the static decomposition of the plugin into building blocks and their responsibilities.
 
-The following diagram drafts the current product-level components of the plugin. It shows components, not classes.
+The following feature-focused views show the current product-level components of the plugin. A component may occur in more than one view where it participates in multiple features. The views show components, not classes, and contain at most seven modules each.
+
+## Syntax Highlighting
 
 ```plantuml
 @startuml
 skinparam componentStyle rectangle
+top to bottom direction
 
 package "JetBrains IDE / IntelliJ Platform" {
   component "Editor and PSI\nInfrastructure" as IdeEditor
-  component "Symbol Search and\nNavigation Infrastructure" as IdeNavigation
-  component "Live Template\nInfrastructure" as IdeLiveTemplates
-  component "Action System" as IdeActions
-  component "Background Task and\nProgress Infrastructure" as IdeTasks
-  component "Output View and\nRun Content Infrastructure" as IdeOutput
-  component "SM Test Runner\nInfrastructure" as IdeTestRunner
-  component "Help Menu and\nWeb View Infrastructure" as IdeHelp
 }
 
 package "Opened Project" {
-  artifact "Project Content Root" as ProjectRoot
   artifact "Markdown and RST\nSpecification Documents" as ProjectSpecs
   artifact "Source Files with\nCoverage Tags" as ProjectSources
-}
-
-package "OpenFastTrace Library" {
-  component "Trace Engine and\nText Reporter" as OftTraceLibrary
+  
+  ProjectSources -[hidden]u- ProjectSpecs
 }
 
 package "OpenFastTrace Plugin" {
@@ -34,53 +27,147 @@ package "OpenFastTrace Plugin" {
   component "Markdown Specification\nSupport" as MarkdownSupport
   component "RST Specification\nSupport" as RstSupport
   component "Coverage Tag\nSupport" as CoverageSupport
-  component "Specification Item\nIndex" as SpecIndex
-  component "Specification Item\nNavigation" as NavigationSupport
-  component "Specification Item\nCompletion" as CompletionSupport
-  component "Live Template\nIntegration" as LiveTemplateSupport
-  component "Trace Configuration\nIntegration" as TraceConfigurationSupport
-  component "Trace Action\nIntegration" as TraceActionSupport
-  component "Trace Execution\nService" as TraceExecutionSupport
-  component "Trace Output\nPresentation" as TraceOutputSupport
-  component "Trace Test Runner\nPresentation" as TraceTestRunnerSupport
-  component "User Guide\nIntegration" as UserGuideSupport
 }
 
-MarkdownSupport --> OftSyntax
-RstSupport --> OftSyntax
-CoverageSupport --> OftSyntax
+ProjectSpecs -l-> MarkdownSupport : reads
+ProjectSpecs --> RstSupport : reads
+ProjectSources --> CoverageSupport : reads
+MarkdownSupport -u-> OftSyntax
+RstSupport -u-> OftSyntax
+CoverageSupport -u-> OftSyntax
+MarkdownSupport -d-> IdeEditor
+RstSupport -d-> IdeEditor
+CoverageSupport -d-> IdeEditor
+@enduml
+```
+
+## Specification-Item Navigation and Refactoring
+
+```plantuml
+@startuml
+skinparam componentStyle rectangle
+
+package "JetBrains IDE / IntelliJ Platform" {
+  component "Symbol Search and\nNavigation Infrastructure" as IdeNavigation
+  component "Refactoring and\nUsage Search Infrastructure" as IdeRefactoring
+  
+  IdeNavigation -[hidden]u- IdeRefactoring
+}
+
+package "OpenFastTrace Plugin" {
+  component "OFT Syntax Core" as OftSyntax
+  component "Specification Item\nIndex" as SpecIndex
+  component "Specification Item\nNavigation" as NavigationSupport
+  component "Specification Item\nRefactoring" as RefactoringSupport
+}
+
 SpecIndex --> OftSyntax
 NavigationSupport --> SpecIndex
-TraceActionSupport --> TraceExecutionSupport
-TraceExecutionSupport --> TraceOutputSupport
-TraceExecutionSupport --> TraceTestRunnerSupport
+NavigationSupport -l-> IdeNavigation
+RefactoringSupport --> OftSyntax
+RefactoringSupport --> SpecIndex
+RefactoringSupport --> NavigationSupport
+RefactoringSupport -l-> IdeRefactoring
+@enduml
+```
 
-MarkdownSupport --> IdeEditor
-RstSupport --> IdeEditor
-CoverageSupport --> IdeEditor
-SpecIndex --> IdeEditor
-NavigationSupport --> IdeNavigation
+## Reference Authoring
+
+```plantuml
+@startuml
+skinparam componentStyle rectangle
+
+package "JetBrains IDE / IntelliJ Platform" {
+  component "Editor and PSI\nInfrastructure" as IdeEditor
+  component "Live Template\nInfrastructure" as IdeLiveTemplates
+}
+
+package "OpenFastTrace Plugin" {
+  component "Specification Item\nIndex" as SpecIndex
+  component "Specification Item\nCompletion" as CompletionSupport
+  component "Live Template\nIntegration" as LiveTemplateSupport
+}
+
 CompletionSupport --> SpecIndex
 CompletionSupport --> IdeEditor
 LiveTemplateSupport --> IdeLiveTemplates
 LiveTemplateSupport --> IdeEditor
+@enduml
+```
+
+## Trace Setup
+
+```plantuml
+@startuml
+skinparam componentStyle rectangle
+
+package "JetBrains IDE / IntelliJ Platform" {
+  component "Action System" as IdeActions
+}
+
+package "Opened Project" {
+  artifact "Project Content Root" as ProjectRoot
+}
+
+package "OpenFastTrace Plugin" {
+  component "Trace Configuration\nIntegration" as TraceConfigurationSupport
+  component "Trace Action\nIntegration" as TraceActionSupport
+}
+
 TraceConfigurationSupport --> IdeActions
 TraceActionSupport --> IdeActions
-TraceExecutionSupport --> IdeTasks
-TraceOutputSupport --> IdeOutput
-TraceTestRunnerSupport --> IdeTestRunner
-TraceTestRunnerSupport --> NavigationSupport
-UserGuideSupport --> IdeHelp
-
 TraceActionSupport --> TraceConfigurationSupport
 TraceActionSupport --> ProjectRoot : reads path
 TraceConfigurationSupport --> ProjectRoot : reads settings roots
-TraceExecutionSupport --> ProjectRoot : traces
+@enduml
+```
+
+## Trace Execution and Results
+
+```plantuml
+@startuml
+skinparam componentStyle rectangle
+
+package "JetBrains IDE / IntelliJ Platform" {
+  component "Background Task and\nProgress Infrastructure" as IdeTasks
+  component "Output View and\nRun Content Infrastructure" as IdeOutput
+  component "SM Test Runner\nInfrastructure" as IdeTestRunner
+}
+
+package "OpenFastTrace Library" {
+  component "Trace Engine and\nText Reporter" as OftTraceLibrary
+}
+
+package "OpenFastTrace Plugin" {
+  component "Trace Execution\nService" as TraceExecutionSupport
+  component "Trace Output\nPresentation" as TraceOutputSupport
+  component "Trace Test Runner\nPresentation" as TraceTestRunnerSupport
+}
+
+TraceExecutionSupport --> IdeTasks
 TraceExecutionSupport --> OftTraceLibrary
-MarkdownSupport --> ProjectSpecs : reads
-RstSupport --> ProjectSpecs : reads
-CoverageSupport --> "1..n" ProjectSources : reads
-SpecIndex --> "1..n" ProjectSpecs : indexes
+TraceExecutionSupport --> TraceOutputSupport
+TraceExecutionSupport --> TraceTestRunnerSupport
+TraceOutputSupport --> IdeOutput
+TraceTestRunnerSupport --> IdeTestRunner
+@enduml
+```
+
+## User Guide
+
+```plantuml
+@startuml
+skinparam componentStyle rectangle
+
+package "JetBrains IDE / IntelliJ Platform" {
+  component "Help Menu and\nWeb View Infrastructure" as IdeHelp
+}
+
+package "OpenFastTrace Plugin" {
+  component "User Guide\nIntegration" as UserGuideSupport
+}
+
+UserGuideSupport --> IdeHelp
 @enduml
 ```
 
@@ -178,6 +265,10 @@ Covers:
 - `scn~open-specification-item-from-coverage-tag-right-side~1`
 
 Needs: impl
+
+### Specification Item Refactoring
+
+The specification-item refactoring component adapts canonical declaration anchors and resolved OFT references to IntelliJ's shared language-module Rename and usage-search infrastructure. It reuses the syntax core to validate proposed full IDs, the declaration index to detect target-ID conflicts, and navigation/reference resolution to identify semantic usages. It never treats arbitrary matching text as a usage and does not merge duplicate declarations. The scenario-specific runtime design items below define the individual rename flows.
 
 ### Specification Item Completion
 `dsn~specification-item-completion~1`

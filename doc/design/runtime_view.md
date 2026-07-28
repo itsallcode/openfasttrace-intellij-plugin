@@ -224,6 +224,73 @@ Covers:
 
 Needs: impl, itest
 
+## Specification Item Refactoring
+
+### Start Specification Item Rename from Declaration
+`dsn~start-specification-item-rename-from-declaration~1`
+
+**Given** a user invokes IntelliJ Rename with the caret on an OFT declaration anchor
+**When** the refactoring component determines the rename target
+**Then** it exposes the declaration's canonical full ID and exact anchor range as the writable target and delegates the dialog, usage preview, and application workflow to IntelliJ's standard Rename infrastructure.
+
+Covers:
+- `scn~rename-specification-item-id-from-declaration~1`
+
+Needs: impl, utest, itest
+
+### Start Specification Item Rename from Reference
+`dsn~start-specification-item-rename-from-reference~1`
+
+**Given** a user invokes IntelliJ Rename with the caret on a supported OFT reference
+**When** that reference resolves to a unique OFT declaration
+**Then** the refactoring component uses the resolved declaration, rather than the reference occurrence, as the canonical Rename target and delegates the workflow to IntelliJ's standard Rename infrastructure.
+
+Covers:
+- `scn~rename-specification-item-id-from-reference~1`
+
+Needs: impl, utest, itest
+
+### Update OFT References during Rename
+`dsn~update-resolved-oft-references-during-specification-item-rename~1`
+
+**Given** IntelliJ applies a rename from one full OFT ID to another after the user confirms the preview
+**When** the refactoring component collects usages of the selected declaration
+**Then** it supplies resolved references in supported `Covers:` and `Depends:` entries and on either resolved side of supported coverage tags
+**And** replaces their ID ranges with the new canonical ID
+**And** preserves surrounding syntax and valid left-side shorthand
+**And** refreshes the canonical declaration lookup after in the index.
+
+Covers:
+- `scn~update-supported-references-during-specification-item-id-rename~1`
+
+Needs: impl, utest, itest
+
+### Exclude Non-Semantic Text from Specification Item Rename
+`dsn~exclude-non-semantic-text-from-specification-item-rename~1`
+
+**Given** a project contains text matching the old full OFT ID outside a declaration or a reference that resolves to the selected declaration
+**When** the refactoring component builds the Rename usage set
+**Then** it derives usages exclusively from supported PSI references 
+**And** excludes ordinary prose, unsupported files, invalid fragments, and unresolved OFT-like text from the preview and applied edits.
+
+Covers:
+- `scn~exclude-unresolved-and-non-oft-text-from-specification-item-id-rename~1`
+
+Needs: impl, utest, itest
+
+### Reject Invalid or Conflicting Specification Item Rename
+`dsn~reject-invalid-or-conflicting-specification-item-rename~1`
+
+**Given** a user proposes a new full OFT ID in the Rename workflow
+**When** the refactoring component validates the proposed ID and queries the declaration index for a different declaration with that ID
+**Then** it reports an invalid-ID or existing-declaration conflict before any file is edited
+**And** does not interpret the conflict as an item merge.
+
+Covers:
+- `scn~reject-invalid-or-existing-specification-item-id-rename~1`
+
+Needs: impl, utest, itest
+
 ## Completion
 
 ### Complete Specification Item ID in Covers Section
@@ -231,7 +298,9 @@ Needs: impl, itest
 
 **Given** a supported specification document contains a `Covers:` entry and the opened project already indexes declared OpenFastTrace specification items
 **When** a user invokes IntelliJ basic completion while editing an OFT item ID in that `Covers:` entry
-**Then** the completion component confirms that the caret is inside a `Covers:` reference, loads declared specification item IDs from the declaration index, ranks them by full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches, and shows the ordered suggestions in the standard IDE completion popup.
+**Then** the completion component confirms that the caret is inside a `Covers:` reference, loads declared specification item IDs from the declaration index
+**And** ranks them by full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches
+**And** shows the ordered suggestions in the standard IDE completion popup.
 
 Covers:
 - `scn~complete-specification-item-id-in-covers-section~1`
@@ -243,7 +312,8 @@ Needs: impl, itest
 
 **Given** a bundled OFT live template is active at a `COVERED` placeholder under `Covers:` and the opened project already indexes declared OpenFastTrace specification items
 **When** a user invokes IntelliJ basic completion in that placeholder before the live-template session ends
-**Then** the completion component reads the active editor document, handles the request like any other `Covers:` reference by reading declared specification item IDs from the declaration index, and shows the matching suggestions in the standard IDE completion popup without ending the live-template session.
+**Then** the completion component reads the active editor document, handles the request like any other `Covers:` reference by reading declared specification item IDs from the declaration index
+**And** shows the matching suggestions in the standard IDE completion popup without ending the live-template session.
 
 Covers:
 - `scn~complete-specification-item-id-in-active-live-template-covers-field~1`

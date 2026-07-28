@@ -24,6 +24,8 @@ Authoring shortcuts use IntelliJ's live-template infrastructure instead of custo
 
 Reference authoring assistance for `Covers:` entries and coverage-tag targets likewise reuses IntelliJ's standard completion infrastructure. The plugin activates completion only in supported OFT reference authoring contexts, then fills the suggestion list from the existing declaration index instead of maintaining a second source of specification-item identities.
 
+Specification-item maintenance reuses IntelliJ's standard Rename and usage-preview workflow from the shared IntelliJ language module. A rename started at a declaration or resolved OFT reference identifies the canonical declaration through the existing resolver, collects only PSI references that resolve to it, and lets the platform preview the affected declaration and usages before applying edits. The plugin validates the proposed full ID with the shared OFT syntax model and detects an existing target declaration through the declaration index; these are conflicts, not implicit item merges. This keeps rename scoped to semantic OFT locations and avoids project-wide text replacement.
+
 This strategy reduces custom code, lowers maintenance effort, and improves cross-IDE compatibility because the implementation stays aligned with the platform abstractions that JetBrains supports across products.
 
 ## OFT Specification Item Index
