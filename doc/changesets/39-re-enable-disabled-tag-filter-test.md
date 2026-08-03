@@ -36,18 +36,17 @@ Treat this as an upstream dependency alignment issue rather than a product featu
 
 ### Requirements And Design
 
-- [ ] Confirm that the existing `req~filter-trace-by-tags~1` and `scn~filter-run-configuration-by-tags~1` coverage already describes the intended behavior, so no requirement or design edits are needed.
+- [x] Confirm that the existing `req~filter-trace-by-tags~1` and `scn~filter-run-configuration-by-tags~1` coverage already describes the intended behavior, so no requirement or design edits are needed.
 
 ### Implementation
 
-- [ ] Update the bundled OpenFastTrace dependency to 4.8.0 in `build.gradle.kts` and refresh `gradle.lockfile` as needed.
-- [ ] Remove the `@Disabled` annotation from `testGivenTagFilterMatchingArtifactWhenTracingThenItIncludesTheArtifact`.
-- [ ] Keep the tag-filter regression test focused on the existing Markdown-based end-to-end trace flow.
+- [x] Update the bundled OpenFastTrace dependency to 4.8.0 in `build.gradle.kts` and refresh `gradle.lockfile` as needed.
+- [x] Remove the `@Disabled` annotation from `testGivenTagFilterMatchingArtifactWhenTracingThenItIncludesTheArtifact`.
+- [x] Keep the tag-filter regression test focused on the existing Markdown-based end-to-end trace flow.
 
 ### Verification
 
-- [ ] Run the focused `OftTraceServiceTest` tag-filter case against the updated dependency.
+- [x] Run the focused `OftTraceServiceTest` tag-filter case against the updated dependency.
 - [ ] Run `./gradlew traceRequirements` to confirm the OFT trace remains clean.
 - [ ] Run `./gradlew check`.
 - [ ] Run `./gradlew verifyPlugin`.
-

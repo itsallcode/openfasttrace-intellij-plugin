@@ -3,7 +3,6 @@ package org.itsallcode.openfasttrace.intellijplugin.trace;
 import org.itsallcode.openfasttrace.core.Oft;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -213,34 +212,38 @@ class OftTraceServiceTest {
         );
     }
 
-    @Disabled("Reanable after https://github.com/itsallcode/openfasttrace/issues/505 is fixed")
     @Test
     void testGivenTagFilterMatchingArtifactWhenTracingThenItIncludesTheArtifact(
             @TempDir final Path temporaryDirectory
     ) throws IOException {
         final Path docDirectory = Files.createDirectories(temporaryDirectory.resolve("doc"));
+        // Note that this example intentionally uses a non-covered chain, so that we get actual defects in the report
+        // with or without tag filter!
         Files.writeString(
                 docDirectory.resolve("tags.md"),
                 """
                 ### Tagged Requirement
                 `req~tagged_requirement~1`
-                
-                Tags: tagged
-                
                 Needs: impl
+                Tags: tagged
                 
                 ### Untagged Requirement
                 `req~untagged_requirement~1`
-                
                 Needs: impl
                 
                 ### Tagged Coverage
                 `impl~tagged_coverage~1`
-                
                 Covers:
                 - `req~tagged_requirement~1`
-                
                 Tags: tagged
+                Needs: foo
+                
+                ### Non-matching Tag
+                `impl~tagged_coverage_non-matching~1`
+                Covers:
+                - `req~tagged_requirement~1`
+                Tags: non_matching_tag
+                Needs: foo
                 """
         );
 
@@ -254,7 +257,15 @@ class OftTraceServiceTest {
         );
         final String renderedOutput = stripAnsi(result.output());
 
-        assertThat(renderedOutput, Matchers.containsString("ok - 2 total"));
+        assertThat(
+                renderedOutput,
+                Matchers.allOf(
+                        Matchers.containsString("req~tagged_requirement~1"),
+                        Matchers.containsString("impl~tagged_coverage~1"),
+                        Matchers.containsString("#: tagged"),
+                        Matchers.not(Matchers.containsString("non-matching"))
+                )
+        );
     }
 
     private String stripAnsi(final String output) {
