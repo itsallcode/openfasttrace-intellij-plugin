@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public final class OftTraceService {
+    private static final String UNTAGGED_ITEMS_FILTER_MARKER = "__oft-include-untagged__!";
     @SuppressWarnings("java:S3032")
     // OFT ServiceLoader discovery must use the plugin class loader, not an arbitrary caller context loader.
     private static final ClassLoader PLUGIN_CLASS_LOADER = OftTraceService.class.getClassLoader();
@@ -52,10 +53,11 @@ public final class OftTraceService {
             if (!inputs.artifactTypes().isEmpty()) {
                 filterSettings.artifactTypes(Set.copyOf(inputs.artifactTypes()));
             }
-            if (!inputs.tags().isEmpty()) {
-                filterSettings.tags(Set.copyOf(inputs.tags()));
+            final Set<String> tags = createTagFilter(inputs);
+            if (!tags.isEmpty()) {
+                filterSettings.tags(tags);
                 // OFT defaults to "without tags" mode unless this is explicitly disabled.
-                filterSettings.withoutTags(false);
+                filterSettings.withoutTags(inputs.includeUntagged());
             }
             final List<SpecificationItem> items = importItems(inputs.inputPaths(), filterSettings);
 
@@ -120,6 +122,17 @@ public final class OftTraceService {
                 .colorScheme(ColorScheme.COLOR)
                 .detailsSectionDisplay(DetailsSectionDisplay.COLLAPSE)
                 .build();
+    }
+
+    private static Set<String> createTagFilter(final OftTraceInputs inputs) {
+        if (!inputs.includeUntagged() && inputs.tags().isEmpty()) {
+            return Set.of();
+        }
+        final Set<String> tags = new java.util.LinkedHashSet<>(inputs.tags());
+        if (inputs.includeUntagged()) {
+            tags.add(UNTAGGED_ITEMS_FILTER_MARKER);
+        }
+        return tags;
     }
 
     private static <T> T runWithPluginClassLoader(final Callable<T> action) {

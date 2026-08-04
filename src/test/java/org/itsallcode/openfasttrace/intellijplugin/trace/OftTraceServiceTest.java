@@ -215,11 +215,22 @@ class OftTraceServiceTest {
         );
     }
 
+
+    private static Stream<Arguments> tagFilterScenarios() {
+        return Stream.of(
+                Arguments.of("work", false, "ok - 2 total"),
+                Arguments.of("work, home", false, "ok - 3 total"),
+                Arguments.of("", false, "ok - 4 total"),
+                Arguments.of("", true, "ok - 1 total")
+        );
+    }
+
     // [itest->dsn~filter-trace-by-artifact-types-and-tags~1]
     @ParameterizedTest(name = "{0}")
     @MethodSource("tagFilterScenarios")
     void testGivenTagFilterWhenTracingThenItIncludesOnlyMatchingItems(
             final String tagsText,
+            final boolean includeUntagged,
             final String expectedSummaryLine,
             @TempDir final Path temporaryDirectory
     ) throws IOException {
@@ -232,7 +243,8 @@ class OftTraceServiceTest {
                         tagsText.isEmpty() ? java.util.List.of() : java.util.Arrays.stream(tagsText.split(","))
                                 .map(String::trim)
                                 .filter(tag -> !tag.isEmpty())
-                                .toList()
+                                .toList(),
+                        includeUntagged
                 ),
                 OftTraceProgress.NONE
         );
@@ -374,13 +386,6 @@ class OftTraceServiceTest {
                 ### Untagged Requirement
                 `req~untagged_requirement~1`
                 """
-        );
-    }
-
-    private static Stream<Arguments> tagFilterScenarios() {
-        return Stream.of(
-                Arguments.of("work", "ok - 2 total"),
-                Arguments.of("work, home", "ok - 3 total")
         );
     }
 }

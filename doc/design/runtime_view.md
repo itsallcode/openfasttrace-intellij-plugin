@@ -454,7 +454,7 @@ Needs: impl, itest
 `dsn~openfasttrace-run-configuration~2`
 
 **When** a user creates or edits an OpenFastTrace run configuration
-**Then** the plugin uses the IntelliJ Run Configuration API (type, factory, configuration) to persist the name, scope, additional paths, artifact type filters, and tag filters. The plugin registers multiple factories to provide pre-configured templates for common scanning scenarios.
+**Then** the plugin uses the IntelliJ Run Configuration API (type, factory, configuration) to persist the name, scope, additional paths, artifact type filters, tag filters, and the `Include untagged items` checkbox. The plugin registers multiple factories to provide pre-configured templates for common scanning scenarios.
 
 Covers:
 - `scn~create-and-run-openfasttrace-run-configuration~1`
@@ -477,11 +477,12 @@ Needs: impl, itest
 `dsn~filter-trace-by-artifact-types-and-tags~1`
 
 **When** the trace-execution service invokes the OpenFastTrace library
-**Then** it passes the configured artifact type and tag filters from the run configuration to the OpenFastTrace engine to restrict the trace result.
+**Then** it passes the configured artifact type and tag filters, together with the `Include untagged items` setting, from the run configuration to the OpenFastTrace engine to restrict the trace result.
 
 Covers:
 - `scn~filter-run-configuration-by-artifact-types~1`
 - `scn~filter-run-configuration-by-tags~1`
+- `scn~filter-run-configuration-by-untagged-items~1`
 
 Needs: impl, itest
 

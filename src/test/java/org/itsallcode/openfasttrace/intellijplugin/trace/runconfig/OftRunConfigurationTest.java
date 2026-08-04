@@ -58,6 +58,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 "additional",
                 "dsn",
                 "mvp",
+                true,
                 OftTraceResultView.TEST_RUNNER
         );
 
@@ -71,6 +72,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 () -> assertThat(stored.additionalPathsText(), is(snapshot.additionalPathsText())),
                 () -> assertThat(stored.artifactTypesText(), is(snapshot.artifactTypesText())),
                 () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
+                () -> assertThat(stored.includeUntagged(), is(snapshot.includeUntagged())),
                 () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
     }
@@ -87,6 +89,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 "additional",
                 "dsn",
                 "mvp",
+                true,
                 OftTraceResultView.TEST_RUNNER
         );
         configuration.updateFrom(snapshot);
@@ -105,6 +108,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 () -> assertThat(stored.additionalPathsText(), is(snapshot.additionalPathsText())),
                 () -> assertThat(stored.artifactTypesText(), is(snapshot.artifactTypesText())),
                 () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
+                () -> assertThat(stored.includeUntagged(), is(snapshot.includeUntagged())),
                 () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
     }
@@ -200,7 +204,8 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 () -> assertThat(snapshot.includeTestRoots(), is(includeTestRoots)),
                 () -> assertThat(snapshot.additionalPathsText(), is(additionalPathsText)),
                 () -> assertThat(snapshot.artifactTypesText(), is(artifactTypesText)),
-                () -> assertThat(snapshot.tagsText(), is(""))
+                () -> assertThat(snapshot.tagsText(), is("")),
+                () -> assertThat(snapshot.includeUntagged(), is(false))
         );
     }
 

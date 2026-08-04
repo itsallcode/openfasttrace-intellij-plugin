@@ -463,7 +463,7 @@ Needs: scn
 ### Filter Trace by Tags
 `req~filter-trace-by-tags~1`
 
-When using an OpenFastTrace run configuration, the plugin lets users filter the trace results by tags. Users can specify a comma-separated list of tags to focus the trace on tagged specification items.
+When using an OpenFastTrace run configuration, the plugin lets users filter the trace results by tags. Users can specify a comma-separated list of tags to focus the trace on tagged specification items and can select an `Include untagged items` checkbox below the Tags field to also include specification items without tags.
 
 Covers:
 - `feat~oft-run-configurations~2`
@@ -1350,6 +1350,18 @@ Needs: dsn
 **Given** an IntelliJ project is open and an `OpenFastTrace` run configuration is configured with tag filters "mvp"
 **When** a user runs that configuration
 **Then** the plugin passes the tag filter to OpenFastTrace and the resulting trace output contains only items matching that tag.
+
+Covers:
+- `req~filter-trace-by-tags~1`
+
+Needs: dsn
+
+### Filter Run Configuration by Untagged Items
+`scn~filter-run-configuration-by-untagged-items~1`
+
+**Given** an IntelliJ project is open and an `OpenFastTrace` run configuration has the `Include untagged items` checkbox selected
+**When** a user runs that configuration
+**Then** the plugin passes the untagged-item filter to OpenFastTrace and the resulting trace output contains only specification items without tags.
 
 Covers:
 - `req~filter-trace-by-tags~1`

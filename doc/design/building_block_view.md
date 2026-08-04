@@ -456,6 +456,7 @@ scale 2
         .               | .
         Tags:           | "mvp                       "
         .               | <i>(comma-separated, empty = all)
+        .               | [ ] Include untagged items
         .               | .
         Result view:    | ()  Plain text output
         .               | (X) IntelliJ Test Runner UI
