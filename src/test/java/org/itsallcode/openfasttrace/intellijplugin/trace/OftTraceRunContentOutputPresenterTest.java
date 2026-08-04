@@ -71,7 +71,7 @@ public class OftTraceRunContentOutputPresenterTest extends AbstractOftPlatformTe
             assertThat(renderedOutput, Matchers.containsString(LAST_ITEM_ID));
             assertThat(consoleText, Matchers.containsString(FIRST_ITEM_ID));
             assertThat(consoleText, Matchers.containsString(LAST_ITEM_ID));
-            assertThat(consoleText, Matchers.containsString("not ok - 2000 total, 2000 defect"));
+            assertThat(consoleText, Matchers.containsString("not ok - 2000 total, 2000 direct, 0 transitive defects"));
             assertThat(stripAnsi(consoleText), is(expectedConsoleText(renderedOutput)));
         } finally {
             disposeConsole(consoleRef.get());
