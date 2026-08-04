@@ -5,6 +5,9 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.lang.reflect.Proxy;
@@ -12,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.net.URLClassLoader;
 import java.util.List;
+import java.util.stream.Stream;
 import java.util.regex.Pattern;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -150,7 +154,7 @@ class OftTraceServiceTest {
         Assertions.assertAll(
                 () -> assertThat(result.isSuccessful(), is(false)),
                 () -> assertThat(result.output(), Matchers.containsString("\u001B[")),
-                () -> assertThat(renderedOutput, Matchers.containsString("not ok - 3 total, 3 defect")),
+                () -> assertThat(renderedOutput, Matchers.containsString("not ok - 3 total, 1 direct, 2 transitive defects")),
                 () -> assertThat(renderedOutput, Matchers.containsString("dsn~chain_design~1")),
                 () -> assertThat(renderedOutput, Matchers.containsString("feat~chain_feature~1")),
                 () -> assertThat(renderedOutput, Matchers.containsString("req~chain_requirement~1"))
@@ -212,59 +216,36 @@ class OftTraceServiceTest {
         );
     }
 
-    @Test
-    void testGivenTagFilterMatchingArtifactWhenTracingThenItIncludesTheArtifact(
+    // [itest->dsn~filter-trace-by-artifact-types-and-tags~1]
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("tagFilterScenarios")
+    void testGivenTagFilterWhenTracingThenItIncludesOnlyMatchingItems(
+            final String tagsText,
+            final String expectedSummaryLine,
+            final List<String> expectedIncludedItems,
+            final List<String> expectedExcludedItems,
             @TempDir final Path temporaryDirectory
     ) throws IOException {
-        final Path docDirectory = Files.createDirectories(temporaryDirectory.resolve("doc"));
-        // Note that this example intentionally uses a non-covered chain, so that we get actual defects in the report
-        // with or without tag filter!
-        Files.writeString(
-                docDirectory.resolve("tags.md"),
-                """
-                ### Tagged Requirement
-                `req~tagged_requirement~1`
-                Needs: impl
-                Tags: tagged
-                
-                ### Untagged Requirement
-                `req~untagged_requirement~1`
-                Needs: impl
-                
-                ### Tagged Coverage
-                `impl~tagged_coverage~1`
-                Covers:
-                - `req~tagged_requirement~1`
-                Tags: tagged
-                Needs: foo
-                
-                ### Non-matching Tag
-                `impl~tagged_coverage_non-matching~1`
-                Covers:
-                - `req~tagged_requirement~1`
-                Tags: non_matching_tag
-                Needs: foo
-                """
-        );
+        writeTagFilterProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(
                 OftTraceInputs.selectedResources(
                         java.util.List.of(temporaryDirectory),
                         java.util.List.of(),
-                        java.util.List.of("tagged")
+                        tagsText.isEmpty() ? java.util.List.of() : java.util.Arrays.stream(tagsText.split(","))
+                                .map(String::trim)
+                                .filter(tag -> !tag.isEmpty())
+                                .toList()
                 ),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
 
-        assertThat(
-                renderedOutput,
-                Matchers.allOf(
-                        Matchers.containsString("req~tagged_requirement~1"),
-                        Matchers.containsString("impl~tagged_coverage~1"),
-                        Matchers.containsString("#: tagged"),
-                        Matchers.not(Matchers.containsString("non-matching"))
-                )
+        Assertions.assertAll(
+                () -> assertThat(result.isSuccessful(), is(true)),
+                () -> assertThat(renderedOutput, Matchers.containsString(expectedSummaryLine)),
+                () -> expectedIncludedItems.forEach(item -> assertThat(renderedOutput, Matchers.containsString(item))),
+                () -> expectedExcludedItems.forEach(item -> assertThat(renderedOutput, Matchers.not(Matchers.containsString(item))))
         );
     }
 
@@ -375,6 +356,60 @@ class OftTraceServiceTest {
 
                 Needs: impl
                 """
+        );
+    }
+
+    private void writeTagFilterProject(final Path projectRoot) throws IOException {
+        final Path docDirectory = Files.createDirectories(projectRoot.resolve("doc"));
+        Files.writeString(
+                docDirectory.resolve("tags.md"),
+                """
+                ### Work Requirement
+                `req~tagged_work_requirement~1`
+                Tags: work
+
+                ### Work and Home Requirement
+                `req~tagged_work_home_requirement~1`
+                Tags: work, home
+
+                ### Home Requirement
+                `req~tagged_home_requirement~1`
+                Tags: home
+
+                ### Untagged Requirement
+                `req~untagged_requirement~1`
+                """
+        );
+    }
+
+    private static Stream<Arguments> tagFilterScenarios() {
+        return Stream.of(
+                Arguments.of(
+                        "work",
+                        "ok - 2 total",
+                        List.of("req~tagged_work_requirement~1", "req~tagged_work_home_requirement~1"),
+                        List.of("req~tagged_home_requirement~1", "req~untagged_requirement~1")
+                ),
+                Arguments.of(
+                        "work, home",
+                        "ok - 3 total",
+                        List.of(
+                                "req~tagged_work_requirement~1",
+                                "req~tagged_work_home_requirement~1",
+                                "req~tagged_home_requirement~1"
+                        ),
+                        List.of("req~untagged_requirement~1")
+                ),
+                Arguments.of(
+                        "_",
+                        "ok - 1 total",
+                        List.of("req~untagged_requirement~1"),
+                        List.of(
+                                "req~tagged_work_requirement~1",
+                                "req~tagged_work_home_requirement~1",
+                                "req~tagged_home_requirement~1"
+                        )
+                )
         );
     }
 }
