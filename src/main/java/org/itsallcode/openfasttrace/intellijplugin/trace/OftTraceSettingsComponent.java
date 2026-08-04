@@ -104,7 +104,7 @@ public final class OftTraceSettingsComponent {
                 .addTooltip("comma-separated, empty = all")
                 .addLabeledComponent("Tags:", tagsField)
                 .addTooltip("comma-separated, empty = all")
-                .addComponent(includeUntaggedCheckBox, 1);
+                .addLabeledComponent("", includeUntaggedCheckBox);
         if (showResultViewSelection) {
             formBuilder
                     .addSeparator()
