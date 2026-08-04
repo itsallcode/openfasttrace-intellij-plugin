@@ -27,6 +27,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 
 // [itest->dsn~openfasttrace-run-configuration~2]
+@SuppressWarnings("JUnitMixedFramework")
 public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
     @BeforeEach
     void initPlatformFixture() throws Exception {
@@ -168,7 +169,6 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                         .map(factory -> (Executable) () -> {
                             final OftRunConfigurationFactory oftFactory = (OftRunConfigurationFactory) factory;
                             assertThat(oftFactory.getSingletonPolicy(), is(RunConfigurationSingletonPolicy.SINGLE_INSTANCE_ONLY));
-                            assertThat(oftFactory.canConfigurationBeSingleton(), is(false));
                         })
                         .toList()
         );

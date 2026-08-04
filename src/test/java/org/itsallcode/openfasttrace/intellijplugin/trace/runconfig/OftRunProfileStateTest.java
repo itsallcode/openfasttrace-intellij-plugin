@@ -11,8 +11,6 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceResultView;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
 
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -20,7 +18,7 @@ import static org.hamcrest.Matchers.not;
 
 public class OftRunProfileStateTest extends AbstractOftPlatformTestCase {
     // [itest->dsn~trace-action-integration~3]
-    public void testExecuteReturnsNotNull() throws Exception {
+    public void testExecuteReturnsNotNull() {
         final ExecutionEnvironment environment = createEnvironment();
         final OftRunProfileState state = new OftRunProfileState(
                 environment,
@@ -36,7 +34,7 @@ public class OftRunProfileStateTest extends AbstractOftPlatformTestCase {
     }
 
     // [itest->dsn~select-plain-text-trace-result-view~1]
-    public void testGivenPlainTextResultViewWhenExecutingThenItUsesPlainTextConsole() throws Exception {
+    public void testGivenPlainTextResultViewWhenExecutingThenItUsesPlainTextConsole() {
         final ExecutionEnvironment environment = createEnvironment();
         final OftRunProfileState state = new OftRunProfileState(
                 environment,
@@ -50,7 +48,7 @@ public class OftRunProfileStateTest extends AbstractOftPlatformTestCase {
     }
 
     // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
-    public void testGivenDefaultResultViewWhenExecutingThenItUsesTestRunnerConsole() throws Exception {
+    public void testGivenDefaultResultViewWhenExecutingThenItUsesTestRunnerConsole() {
         final ExecutionEnvironment environment = createEnvironment();
         final OftRunProfileState state = new OftRunProfileState(
                 environment,
@@ -64,7 +62,7 @@ public class OftRunProfileStateTest extends AbstractOftPlatformTestCase {
     }
 
     // [itest->dsn~select-test-runner-trace-result-view~1]
-    public void testGivenTestRunnerResultViewWhenExecutingThenItUsesTestRunnerConsole() throws Exception {
+    public void testGivenTestRunnerResultViewWhenExecutingThenItUsesTestRunnerConsole() {
         final ExecutionEnvironment environment = createEnvironment();
         final OftRunProfileState state = new OftRunProfileState(
                 environment,
