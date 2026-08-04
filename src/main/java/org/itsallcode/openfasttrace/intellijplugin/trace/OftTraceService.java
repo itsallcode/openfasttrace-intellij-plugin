@@ -48,10 +48,15 @@ public final class OftTraceService {
         try {
             progress.phase("Importing OpenFastTrace items...", 0.15D);
             progress.checkCanceled();
-            final FilterSettings filterSettings = FilterSettings.builder()
-                    .artifactTypes(Set.copyOf(inputs.artifactTypes()))
-                    .tags(Set.copyOf(inputs.tags()))
-                    .build();
+            final FilterSettings.Builder filterSettings = FilterSettings.builder();
+            if (!inputs.artifactTypes().isEmpty()) {
+                filterSettings.artifactTypes(Set.copyOf(inputs.artifactTypes()));
+            }
+            if (!inputs.tags().isEmpty()) {
+                filterSettings.tags(Set.copyOf(inputs.tags()));
+                // OFT defaults to "without tags" mode unless this is explicitly disabled.
+                filterSettings.withoutTags(false);
+            }
             final List<SpecificationItem> items = importItems(inputs.inputPaths(), filterSettings);
 
             progress.phase("Linking OpenFastTrace items...", 0.4D);
@@ -75,10 +80,10 @@ public final class OftTraceService {
     }
 
 
-    private List<SpecificationItem> importItems(final List<Path> inputs, final FilterSettings filterSettings) {
+    private List<SpecificationItem> importItems(final List<Path> inputs, final FilterSettings.Builder filterSettings) {
         final ImportSettings settings = ImportSettings.builder()
                 .addInputs(inputs)
-                .filter(filterSettings)
+                .filter(filterSettings.build())
                 .build();
         return runWithPluginClassLoader(() -> oft.importItems(settings));
     }

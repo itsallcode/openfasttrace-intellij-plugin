@@ -1,6 +1,7 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace.runconfig;
 
 import com.intellij.execution.configurations.ConfigurationFactory;
+import com.intellij.execution.configurations.RunConfigurationSingletonPolicy;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.api.function.Executable;
 
 import java.util.Arrays;
 
@@ -157,6 +159,21 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
         ));
     }
 
+    // [itest->dsn~trace-configuration-integration~2]
+    public void testGivenRunConfigurationTypeWhenCheckingFactorySingletonPolicyThenItDisallowsMultipleInstances() {
+        final OftRunConfigurationType type = new OftRunConfigurationType();
+
+        Assertions.assertAll(
+                Arrays.stream(type.getConfigurationFactories())
+                        .map(factory -> (Executable) () -> {
+                            final OftRunConfigurationFactory oftFactory = (OftRunConfigurationFactory) factory;
+                            assertThat(oftFactory.getSingletonPolicy(), is(RunConfigurationSingletonPolicy.SINGLE_INSTANCE_ONLY));
+                            assertThat(oftFactory.canConfigurationBeSingleton(), is(false));
+                        })
+                        .toList()
+        );
+    }
+
     @ParameterizedTest(name = "{0}")
     @CsvSource({
             "'User requirements', false, false, false, 'doc/', 'feat, req, scn, bconstr'",
@@ -182,7 +199,8 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 () -> assertThat(snapshot.includeSourceRoots(), is(includeSourceRoots)),
                 () -> assertThat(snapshot.includeTestRoots(), is(includeTestRoots)),
                 () -> assertThat(snapshot.additionalPathsText(), is(additionalPathsText)),
-                () -> assertThat(snapshot.artifactTypesText(), is(artifactTypesText))
+                () -> assertThat(snapshot.artifactTypesText(), is(artifactTypesText)),
+                () -> assertThat(snapshot.tagsText(), is(""))
         );
     }
 

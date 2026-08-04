@@ -11,6 +11,8 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceResultView;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
 
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;

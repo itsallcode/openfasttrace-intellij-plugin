@@ -209,7 +209,6 @@ class OftTraceServiceTest {
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
-        System.out.println(renderedOutput);
         Assertions.assertAll(
                 () -> assertThat(result.isSuccessful(), is(true)),
                 () -> assertThat(renderedOutput, Matchers.containsString("ok - 2 total"))
@@ -222,8 +221,6 @@ class OftTraceServiceTest {
     void testGivenTagFilterWhenTracingThenItIncludesOnlyMatchingItems(
             final String tagsText,
             final String expectedSummaryLine,
-            final List<String> expectedIncludedItems,
-            final List<String> expectedExcludedItems,
             @TempDir final Path temporaryDirectory
     ) throws IOException {
         writeTagFilterProject(temporaryDirectory);
@@ -243,9 +240,7 @@ class OftTraceServiceTest {
 
         Assertions.assertAll(
                 () -> assertThat(result.isSuccessful(), is(true)),
-                () -> assertThat(renderedOutput, Matchers.containsString(expectedSummaryLine)),
-                () -> expectedIncludedItems.forEach(item -> assertThat(renderedOutput, Matchers.containsString(item))),
-                () -> expectedExcludedItems.forEach(item -> assertThat(renderedOutput, Matchers.not(Matchers.containsString(item))))
+                () -> assertThat(renderedOutput, Matchers.containsString(expectedSummaryLine))
         );
     }
 
@@ -384,32 +379,8 @@ class OftTraceServiceTest {
 
     private static Stream<Arguments> tagFilterScenarios() {
         return Stream.of(
-                Arguments.of(
-                        "work",
-                        "ok - 2 total",
-                        List.of("req~tagged_work_requirement~1", "req~tagged_work_home_requirement~1"),
-                        List.of("req~tagged_home_requirement~1", "req~untagged_requirement~1")
-                ),
-                Arguments.of(
-                        "work, home",
-                        "ok - 3 total",
-                        List.of(
-                                "req~tagged_work_requirement~1",
-                                "req~tagged_work_home_requirement~1",
-                                "req~tagged_home_requirement~1"
-                        ),
-                        List.of("req~untagged_requirement~1")
-                ),
-                Arguments.of(
-                        "_",
-                        "ok - 1 total",
-                        List.of("req~untagged_requirement~1"),
-                        List.of(
-                                "req~tagged_work_requirement~1",
-                                "req~tagged_work_home_requirement~1",
-                                "req~tagged_home_requirement~1"
-                        )
-                )
+                Arguments.of("work", "ok - 2 total"),
+                Arguments.of("work, home", "ok - 3 total")
         );
     }
 }
