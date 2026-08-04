@@ -88,13 +88,6 @@ The plugin lets users search specification items by name across the project and 
 
 Needs: req
 
-### Rename Specification Item IDs
-`feat~rename-specification-item-ids~1`
-
-The plugin lets users safely rename OpenFastTrace specification item IDs with the IntelliJ Rename refactoring.Updates affect  item declaration and  references.
-
-Needs: req
-
 ### Open OFT User Guide
 `feat~open-oft-user-guide~1`
 
@@ -262,30 +255,6 @@ The plugin opens the covered OpenFastTrace specification item when a user invoke
 
 Covers:
 - `feat~go-to-specification-item~1`
-
-Needs: scn
-
-### Rename Specification Item IDs
-
-The following requirements refine the specification-item rename feature into user-visible capabilities.
-
-### Rename Declaration and Resolved References
-`req~rename-specification-item-declaration-and-references~1`
-
-The plugin lets users invoke IntelliJ Rename on an OpenFastTrace specification item declaration or a resolved reference to that declaration. Before applying the rename, the standard IntelliJ refactoring workflow shows the declaration and all affected resolved OFT references for review. Applying the rename updates only those OFT declaration and reference IDs.
-
-Covers:
-- `feat~rename-specification-item-ids~1`
-
-Needs: scn
-
-### Reject Invalid or Conflicting Renamed IDs
-`req~reject-invalid-or-conflicting-renamed-specification-item-ids~1`
-
-The plugin rejects a rename when the proposed full OFT item ID is invalid or when a declaration with that target ID already exists in the project. The rejected refactoring leaves the declaration and references unchanged.
-
-Covers:
-- `feat~rename-specification-item-ids~1`
 
 Needs: scn
 
@@ -1030,70 +999,6 @@ Needs: dsn
 
 Covers:
 - `req~show-covering-occurrences-from-specification-item-declaration~1`
-
-Needs: dsn
-
-### Rename Specification Item IDs
-
-The following scenarios describe the expected IntelliJ Rename workflow for OFT specification item IDs.
-
-### Rename Specification Item ID from Declaration
-`scn~rename-specification-item-id-from-declaration~1`
-
-**Given** a project declares `req~old-name~1` and contains resolved OFT references to it
-**When** a user invokes IntelliJ Rename on the declaration and proposes `req~new-name~1`
-**Then** the standard Rename workflow previews the declaration and the resolved OFT references before applying the coordinated rename.
-
-Covers:
-- `req~rename-specification-item-declaration-and-references~1`
-
-Needs: dsn
-
-### Rename Specification Item ID from Reference
-`scn~rename-specification-item-id-from-reference~1`
-
-**Given** a project declares `req~old-name~1` and a supported OFT reference resolves to that declaration
-**When** a user invokes IntelliJ Rename on the reference and proposes `req~new-name~1`
-**Then** the standard Rename workflow renames the declaration and all resolved OFT references to `req~new-name~1`.
-
-Covers:
-- `req~rename-specification-item-declaration-and-references~1`
-
-Needs: dsn
-
-### Update Supported References during Specification Item ID Rename
-`scn~update-supported-references-during-specification-item-id-rename~1`
-
-**Given** a project declares `req~old-name~1`, has `Covers:` and `Depends:` entries that resolve to it, and has supported source-code coverage tags whose source or target side resolves to it
-**When** a user renames the declaration to `req~new-name~1` and applies the standard Rename workflow
-**Then** the declaration and those resolved references use `req~new-name~1`, while their surrounding Markdown and coverage-tag syntax remains unchanged.
-
-Covers:
-- `req~rename-specification-item-declaration-and-references~1`
-
-Needs: dsn
-
-### Exclude Unresolved and Non-OFT Text from Specification Item ID Rename
-`scn~exclude-unresolved-and-non-oft-text-from-specification-item-id-rename~1`
-
-**Given** a project contains the text `req~old-name~1` in ordinary prose, an unsupported file, or an unresolved OFT-like fragment as well as a declared `req~old-name~1`
-**When** a user renames the declaration to `req~new-name~1`
-**Then** the Rename preview and applied changes include only the declaration and resolved OFT references, leaving the other text unchanged.
-
-Covers:
-- `req~rename-specification-item-declaration-and-references~1`
-
-Needs: dsn
-
-### Reject Invalid or Existing Specification Item ID Rename
-`scn~reject-invalid-or-existing-specification-item-id-rename~1`
-
-**Given** a project declares `req~old-name~1` and also declares `req~existing-name~1`
-**When** a user attempts to rename `req~old-name~1` to an invalid OFT ID or to `req~existing-name~1`
-**Then** the IDE reports the invalid ID or conflicting declaration and does not change any declaration or reference.
-
-Covers:
-- `req~reject-invalid-or-conflicting-renamed-specification-item-ids~1`
 
 Needs: dsn
 

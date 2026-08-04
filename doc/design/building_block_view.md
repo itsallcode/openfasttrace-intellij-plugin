@@ -266,10 +266,6 @@ Covers:
 
 Needs: impl
 
-### Specification Item Refactoring
-
-The specification-item refactoring component adapts canonical declaration anchors and resolved OFT references to IntelliJ's shared language-module Rename and usage-search infrastructure. It reuses the syntax core to validate proposed full IDs, the declaration index to detect target-ID conflicts, and navigation/reference resolution to identify semantic usages. It never treats arbitrary matching text as a usage and does not merge duplicate declarations. The scenario-specific runtime design items below define the individual rename flows.
-
 ### Specification Item Completion
 `dsn~specification-item-completion~1`
 
