@@ -58,7 +58,7 @@ Ranking should be deterministic and acceptance-criteria-driven. The implementati
 - [x] Implement deterministic ranking that prioritizes exact full-ID prefix matches over name-prefix matches, name-substring matches, and artifact-type prefix matches
 - [x] Define stable tie-breakers for equally ranked matches so completion results stay predictable across runs and files
 - [x] Keep completion suggestions limited to declared specification items and exclude coverage occurrences or synthetic non-declaration matches
-- [x] Register the completion extension in [plugin.xml](/home/seb/git/openfasttrace-intellij-plugin/src/main/resources/META-INF/plugin.xml) without adding new dependencies
+- [x] Register the completion extension in `plugin.xml` without adding new dependencies
 - [x] Evaluate whether IntelliJ's normal popup behavior already satisfies the optional "next best matches near the input point" acceptance criterion and only add extra logic if a concrete gap remains
 
 ### Automated Verification

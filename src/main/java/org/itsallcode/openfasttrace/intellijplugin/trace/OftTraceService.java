@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public final class OftTraceService {
+    private static final String UNTAGGED_ITEMS_FILTER_MARKER = "__oft-include-untagged__!";
     @SuppressWarnings("java:S3032")
     // OFT ServiceLoader discovery must use the plugin class loader, not an arbitrary caller context loader.
     private static final ClassLoader PLUGIN_CLASS_LOADER = OftTraceService.class.getClassLoader();
@@ -48,10 +49,16 @@ public final class OftTraceService {
         try {
             progress.phase("Importing OpenFastTrace items...", 0.15D);
             progress.checkCanceled();
-            final FilterSettings filterSettings = FilterSettings.builder()
-                    .artifactTypes(Set.copyOf(inputs.artifactTypes()))
-                    .tags(Set.copyOf(inputs.tags()))
-                    .build();
+            final FilterSettings.Builder filterSettings = FilterSettings.builder();
+            if (!inputs.artifactTypes().isEmpty()) {
+                filterSettings.artifactTypes(Set.copyOf(inputs.artifactTypes()));
+            }
+            final Set<String> tags = createTagFilter(inputs);
+            if (!tags.isEmpty()) {
+                filterSettings.tags(tags);
+                // OFT defaults to "without tags" mode unless this is explicitly disabled.
+                filterSettings.withoutTags(inputs.includeUntagged());
+            }
             final List<SpecificationItem> items = importItems(inputs.inputPaths(), filterSettings);
 
             progress.phase("Linking OpenFastTrace items...", 0.4D);
@@ -75,10 +82,10 @@ public final class OftTraceService {
     }
 
 
-    private List<SpecificationItem> importItems(final List<Path> inputs, final FilterSettings filterSettings) {
+    private List<SpecificationItem> importItems(final List<Path> inputs, final FilterSettings.Builder filterSettings) {
         final ImportSettings settings = ImportSettings.builder()
                 .addInputs(inputs)
-                .filter(filterSettings)
+                .filter(filterSettings.build())
                 .build();
         return runWithPluginClassLoader(() -> oft.importItems(settings));
     }
@@ -115,6 +122,17 @@ public final class OftTraceService {
                 .colorScheme(ColorScheme.COLOR)
                 .detailsSectionDisplay(DetailsSectionDisplay.COLLAPSE)
                 .build();
+    }
+
+    private static Set<String> createTagFilter(final OftTraceInputs inputs) {
+        if (!inputs.includeUntagged() && inputs.tags().isEmpty()) {
+            return Set.of();
+        }
+        final Set<String> tags = new java.util.LinkedHashSet<>(inputs.tags());
+        if (inputs.includeUntagged()) {
+            tags.add(UNTAGGED_ITEMS_FILTER_MARKER);
+        }
+        return tags;
     }
 
     private static <T> T runWithPluginClassLoader(final Callable<T> action) {

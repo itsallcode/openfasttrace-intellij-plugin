@@ -231,7 +231,9 @@ Needs: impl, itest
 
 **Given** a supported specification document contains a `Covers:` entry and the opened project already indexes declared OpenFastTrace specification items
 **When** a user invokes IntelliJ basic completion while editing an OFT item ID in that `Covers:` entry
-**Then** the completion component confirms that the caret is inside a `Covers:` reference, loads declared specification item IDs from the declaration index, ranks them by full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches, and shows the ordered suggestions in the standard IDE completion popup.
+**Then** the completion component confirms that the caret is inside a `Covers:` reference, loads declared specification item IDs from the declaration index
+**And** ranks them by full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches
+**And** shows the ordered suggestions in the standard IDE completion popup.
 
 Covers:
 - `scn~complete-specification-item-id-in-covers-section~1`
@@ -243,7 +245,8 @@ Needs: impl, itest
 
 **Given** a bundled OFT live template is active at a `COVERED` placeholder under `Covers:` and the opened project already indexes declared OpenFastTrace specification items
 **When** a user invokes IntelliJ basic completion in that placeholder before the live-template session ends
-**Then** the completion component reads the active editor document, handles the request like any other `Covers:` reference by reading declared specification item IDs from the declaration index, and shows the matching suggestions in the standard IDE completion popup without ending the live-template session.
+**Then** the completion component reads the active editor document, handles the request like any other `Covers:` reference by reading declared specification item IDs from the declaration index
+**And** shows the matching suggestions in the standard IDE completion popup without ending the live-template session.
 
 Covers:
 - `scn~complete-specification-item-id-in-active-live-template-covers-field~1`
@@ -451,7 +454,7 @@ Needs: impl, itest
 `dsn~openfasttrace-run-configuration~2`
 
 **When** a user creates or edits an OpenFastTrace run configuration
-**Then** the plugin uses the IntelliJ Run Configuration API (type, factory, configuration) to persist the name, scope, additional paths, artifact type filters, and tag filters. The plugin registers multiple factories to provide pre-configured templates for common scanning scenarios.
+**Then** the plugin uses the IntelliJ Run Configuration API (type, factory, configuration) to persist the name, scope, additional paths, artifact type filters, tag filters, and the `Include untagged items` checkbox. The plugin registers multiple factories to provide pre-configured templates for common scanning scenarios.
 
 Covers:
 - `scn~create-and-run-openfasttrace-run-configuration~1`
@@ -474,11 +477,12 @@ Needs: impl, itest
 `dsn~filter-trace-by-artifact-types-and-tags~1`
 
 **When** the trace-execution service invokes the OpenFastTrace library
-**Then** it passes the configured artifact type and tag filters from the run configuration to the OpenFastTrace engine to restrict the trace result.
+**Then** it passes the configured artifact type and tag filters, together with the `Include untagged items` setting, from the run configuration to the OpenFastTrace engine to restrict the trace result.
 
 Covers:
 - `scn~filter-run-configuration-by-artifact-types~1`
 - `scn~filter-run-configuration-by-tags~1`
+- `scn~filter-run-configuration-by-untagged-items~1`
 
 Needs: impl, itest
 

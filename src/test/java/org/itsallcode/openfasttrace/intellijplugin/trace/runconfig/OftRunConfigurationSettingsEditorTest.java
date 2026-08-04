@@ -39,6 +39,7 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 "additional",
                 "dsn",
                 "mvp",
+                true,
                 OftTraceResultView.TEST_RUNNER
         );
         configuration.updateFrom(snapshot);
@@ -54,6 +55,7 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 () -> assertThat(uiSettings.additionalPathsText(), is(snapshot.additionalPathsText())),
                 () -> assertThat(uiSettings.artifactTypesText(), is(snapshot.artifactTypesText())),
                 () -> assertThat(uiSettings.tagsText(), is(snapshot.tagsText())),
+                () -> assertThat(uiSettings.includeUntagged(), is(snapshot.includeUntagged())),
                 () -> assertThat(uiSettings.resultView(), is(snapshot.resultView()))
         );
     }
@@ -69,6 +71,7 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 "more paths",
                 "req",
                 "tag",
+                true,
                 OftTraceResultView.TEST_RUNNER
         );
         editor.component.setSettings(snapshot);
@@ -84,6 +87,7 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 () -> assertThat(stored.additionalPathsText(), is(snapshot.additionalPathsText())),
                 () -> assertThat(stored.artifactTypesText(), is(snapshot.artifactTypesText())),
                 () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
+                () -> assertThat(stored.includeUntagged(), is(snapshot.includeUntagged())),
                 () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
     }
@@ -98,6 +102,7 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 "missing",
                 "",
                 "",
+                false,
                 OftTraceResultView.TEST_RUNNER
         ));
 

@@ -136,7 +136,7 @@ Use OpenFastTrace run configurations when you need multiple repeatable trace set
 1. Open the run/debug configuration menu.
 2. Choose `Edit Configurations...`.
 3. Add a new `OpenFastTrace` configuration.
-4. Configure the trace scope, artifact types, tags, and result view.
+4. Configure the trace scope, artifact types, tags, whether to include untagged items, and the result view.
 5. Save and run the configuration from the IDE toolbar.
 
 Run configurations provide the same trace-scope controls in the configuration editor.
@@ -147,6 +147,8 @@ They also let you choose the result view:
 * `Plain text output` shows the rendered OFT report in an IDE output tab with ANSI colors preserved.
 
 Use run configurations for recurring workflows such as tracing only a subsystem, tracing only requirement and design layers, or tracing a document set with a specific tag.
+
+To include specification items without tags, select `Include untagged items` directly below the Tags field.
 
 ![OpenFastTrace run configuration editor](user_guide/images/run-configurations.png)
 

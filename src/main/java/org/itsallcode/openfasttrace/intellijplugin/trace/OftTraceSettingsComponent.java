@@ -30,6 +30,8 @@ public final class OftTraceSettingsComponent {
     private final JBTextArea additionalPathsTextArea = new JBTextArea();
     private final JBTextField artifactTypesField = new JBTextField();
     private final JBTextField tagsField = new JBTextField();
+    private final JBCheckBox includeUntaggedCheckBox =
+            new JBCheckBox("Include untagged items");
     private final JBRadioButton plainTextResultViewRadioButton =
             new JBRadioButton("Plain text output");
     private final JBRadioButton testRunnerResultViewRadioButton =
@@ -101,7 +103,8 @@ public final class OftTraceSettingsComponent {
                 .addLabeledComponent("Artifact types:", artifactTypesField)
                 .addTooltip("comma-separated, empty = all")
                 .addLabeledComponent("Tags:", tagsField)
-                .addTooltip("comma-separated, empty = all");
+                .addTooltip("comma-separated, empty = all")
+                .addLabeledComponent("", includeUntaggedCheckBox);
         if (showResultViewSelection) {
             formBuilder
                     .addSeparator()
@@ -129,6 +132,7 @@ public final class OftTraceSettingsComponent {
                 additionalPathsTextArea.getText(),
                 artifactTypesField.getText(),
                 tagsField.getText(),
+                includeUntaggedCheckBox.isSelected(),
                 selectedResultView()
         );
     }
@@ -141,6 +145,7 @@ public final class OftTraceSettingsComponent {
         additionalPathsTextArea.setText(settings.additionalPathsText());
         artifactTypesField.setText(settings.artifactTypesText());
         tagsField.setText(settings.tagsText());
+        includeUntaggedCheckBox.setSelected(settings.includeUntagged());
         plainTextResultViewRadioButton.setSelected(settings.resultView() == OftTraceResultView.PLAIN_TEXT);
         testRunnerResultViewRadioButton.setSelected(settings.resultView() == OftTraceResultView.TEST_RUNNER);
         updateSelectedResourcesEnabledState();

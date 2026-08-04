@@ -29,6 +29,7 @@ public final class OftSupportedFiles {
             "robot",
             "r",
             "rs",
+            "dox",
             "sv", "v", "inc",
             "sh", "bash", "zsh",
             "swift",

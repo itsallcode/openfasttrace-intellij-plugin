@@ -10,6 +10,7 @@ public record OftTraceSettingsSnapshot(
         String additionalPathsText,
         String artifactTypesText,
         String tagsText,
+        boolean includeUntagged,
         OftTraceResultView resultView
 ) {
     public static final OftTraceSettingsSnapshot DEFAULT = new OftTraceSettingsSnapshot(
@@ -19,6 +20,7 @@ public record OftTraceSettingsSnapshot(
             "doc/",
             "",
             "",
+            false,
             OftTraceResultView.TEST_RUNNER
     );
 
@@ -40,7 +42,29 @@ public record OftTraceSettingsSnapshot(
                 additionalPathsText,
                 artifactTypesText,
                 tagsText,
+                false,
                 DEFAULT.resultView()
+        );
+    }
+
+    public OftTraceSettingsSnapshot(
+            final OftTraceScopeMode scopeMode,
+            final boolean includeSourceRoots,
+            final boolean includeTestRoots,
+            final String additionalPathsText,
+            final String artifactTypesText,
+            final String tagsText,
+            final OftTraceResultView resultView
+    ) {
+        this(
+                scopeMode,
+                includeSourceRoots,
+                includeTestRoots,
+                additionalPathsText,
+                artifactTypesText,
+                tagsText,
+                false,
+                resultView
         );
     }
 
