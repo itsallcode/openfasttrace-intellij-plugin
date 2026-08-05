@@ -91,8 +91,10 @@ final class OftTraceTestTreeMapper {
     ) {
         final String itemStatus = itemStatus(item);
         final String itemId = item.getId().toString();
+        final String itemName = itemName(item);
+        final String visibleItemName = item.isTransitiveDefect() ? "↳ " + itemName : itemName;
         return new OftTraceItemNode(
-                nodeName(itemName(item), itemStatus, !item.isDefect()),
+                nodeName(visibleItemName, itemStatus, !item.isDefect()),
                 itemId,
                 item.isDefect(),
                 item.isDefect()
