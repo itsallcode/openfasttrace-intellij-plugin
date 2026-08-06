@@ -1,4 +1,4 @@
-W# GH-72 Add filter for transitive tracing defects in run config
+# GH-72 Add filter for transitive tracing defects in run config
 
 ## Goal
 
@@ -37,22 +37,22 @@ Treat the filter as a presentation concern that is stored with the run configura
 
 ### Requirements And Design
 
-- [ ] Update `doc/system_requirements.md` with a run-configuration result-view requirement for showing or hiding transitive defects and scenarios for the default-on template behavior.
-- [ ] Update `doc/design/runtime_view.md` with a design item describing how the stored result-view filter is applied in the test runner tree and plain-text presenter.
+- [x] Update `doc/system_requirements.md` with a run-configuration result-view requirement for showing or hiding transitive defects and scenarios for the default-on template behavior.
+- [x] Update `doc/design/runtime_view.md` with a design item describing how the stored result-view filter is applied in the test runner tree and plain-text presenter.
 - [ ] Update `doc/design/building_block_view.md` if needed to show the run-configuration/settings-editor and presenter wiring for the new filter.
-- [ ] Stop and ask user for a review of the system requirements and design.
+- [x] Stop and ask user for a review of the system requirements and design.
 
 ### Implementation
 
-- [ ] Extend the trace settings model and run-configuration persistence with a transitive-defect visibility flag.
-- [ ] Add the checkbox to the run-configuration settings editor and default it on for the existing templates.
-- [ ] Filter transitive defects out of the test-runner tree and plain-text output when the setting is off.
-- [ ] Keep direct defects, navigation, and overall trace failure behavior unchanged.
+- [x] Extend the trace settings model and run-configuration persistence with a transitive-defect visibility flag.
+- [x] Add the checkbox to the run-configuration settings editor and default it on for the existing templates.
+- [x] Filter transitive defects out of the test-runner tree and plain-text output when the setting is off.
+- [x] Keep direct defects, navigation, and overall trace failure behavior unchanged.
 
 ### Verification
 
-- [ ] Add focused tests for settings persistence, template defaults, and editor round-tripping of the transitive-defect flag.
-- [ ] Add presenter and tree-mapper tests proving transitive defects are shown or hidden according to the saved setting.
-- [ ] Add plain-text renderer or run-content tests proving the filtered output stays consistent with the configured result view.
-- [ ] Keep the OpenFastTrace trace clean.
-- [ ] Keep required build and plugin verification tasks green.
+- [x] Add focused tests for settings persistence, template defaults, and editor round-tripping of the transitive-defect flag.
+- [x] Add presenter and tree-mapper tests proving transitive defects are shown or hidden according to the saved setting.
+- [x] Add plain-text renderer or run-content tests proving the filtered output stays consistent with the configured result view.
+- [x] Keep the OpenFastTrace trace clean.
+- [x] Keep required build and plugin verification tasks green.

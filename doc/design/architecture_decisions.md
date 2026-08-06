@@ -184,7 +184,7 @@ The plugin needs a way to reduce trace-result noise when users debug broken depe
 * whether the same setting can drive both the Test Runner UI and plain-text trace output
 * whether the project can keep transitive-defect detection in OpenFastTrace while changing only presentation
 
-Picking the wrong option here would be expensive to undo. A local-only workaround would leave the result views inconsistent, and a trace-engine change would spread through tracing, report rendering, and test coverage. Once the wrong behavior is baked into the result model or the trace engine, changing it later would require broad refactoring across the trace pipeline instead of a narrow presentation-layer adjustment.
+Picking the wrong option here would be expensive to undo. A local-only workaround would leave the result views inconsistent and force users to learn two different behaviors. Burying the filter in the trace engine or result model would be harder still because that choice would spread into tracing, rendering, settings persistence, and tests, so correcting it later would require broad refactoring instead of a narrow presentation-layer change.
 
 We considered the following alternatives:
 

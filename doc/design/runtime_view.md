@@ -404,6 +404,18 @@ Covers:
 
 Needs: impl, itest
 
+### Show Transitive Defects by Default in Run Configuration Templates
+`dsn~show-transitive-defects-by-default-in-run-configuration-templates~1`
+
+**Given** the run-configuration templates initialize a new OpenFastTrace run configuration
+**When** the configuration editor opens for one of those templates
+**Then** the `Show transitive defects` checkbox is selected so the default template behavior keeps transitive defects visible.
+
+Covers:
+- `scn~show-transitive-defects-by-default-in-run-configuration-templates~1`
+
+Needs: impl, itest
+
 ### Hide Transitive Defects in Test Runner UI
 `dsn~hide-transitive-defects-in-test-runner-ui~1`
 
@@ -421,7 +433,7 @@ Needs: impl, itest
 
 **Given** the plain-text trace presentation receives a structured OpenFastTrace trace result and the saved run-configuration setting disables transitive defects
 **When** it prepares the OFT report settings for the plain-text renderer
-**Then** it sets the base library's transitive-defect filter option so the rendered report omits transitive defects while still preserving direct-defect information and the existing summary for the remaining trace.
+**Then** it passes the saved setting to the OpenFastTrace base library's report filter option so the rendered report omits transitive defects while still preserving direct-defect information and the existing summary for the remaining trace.
 
 Covers:
 - `scn~hide-transitive-defects-in-plain-text-output~1`

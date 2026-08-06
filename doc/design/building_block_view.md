@@ -464,6 +464,7 @@ scale 2
         Result view:    | ()  Plain text output
         .               | (X) IntelliJ Test Runner UI
         .               | .
+        .               | [X] Include transitive defects
     }
 
     {
