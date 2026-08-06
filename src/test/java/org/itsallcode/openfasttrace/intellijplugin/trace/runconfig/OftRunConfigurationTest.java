@@ -12,10 +12,6 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
 import org.jdom.Element;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.api.function.Executable;
 
 import java.util.Arrays;
@@ -27,18 +23,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 
 // [itest->dsn~openfasttrace-run-configuration~2]
-@SuppressWarnings("JUnitMixedFramework")
 public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
-    @BeforeEach
-    void initPlatformFixture() throws Exception {
-        super.setUp();
-    }
-
-    @AfterEach
-    void releasePlatformFixture() throws Exception {
-        super.tearDown();
-    }
-
     // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
     // [itest->dsn~trace-configuration-integration~2]
     public void testGivenNewRunConfigurationWhenReadingSnapshotThenItDefaultsToTestRunner() {
@@ -178,14 +163,51 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
         );
     }
 
-    @ParameterizedTest(name = "{0}")
-    @CsvSource({
-            "'User requirements', false, false, false, 'doc/', 'feat, req, scn, bconstr'",
-            "'Design and above', false, false, false, 'doc/', 'feat, req, scn, bconstr, arch, dsn, constr, bld'",
-            "'Typical project', false, true, true, 'doc/', ''",
-            "'Unfiltered', true, false, false, '.', ''"
-    })
-    void testGivenRunConfigurationTemplateWhenCreatingConfigurationThenItHasCorrectSettings(
+    public void testGivenUserRequirementsTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
+        assertTemplateSettings(
+                "User requirements",
+                false,
+                false,
+                false,
+                "doc/",
+                "feat, req, scn, bconstr"
+        );
+    }
+
+    public void testGivenDesignAndAboveTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
+        assertTemplateSettings(
+                "Design and above",
+                false,
+                false,
+                false,
+                "doc/",
+                "feat, req, scn, bconstr, arch, dsn, constr, bld"
+        );
+    }
+
+    public void testGivenTypicalProjectTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
+        assertTemplateSettings(
+                "Typical project",
+                false,
+                true,
+                true,
+                "doc/",
+                ""
+        );
+    }
+
+    public void testGivenUnfilteredTemplateWhenCreatingConfigurationThenItHasCorrectSettings() {
+        assertTemplateSettings(
+                "Unfiltered",
+                true,
+                false,
+                false,
+                ".",
+                ""
+        );
+    }
+
+    private void assertTemplateSettings(
             final String templateName,
             final boolean wholeProject,
             final boolean includeSourceRoots,

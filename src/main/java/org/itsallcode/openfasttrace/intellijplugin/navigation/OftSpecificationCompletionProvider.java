@@ -25,6 +25,8 @@ import java.util.Set;
 // [impl->dsn~specification-item-completion~1]
 // [impl->dsn~complete-specification-item-id-in-covers-section~1]
 // [impl->dsn~complete-specification-item-id-in-active-live-template-covers-field~1]
+// [impl->dsn~complete-markdown-specification-item-id-in-declaration-id-field~1]
+// [impl->dsn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1]
 // [impl->dsn~complete-specification-item-id-in-coverage-tag-target~1]
 // [impl->dsn~complete-specification-item-id-in-spaced-coverage-tag-target~1]
 // [impl->dsn~complete-specification-item-id-in-incomplete-coverage-tag-target~1]
@@ -75,9 +77,19 @@ public final class OftSpecificationCompletionProvider extends CompletionContribu
                 final int offset
         ) {
             final PsiFile originalFile = parameters.getOriginalFile();
+            if (OftSupportedFiles.isMarkdownSpecificationFileName(originalFile.getName())) {
+                final Optional<String> markdownPrefix =
+                        OftMarkdownSpecificationCompletionContext.findAt(fileText, offset);
+                if (markdownPrefix.isPresent()) {
+                    return markdownPrefix;
+                }
+            }
             if (OftSupportedFiles.isSpecificationFileName(originalFile.getName())
                     && OftDeclarationResolver.isInsideCoversSection(fileText, offset)) {
-                return Optional.of(OftSpecificationCompletionSupport.specificationPrefixAt(fileText, offset));
+                if (OftMarkdownLinkDestinationContext.findAt(fileText, offset).isEmpty()) {
+                    return Optional.of(OftSpecificationCompletionSupport.specificationPrefixAt(fileText, offset));
+                }
+                return Optional.empty();
             }
             if (OftSupportedFiles.isCoverageTagFileName(originalFile.getName())) {
                 return OftCoverageTagCompletionContext.findAt(fileText, offset)

@@ -100,7 +100,7 @@ The `scn` template inserts a Given-When-Then scenario skeleton. Templates with a
 
 ## Complete OFT References
 
-Use basic completion while editing a `Covers:` entry to select an existing specification item ID from the project index.
+Use basic completion while editing a Markdown declaration ID field or the OFT item text inside a `Covers:` entry to select an existing specification item ID from the project index. Markdown link destinations nested inside `Covers:` entries stay available for Markdown anchor completion instead.
 
 ![OpenFastTrace reference completion in a Covers entry](user_guide/images/reference-completion.png)
 

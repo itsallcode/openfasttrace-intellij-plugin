@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.not;
 
 public class OftLiveTemplatesTest extends AbstractOftPlatformTestCase {
     private static final String DESIGN_TEMPLATE_KEY = "dsn";
@@ -140,6 +141,68 @@ public class OftLiveTemplatesTest extends AbstractOftPlatformTestCase {
         );
     }
 
+    // [itest->dsn~complete-markdown-specification-item-id-in-declaration-id-field~1]
+    public void testGivenActiveLiveTemplateTitleFieldWhenCompletionInvokesThenItDoesNotSuggestDeclaredSpecificationIds() {
+        myFixture.addFileToProject("doc/spec.md", """
+                req~live-template-alpha.feature~1
+                Needs: scn
+                """);
+        myFixture.configureByText("current.md", "<caret>");
+
+        final TemplateImpl designTemplate = TemplateSettings.getInstance()
+                .getTemplate(DESIGN_TEMPLATE_KEY, OftLiveTemplates.GROUP_NAME);
+        TemplateManagerImpl.setTemplateTesting(getTestRootDisposable());
+        TemplateManager.getInstance(getProject()).startTemplate(myFixture.getEditor(), designTemplate);
+
+        final TemplateState templateState = Objects.requireNonNull(TemplateManagerImpl.getTemplateState(myFixture.getEditor()));
+        advanceTemplateToVariable(getProject(), templateState, "TITLE");
+        myFixture.type("Markdown Completion");
+
+        myFixture.completeBasic();
+
+        Assertions.assertAll(
+                () -> assertThat(templateState, notNullValue()),
+                () -> assertThat(activeVariableName(templateState), is("TITLE")),
+                () -> assertThat(lookupStrings(), is(List.of())),
+                () -> assertThat(
+                        TemplateManager.getInstance(getProject()).getActiveTemplate(myFixture.getEditor()),
+                        notNullValue(Template.class)
+                )
+        );
+    }
+
+    // [itest->dsn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1]
+    public void testGivenActiveLiveTemplateMarkdownLinkFieldWhenCompletionInvokesThenItDoesNotSuggestDeclaredSpecificationIds() {
+        myFixture.addFileToProject("doc/spec.md", """
+                req~live-template-alpha.feature~1
+                Needs: scn
+                """);
+        myFixture.configureByText("current.md", "<caret>");
+
+        final TemplateImpl requestTemplate = TemplateSettings.getInstance()
+                .getTemplate("req", OftLiveTemplates.GROUP_NAME);
+        TemplateManagerImpl.setTemplateTesting(getTestRootDisposable());
+        TemplateManager.getInstance(getProject()).startTemplate(myFixture.getEditor(), requestTemplate);
+
+        final TemplateState templateState = Objects.requireNonNull(TemplateManagerImpl.getTemplateState(myFixture.getEditor()));
+        advanceTemplateToVariable(getProject(), templateState, "MARKDOWN_LINK");
+
+        myFixture.completeBasic();
+
+        Assertions.assertAll(
+                () -> assertThat(templateState, notNullValue()),
+                () -> assertThat(activeVariableName(templateState), is("MARKDOWN_LINK")),
+                () -> assertThat(
+                        lookupStrings(),
+                        not(hasItems("req~live-template-alpha.feature~1"))
+                ),
+                () -> assertThat(
+                        TemplateManager.getInstance(getProject()).getActiveTemplate(myFixture.getEditor()),
+                        notNullValue(Template.class)
+                )
+        );
+    }
+
     private static void advanceTemplateToVariable(
             final Project project,
             final TemplateState templateState,
@@ -166,5 +229,10 @@ public class OftLiveTemplatesTest extends AbstractOftPlatformTestCase {
     private static String activeVariableName(final TemplateState templateState) {
         final int currentVariableNumber = templateState.getCurrentVariableNumber();
         return templateState.getTemplate().getVariableNameAt(currentVariableNumber);
+    }
+
+    private List<String> lookupStrings() {
+        final List<String> lookupElementStrings = myFixture.getLookupElementStrings();
+        return lookupElementStrings == null ? List.of() : lookupElementStrings;
     }
 }

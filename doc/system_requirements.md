@@ -320,6 +320,28 @@ Covers:
 
 Needs: scn
 
+#### Suppress Specification Item ID Completion in Markdown Link Targets Inside Covers Entries
+`req~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+The plugin does not suggest existing OpenFastTrace specification item IDs when a user invokes completion inside the destination part of a Markdown link nested in a `Covers:` entry. Users can keep the link destination available for Markdown anchor completion without OFT IDs taking over the popup.
+
+Covers:
+- `feat~oft-reference-completion~1`
+
+Needs: scn
+
+### Suppress Specification Item ID Completion in Markdown Link Targets Inside Covers Entries
+`scn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+**Given** a supported specification document contains a `Covers:` entry with a Markdown link and the caret is inside the link destination
+**When** a user invokes completion there
+**Then** the plugin does not suggest OpenFastTrace specification item IDs inside that Markdown link destination
+
+Covers:
+- `req~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+Needs: dsn
+
 #### Complete Specification Item IDs in Coverage Tag Target
 `req~complete-specification-item-ids-in-coverage-tag-target~1`
 
@@ -1008,7 +1030,36 @@ Needs: dsn
 
 ### OFT Reference Completion
 
-The following scenarios describe completion support while editing OFT references in `Covers:` sections and coverage-tag targets.
+The following scenarios describe completion support while editing OFT references in `Covers:` sections and coverage-tag targets. Markdown declaration ID completion is described in the feature block below.
+
+### Markdown Specification Item ID Completion
+`feat~markdown-specification-item-id-completion~1`
+
+The plugin suggests existing OpenFastTrace specification item IDs while users edit the actual declaration ID field in supported Markdown specification documents. Users can complete declaration anchors from indexed declarations.
+
+Needs: req
+
+#### Complete Markdown Specification Item ID in Declaration ID Field
+`req~complete-markdown-specification-item-ids-in-declaration-id-field~1`
+
+The plugin suggests existing OpenFastTrace specification item IDs while users invoke completion in the actual specification item ID field of a Markdown declaration.
+
+Covers:
+- `feat~markdown-specification-item-id-completion~1`
+
+Needs: scn
+
+### Complete Markdown Specification Item ID in Declaration ID Field
+`scn~complete-markdown-specification-item-id-in-declaration-id-field~1`
+
+**Given** a project contains declared OpenFastTrace specification items and a user edits the actual ID field of a Markdown specification item declaration
+**When** the user types a partial specification item ID and invokes completion
+**Then** the IDE suggests existing declared specification item IDs from the project index and orders the suggestion list by full-ID prefix match, then name-prefix match, then name-substring match, and finally artifact-type prefix match
+
+Covers:
+- `req~complete-markdown-specification-item-ids-in-declaration-id-field~1`
+
+Needs: dsn
 
 ### Complete Specification Item ID in Covers Section
 `scn~complete-specification-item-id-in-covers-section~1`

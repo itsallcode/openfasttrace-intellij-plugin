@@ -7,7 +7,10 @@ The Test Runner UI now marks transitive defects with a leading `↳` so they sta
 
 OpenFastTrace 4.8.0
 
+## Feature
+
+* #66: Transitive defects now use a visible `↳` prefix in the Test Runner UI
+
 ## Bugfix
 
 * #39: Re-enabled tag filter test
-* #66: Transitive defects now use a visible `↳` prefix in the Test Runner UI

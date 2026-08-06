@@ -226,6 +226,19 @@ Needs: impl, itest
 
 ## Completion
 
+### Complete Markdown Specification Item ID in Declaration ID Field
+`dsn~complete-markdown-specification-item-id-in-declaration-id-field~1`
+
+**Given** a supported Markdown specification document contains a specification-item declaration and the caret is in the actual declaration ID field
+**When** a user invokes IntelliJ basic completion while editing that declaration ID
+**Then** the completion component confirms the Markdown declaration-ID context, loads declared specification item IDs from the declaration index, and shows the ordered suggestions in the standard IDE completion popup
+**And** the same Markdown context detector rejects the title field, other non-ID text, and a still-active live-template title placeholder until the caret reaches the actual declaration ID field.
+
+Covers:
+- `scn~complete-markdown-specification-item-id-in-declaration-id-field~1`
+
+Needs: impl, itest
+
 ### Complete Specification Item ID in Covers Section
 `dsn~complete-specification-item-id-in-covers-section~1`
 
@@ -239,6 +252,18 @@ Covers:
 - `scn~complete-specification-item-id-in-covers-section~1`
 
 Needs: impl, itest
+
+### Suppress Specification Item ID Completion in Markdown Link Targets Inside Covers Entries
+`dsn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+**Given** a supported specification document contains a `Covers:` entry with a Markdown link and the caret is inside the link destination
+**When** a user invokes IntelliJ basic completion there
+**Then** the completion component does not add OpenFastTrace specification item ID suggestions inside that Markdown link destination so anchor completion can remain in control.
+
+Covers:
+- `scn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+Needs: impl, itest, utest
 
 ### Complete Specification Item ID in Active Live Template Covers Field
 `dsn~complete-specification-item-id-in-active-live-template-covers-field~1`
