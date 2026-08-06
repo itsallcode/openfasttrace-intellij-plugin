@@ -63,7 +63,7 @@ public class OftLiveTemplatesTest extends AbstractOftPlatformTestCase {
                         scenarioTemplate.getString(),
                         is("""
                                 $HEADER_LEVEL$ $TITLE$
-                                `scn~$NAME$~1`
+                                `scn~$ID$~1`
 
                                 **Given** $GIVEN$
                                 **When** $WHEN$
@@ -87,7 +87,7 @@ public class OftLiveTemplatesTest extends AbstractOftPlatformTestCase {
                                 scenarioTemplate.getVariableNameAt(5),
                                 scenarioTemplate.getVariableNameAt(6)
                         ),
-                        is(List.of("HEADER_LEVEL", "TITLE", "NAME", "GIVEN", "WHEN", "THEN", "COVERED"))
+                        is(List.of("HEADER_LEVEL", "TITLE", "ID", "GIVEN", "WHEN", "THEN", "COVERED"))
                 )
         );
     }
