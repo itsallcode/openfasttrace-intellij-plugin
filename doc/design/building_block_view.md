@@ -252,7 +252,7 @@ Needs: impl
 ### Specification Item Navigation
 `dsn~specification-item-navigation~1`
 
-The plugin exposes indexed OpenFastTrace specification item declarations through the IntelliJ navigation facilities so users can find declarations through `Go to Symbol` and the Symbols tab in `Search Everywhere`, invoke `Go To Declaration` from `Covers:` entries and from either side of coverage tags, and invoke `Go To Implementations` on a declaration to see coverage-providing occurrences. For shortened left sides of coverage tags, the navigation component resolves the effective covering item ID by inheriting missing name and revision parts from the covered ID on the right side before opening the corresponding declaration.
+The plugin exposes indexed OpenFastTrace specification item declarations through the IntelliJ navigation facilities so users can find declarations through `Go to Symbol` and the Symbols tab in `Search Everywhere`, invoke `Go To Declaration` from `Covers:` entries and from either side of coverage tags, and invoke `Go To Implementations` on a declaration to see coverage-providing occurrences. For shortened left sides of coverage tags, the navigation component resolves the effective covering item ID by inheriting the missing middle component and revision from the covered ID on the right side before opening the corresponding declaration.
 
 Covers:
 - `scn~show-specification-item-in-go-to-symbol~1`
@@ -269,7 +269,7 @@ Needs: impl
 ### Specification Item Completion
 `dsn~specification-item-completion~1`
 
-The plugin provides a specification-item completion component that activates IntelliJ basic completion for supported OFT reference authoring contexts, reads declared specification item IDs from the project-local declaration index, and presents those IDs in a deterministic order based on full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches. Supported contexts include OFT item references under `Covers:` in supported specification documents, completion requests started from an active live-template placeholder when the placeholder expands inside a `Covers:` entry, and the target side of likely OFT coverage tags in source-code comments for the default file extensions supported by the upstream OpenFastTrace Tag Importer after a left-hand artifact type and arrow.
+The plugin provides a specification-item completion component that activates IntelliJ basic completion for supported OFT reference authoring contexts, reads declared specification item IDs from the project-local declaration index, and presents those IDs in a deterministic order based on full-ID prefix, middle-component prefix, middle-component substring, and artifact-type prefix matches. Supported contexts include OFT item references under `Covers:` in supported specification documents, completion requests started from an active live-template placeholder when the placeholder expands inside a `Covers:` entry, and the target side of likely OFT coverage tags in source-code comments for the default file extensions supported by the upstream OpenFastTrace Tag Importer after a left-hand artifact type and arrow.
 
 Covers:
 - `scn~complete-specification-item-id-in-covers-section~1`

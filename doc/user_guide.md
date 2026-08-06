@@ -190,7 +190,7 @@ Wait for IntelliJ indexing to finish. Symbol search and completion depend on the
 
 ### Navigation Does Not Jump To The Expected Item
 
-Check the item ID spelling, artifact type, name, and revision. OFT revisions are part of the ID, so `req~example~1` and `req~example~2` are different items.
+Check the item ID spelling, artifact type, middle component, and revision. OFT revisions are part of the ID, so `req~example~1` and `req~example~2` are different items.
 
 Check that the declaration exists in the opened project, not only in another checkout or a generated report.
 

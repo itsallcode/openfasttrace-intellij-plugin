@@ -8,9 +8,9 @@ The IntelliJ plugin makes authoring OpenFastTrace documents easier in the enviro
 
 ## Notation
 
-This document uses OpenFastTrace specification items to express product features, user requirements, scenarios, and design items. Each specification item has a unique identifier in the form `<artifact-type>~<name>~<revision>`.
+This document uses OpenFastTrace specification items to express product features, user requirements, scenarios, and design items. Each specification item has a unique ID in the form `<artifact-type>~<middle-component>~<revision>`.
 
-In this document, feature items use the artifact type `feat`, user requirements use `req`, scenarios use `scn`, and design items use `dsn`. The item name describes the subject of the item in a project-wide unique form. The revision distinguishes semantically different versions of the same item.
+In this document, feature items use the artifact type `feat`, user requirements use `req`, scenarios use `scn`, and design items use `dsn`. The title describes the subject of the item. The ID is the canonical reference used when one item points to another. The revision distinguishes semantically different versions of the same item.
 
 Informative text explains background, scope, and intent. Specification items define the normative content of the document. Relationships between items are expressed with OpenFastTrace keywords such as `Needs` and `Covers`.
 
@@ -84,7 +84,7 @@ Needs: req
 ### Go to Specification Item
 `feat~go-to-specification-item~1`
 
-The plugin lets users search specification items by name across the project and navigate from OpenFastTrace references in the editor. Users can select a matching item from the result list or invoke Go To on a specification reference or coverage-tag side and open the corresponding definition in the editor.
+The plugin lets users search specification items by ID across the project and navigate from OpenFastTrace references in the editor. Users can select a matching item from the result list or invoke Go To on a specification reference or coverage-tag side and open the corresponding definition in the editor.
 
 Needs: req
 
@@ -241,7 +241,7 @@ Needs: scn
 #### Open Specification Item from Coverage Tag Left Side
 `req~open-specification-item-from-coverage-tag-left-side~1`
 
-The plugin resolves the covering OpenFastTrace specification item when a user invokes `Go To Declaration` on the left side of an OFT coverage tag in a supported file and opens that item's declaration in the specification document. If the left side omits the name and revision, the plugin resolves the effective ID by copying the missing parts from the covered ID on the right side of the arrow.
+The plugin resolves the covering OpenFastTrace specification item when a user invokes `Go To Declaration` on the left side of an OFT coverage tag in a supported file and opens that item's declaration in the specification document. If the left side omits the middle component and revision, the plugin resolves the effective ID by copying the missing parts from the covered ID on the right side of the arrow.
 
 Covers:
 - `feat~go-to-specification-item~1`
@@ -299,7 +299,7 @@ Needs: scn
 #### Provide OFT Scenario Live Template
 `req~provide-oft-scenario-live-template~1`
 
-The bundled OpenFastTrace live-template group includes a scenario template for `scn` items. Users can insert a scenario skeleton with placeholders for the scenario title, item name, given-when-then text, and covered requirement.
+The bundled OpenFastTrace live-template group includes a scenario template for `scn` items. Users can insert a scenario skeleton with placeholders for the scenario title, item ID, given-when-then text, and covered requirement.
 
 Covers:
 - `feat~oft-live-templates~1`
@@ -313,7 +313,7 @@ The following requirements refine the OFT reference-completion feature into user
 #### Complete Specification Item IDs in Covers Section
 `req~complete-specification-item-ids-in-covers-section~1`
 
-The plugin suggests existing OpenFastTrace specification item IDs when a user invokes completion while editing an OFT item ID under `Covers:` in a supported specification document. The suggestion list is ranked first by exact prefix match against the full ID, then by prefix match against the item name, then by substring match against the item name, and finally by prefix match against the artifact type.
+The plugin suggests existing OpenFastTrace specification item IDs when a user invokes completion while editing an OFT item ID under `Covers:` in a supported specification document. The suggestion list is ranked first by exact prefix match against the full ID, then by prefix match against the middle component of the ID, then by substring match against the middle component of the ID, and finally by prefix match against the artifact type.
 
 Covers:
 - `feat~oft-reference-completion~1`
@@ -323,7 +323,7 @@ Needs: scn
 #### Complete Specification Item IDs in Coverage Tag Target
 `req~complete-specification-item-ids-in-coverage-tag-target~1`
 
-The plugin suggests existing OpenFastTrace specification item IDs when a user invokes completion while editing the target side of a likely OFT coverage tag in a supported source-code comment. Coverage-tag target completion is available for the default file extensions supported by the upstream OpenFastTrace Tag Importer. The completion context requires a left-hand artifact type and an arrow before the caret so suggestions appear for coverage-tag targets instead of ordinary comment text. The suggestion list is ranked first by exact prefix match against the full ID, then by prefix match against the item name, then by substring match against the item name, and finally by prefix match against the artifact type.
+The plugin suggests existing OpenFastTrace specification item IDs when a user invokes completion while editing the target side of a likely OFT coverage tag in a supported source-code comment. Coverage-tag target completion is available for the default file extensions supported by the upstream OpenFastTrace Tag Importer. The completion context requires a left-hand artifact type and an arrow before the caret so suggestions appear for coverage-tag targets instead of ordinary comment text. The suggestion list is ranked first by exact prefix match against the full ID, then by prefix match against the middle component of the ID, then by substring match against the middle component of the ID, and finally by prefix match against the artifact type.
 
 Covers:
 - `feat~oft-reference-completion~1`
@@ -572,7 +572,7 @@ Needs: scn
 #### Sort Specification Items in Test Runner UI
 `req~sort-specification-items-in-test-runner-ui~1`
 
-Within each source-file suite, the IntelliJ Test Runner UI result view sorts specification item entries by artifact type, then by the name part of the specification item ID, then by revision number.
+Within each source-file suite, the IntelliJ Test Runner UI result view sorts specification item entries by artifact type, then by the middle component of the specification item ID, then by revision number.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
@@ -975,7 +975,7 @@ Needs: dsn
 
 **Given** a project contains the specification items `impl~openfasttrace_navigation_target~1` and `req~openfasttrace_navigation_target~1`, and a supported source file contains the OFT coverage tag `[impl->req~openfasttrace_navigation_target~1]`
 **When** a user invokes `Go To Declaration` on `impl` on the left side of the coverage tag
-**Then** the editor opens `impl~openfasttrace_navigation_target~1` at its definition by copying the missing name and revision from the covered ID on the right side.
+**Then** the editor opens `impl~openfasttrace_navigation_target~1` at its definition by copying the missing middle component and revision from the covered ID on the right side.
 
 Covers:
 - `req~open-specification-item-from-coverage-tag-left-side~1`
@@ -1015,7 +1015,7 @@ The following scenarios describe completion support while editing OFT references
 
 **Given** a project contains declared OpenFastTrace specification items and a user edits a `Covers:` entry in a supported specification document
 **When** the user types a partial specification item ID and invokes completion
-**Then** the IDE suggests existing declared specification item IDs from the project index and orders the suggestion list by full-ID prefix match, then name-prefix match, then name-substring match, and finally artifact-type prefix match
+**Then** the IDE suggests existing declared specification item IDs from the project index and orders the suggestion list by full-ID prefix match, then middle-component prefix match, then middle-component substring match, and finally artifact-type prefix match
 
 Covers:
 - `req~complete-specification-item-ids-in-covers-section~1`
@@ -1027,7 +1027,7 @@ Needs: dsn
 
 **Given** a project contains declared OpenFastTrace specification items and a user edits the target side of an OFT coverage tag candidate such as `[impl->dsn~openfasttrace<caret>]` in a comment of a file whose extension is supported by the upstream OpenFastTrace Tag Importer
 **When** the user invokes completion
-**Then** the IDE suggests existing declared specification item IDs from the project index and orders the suggestion list by full-ID prefix match, then name-prefix match, then name-substring match, and finally artifact-type prefix match
+**Then** the IDE suggests existing declared specification item IDs from the project index and orders the suggestion list by full-ID prefix match, then middle-component prefix match, then middle-component substring match, and finally artifact-type prefix match
 
 Covers:
 - `req~complete-specification-item-ids-in-coverage-tag-target~1`
@@ -1131,7 +1131,7 @@ Needs: dsn
 
 **Given** the OpenFastTrace plugin is installed and a user edits an OFT specification document in a live-template context
 **When** the user expands the `scn` live template
-**Then** the IDE inserts an OFT scenario skeleton with placeholders for the title, item name, `Given`, `When`, `Then`, and covered requirement
+**Then** the IDE inserts an OFT scenario skeleton with placeholders for the title, item ID, `Given`, `When`, `Then`, and covered requirement
 
 Covers:
 - `req~provide-oft-scenario-live-template~1`
@@ -1498,7 +1498,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and one source-file suite contains multiple specification items
 **When** the trace completes
-**Then** the specification item entries in that source-file suite are ordered by artifact type, ID name part, and revision number
+**Then** the specification item entries in that source-file suite are ordered by artifact type, the middle component of the ID, and revision number
 
 Covers:
 - `req~sort-specification-items-in-test-runner-ui~1`

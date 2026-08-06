@@ -205,7 +205,7 @@ Needs: impl, itest
 
 **Given** a supported source file contains an OFT coverage tag whose left side is shortened and the corresponding covering specification item is declared in the project
 **When** a user invokes `Go To Declaration` on the left side of the coverage tag
-**Then** the navigation component resolves the effective covering item ID by copying the missing name and revision parts from the covered ID on the right side and opens the specification document at the declaration anchor of that covering item.
+**Then** the navigation component resolves the effective covering item ID by copying the missing middle component and revision from the covered ID on the right side and opens the specification document at the declaration anchor of that covering item.
 
 Covers:
 - `scn~open-specification-item-from-coverage-tag-left-side~1`
@@ -232,7 +232,7 @@ Needs: impl, itest
 **Given** a supported specification document contains a `Covers:` entry and the opened project already indexes declared OpenFastTrace specification items
 **When** a user invokes IntelliJ basic completion while editing an OFT item ID in that `Covers:` entry
 **Then** the completion component confirms that the caret is inside a `Covers:` reference, loads declared specification item IDs from the declaration index
-**And** ranks them by full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches
+**And** ranks them by full-ID prefix, middle-component prefix, middle-component substring, and artifact-type prefix matches
 **And** shows the ordered suggestions in the standard IDE completion popup.
 
 Covers:
@@ -258,7 +258,7 @@ Needs: impl, itest
 
 **Given** a source, configuration, or markup file with a default extension supported by the upstream OpenFastTrace Tag Importer contains a comment with an OFT coverage-tag candidate whose left-hand side contains an artifact type and whose right-hand side contains the caret after `->`
 **When** a user invokes IntelliJ basic completion on the right-hand side
-**Then** the completion component confirms the supported file and comment context, extracts the target-side prefix under the caret, loads declared specification item IDs from the declaration index, ranks them by full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches, and shows the ordered suggestions in the standard IDE completion popup.
+**Then** the completion component confirms the supported file and comment context, extracts the target-side prefix under the caret, loads declared specification item IDs from the declaration index, ranks them by full-ID prefix, middle-component prefix, middle-component substring, and artifact-type prefix matches, and shows the ordered suggestions in the standard IDE completion popup.
 
 Covers:
 - `scn~complete-specification-item-id-in-coverage-tag-target~1`
@@ -346,7 +346,7 @@ Needs: impl, itest
 
 **Given** the bundled OpenFastTrace live-template group is available in a supported editing context
 **When** a user expands the `scn` live template
-**Then** IntelliJ inserts the scenario template text from the bundled plugin resource and lets the user tab through the placeholders for the title, item name, `Given`, `When`, `Then`, and covered requirement.
+**Then** IntelliJ inserts the scenario template text from the bundled plugin resource and lets the user tab through the placeholders for the title, item ID, `Given`, `When`, `Then`, and covered requirement.
 
 Covers:
 - `scn~insert-oft-scenario-live-template~1`
@@ -575,7 +575,7 @@ Needs: impl, itest
 
 **Given** the trace test-runner presentation maps traced specification items for one source-file suite
 **When** it creates the specification-item test nodes
-**Then** it orders them by artifact type, the specification item ID name part, and revision number.
+**Then** it orders them by artifact type, the middle component of the specification item ID, and revision number.
 
 Covers:
 - `scn~sort-specification-items-in-test-runner-ui~1`
