@@ -461,10 +461,14 @@ scale 2
         .               | <i>(comma-separated, empty = all)
         .               |  [ ] Include untagged items
         .               | .
+        Defects         |  [X] Include transitive defects
+     }
+     ---
+     {
+        .               | .
         Result view:    | ()  Plain text output
         .               | (X) IntelliJ Test Runner UI
         .               | .
-        .               | [X] Include transitive defects
     }
 
     {

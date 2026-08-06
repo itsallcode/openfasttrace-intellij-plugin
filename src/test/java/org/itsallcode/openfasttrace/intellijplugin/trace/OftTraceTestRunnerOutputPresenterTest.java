@@ -22,6 +22,7 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigu
 import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationFactory;
 import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationType;
 import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -165,6 +166,28 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
                 () -> assertThat(resultsViewer.getTestsRootNode().isDefect(), is(true)));
     }
 
+    // [itest->dsn~hide-transitive-defects-in-test-runner-ui~1]
+    // [itest->dsn~trace-test-runner-presentation~1]
+    public void testGivenTransitiveDefectTraceResultWhenTransitiveDefectsAreHiddenThenItOmitsTransitiveItems()
+            throws IOException {
+        writeUncleanTraceChainProject(Path.of(Objects.requireNonNull(getProject().getBasePath())));
+
+        final OftTraceResult result = new OftTraceService(false).traceProject(
+                OftTraceInputs.wholeProject(Path.of(Objects.requireNonNull(getProject().getBasePath())), List.of(), List.of()),
+                OftTraceProgress.NONE
+        );
+        final SMTRunnerConsoleView console = present(result, false);
+        final SMTestRunnerResultsForm resultsViewer = console.getResultsViewer();
+        final SMTestProxy suite = resultsViewer.getTestsRootNode().getChildren().getFirst();
+
+        assertAll(
+                () -> assertThat(suite.getChildren(), hasSize(1)),
+                () -> assertThat(suite.getChildren().getFirst().getName(), is("Design (uncovered)")),
+                () -> assertThat(suite.getChildren().getFirst().isDefect(), is(true)),
+                () -> assertThat(resultsViewer.getTestsRootNode().isDefect(), is(true))
+        );
+    }
+
     public void testGivenResultWithoutStructuredTraceWhenPresentedThenItCreatesFailedFallbackNode() {
         final SMTRunnerConsoleView console = present(OftTraceResult.invalidInput("invalid configuration"));
         final SMTestRunnerResultsForm resultsViewer = console.getResultsViewer();
@@ -186,12 +209,19 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
     }
 
     private SMTRunnerConsoleView present(final OftTraceResult result) {
+        return present(result, true);
+    }
+
+    private SMTRunnerConsoleView present(final OftTraceResult result, final boolean showTransitiveDefects) {
         final AtomicReference<SMTRunnerConsoleView> consoleRef = new AtomicReference<>();
-        final OftTraceTestRunnerOutputPresenter presenter = new OftTraceTestRunnerOutputPresenter(project -> {
-            final SMTRunnerConsoleView console = createConsole();
-            consoleRef.set(console);
-            return console;
-        });
+        final OftTraceTestRunnerOutputPresenter presenter = new OftTraceTestRunnerOutputPresenter(
+                project -> {
+                    final SMTRunnerConsoleView console = createConsole();
+                    consoleRef.set(console);
+                    return console;
+                },
+                showTransitiveDefects
+        );
 
         EdtTestUtil.runInEdtAndWait(() -> presenter.show(
                 getProject(),

@@ -59,7 +59,22 @@ final class OftTraceTestTreeMapper {
     }
 
     static OftTraceTestTree map(final Trace trace, final String projectBasePath) {
-        final List<TraceItemLinks> visibleLinksByItem = visibleLinksByItem(trace.getItems());
+        return map(trace, projectBasePath, true);
+    }
+
+    static OftTraceTestTree map(
+            final Trace trace,
+            final String projectBasePath,
+            final boolean showTransitiveDefects
+    ) {
+        // [impl->dsn~hide-transitive-defects-in-test-runner-ui~1]
+        // [impl->dsn~transitive-defect-visibility-is-controlled-by-the-run-configuration~1]
+        final List<LinkedSpecificationItem> items = showTransitiveDefects
+                ? trace.getItems()
+                : trace.getItems().stream()
+                        .filter(item -> !item.isTransitiveDefect())
+                        .toList();
+        final List<TraceItemLinks> visibleLinksByItem = visibleLinksByItem(items);
         final Map<String, SourceFileItems> itemsBySource = new LinkedHashMap<>();
         for (final TraceItemLinks itemLinks : visibleLinksByItem) {
             final SourceFileSuite sourceFileSuite = sourceFileSuite(itemLinks.item(), projectBasePath);
