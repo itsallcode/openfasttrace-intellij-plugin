@@ -606,6 +606,18 @@ Covers:
 
 Needs: impl, itest
 
+No### Mark Transitive Defects in Test Runner UI
+`dsn~mark-transitive-defects-in-test-runner~1`
+
+**Given** the trace test-runner presentation creates a specification-item test node for a defective item that is identified as a transitive defect
+**When** it derives the node name from the OpenFastTrace trace result
+**Then** it prefixes the visible node name with `↳` so transitive defects are visually distinct in the tree.
+
+Covers:
+- `scn~mark-transitive-defects-in-test-runner~1`
+
+Needs: impl, itest
+
 ### Show Trace Link Status in Test Runner UI
 `dsn~show-trace-link-status-in-test-runner-ui~2`
 

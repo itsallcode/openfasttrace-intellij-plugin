@@ -23,9 +23,12 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigu
 import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationType;
 import org.jspecify.annotations.NonNull;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,6 +36,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 // [itest->dsn~trace-test-runner-presentation~1]
 public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTestCase {
@@ -126,6 +130,39 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         assertThat(link.getStacktrace(), containsString("OpenFastTrace could not find"));
         assertThat(resultsViewer.getTotalTestCount(), is(2));
         assertThat(resultsViewer.getFailedTestCount(), is(2));
+    }
+
+    // [itest->dsn~mark-transitive-defects-in-test-runner~1]
+    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
+    // [itest->dsn~show-specification-item-defect-details-in-test-runner-ui~1]
+    // [itest->dsn~roll-up-source-file-suite-trace-status~1]
+    // [itest->dsn~roll-up-top-level-trace-status~1]
+    public void testGivenTransitiveDefectTraceResultWhenPresentedThenItPrefixesTheNodeNameAndExplainsTheError()
+            throws IOException {
+        writeUncleanTraceChainProject(Path.of(Objects.requireNonNull(getProject().getBasePath())));
+
+        final OftTraceResult result = new OftTraceService().traceProject(
+                OftTraceInputs.wholeProject(Path.of(Objects.requireNonNull(getProject().getBasePath())), List.of(), List.of()),
+                OftTraceProgress.NONE
+        );
+        final SMTRunnerConsoleView console = present(result);
+        final SMTestRunnerResultsForm resultsViewer = console.getResultsViewer();
+        final SMTestProxy suite = resultsViewer.getTestsRootNode().getChildren().getFirst();
+        final SMTestProxy transitiveFeature = suite.getChildren().stream()
+                .filter(child -> child.getName().startsWith("↳ Feature"))
+                .findFirst()
+                .orElseThrow();
+
+        assertAll(
+                () -> assertThat(transitiveFeature.isSuite(), is(true)),
+                () -> assertThat(transitiveFeature.isDefect(), is(true)),
+                () -> assertThat(transitiveFeature.getErrorMessage(),
+                        is("Transitive trace defect. The problem is not in this item but in one it depends on.")),
+                () -> assertThat(transitiveFeature.getStacktrace(), containsString("Specification item ID: feat~chain_feature~1")),
+                () -> assertThat(transitiveFeature.getStacktrace(), containsString("Trace status: uncovered")),
+                () -> assertThat(transitiveFeature.getStacktrace(), containsString("Fix the specification items this one depends on.")),
+                () -> assertThat(resultsViewer.getTestsRootNode().isDefect(), is(true)));
     }
 
     public void testGivenResultWithoutStructuredTraceWhenPresentedThenItCreatesFailedFallbackNode() {
@@ -234,12 +271,47 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
                 .build();
     }
 
-    private static LinkedSpecificationItem titledItem(final String id, final String locationPath, final String title) {
-        return new LinkedSpecificationItem(SpecificationItem.builder()
+    private static LinkedSpecificationItem titledItem(
+            final String id,
+            final String locationPath,
+            final String title,
+            final String... needsArtifactTypes
+    ) {
+        final SpecificationItem.Builder builder = SpecificationItem.builder()
                 .id(SpecificationItemId.parseId(id))
                 .title(title)
                 .status(ItemStatus.APPROVED)
-                .location(locationPath, 1)
-                .build());
+                .location(locationPath, 1);
+        Arrays.stream(needsArtifactTypes).forEach(builder::addNeedsArtifactType);
+        return new LinkedSpecificationItem(builder.build());
+    }
+
+    private void writeUncleanTraceChainProject(final Path projectRoot) throws IOException {
+        final Path docDirectory = Files.createDirectories(projectRoot.resolve("doc"));
+        Files.writeString(
+                docDirectory.resolve("trace.md"),
+                """
+                ### Feature
+                `feat~chain_feature~1`
+
+                Needs: req
+
+                ### Requirement
+                `req~chain_requirement~1`
+
+                Covers:
+                - `feat~chain_feature~1`
+
+                Needs: dsn
+
+                ### Design
+                `dsn~chain_design~1`
+
+                Covers:
+                - `req~chain_requirement~1`
+
+                Needs: impl
+                """
+        );
     }
 }

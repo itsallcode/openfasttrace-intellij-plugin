@@ -166,6 +166,8 @@ Use it to:
 
 Clean items are shown as passed tests. Trace defects are shown as failed tests. The top-level trace result is marked failed when OFT reports trace defects.
 
+Transitive defects in the tree are prefixed with `↳` so they are easy to distinguish from direct defects.
+
 Plain text output is useful when you want the raw OFT report. Specification item IDs in the plain text output are clickable when the plugin can resolve them to project files.
 
 ![OpenFastTrace trace result in the IntelliJ Test Runner UI](user_guide/images/test-runner-results.png)
