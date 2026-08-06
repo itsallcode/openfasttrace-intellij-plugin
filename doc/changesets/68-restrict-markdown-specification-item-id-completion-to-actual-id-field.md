@@ -72,7 +72,7 @@ The terminology cleanup should follow the same rule: prefer `ID` for the canonic
 - [x] Run `./gradlew test`
 - [x] Run `./gradlew traceRequirements`
 - [x] Run `./gradlew buildPlugin`
-- [ ] Run `./gradlew verifyPlugin`
+- [x] Run `./gradlew verifyPlugin`
 - [ ] Keep SonarQube Cloud quality-gate checks green
 - [ ] Keep OSS Index audit results clean
 

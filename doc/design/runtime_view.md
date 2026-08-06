@@ -263,7 +263,7 @@ Needs: impl, itest
 Covers:
 - `scn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
 
-Needs: impl, itest
+Needs: impl, itest, utest
 
 ### Complete Specification Item ID in Active Live Template Covers Field
 `dsn~complete-specification-item-id-in-active-live-template-covers-field~1`

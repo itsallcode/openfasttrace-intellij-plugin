@@ -2,7 +2,12 @@ package org.itsallcode.openfasttrace.intellijplugin;
 
 import com.intellij.codeInsight.daemon.impl.HighlightInfo;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,6 +15,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -17,6 +23,17 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 // [tst->dsn~intellij-light-tests-keep-junit4-compatibility-dependency~1]
 public abstract class AbstractOftPlatformTestCase extends BasePlatformTestCase {
     private final List<Path> managedTestArtifactDirectories = new ArrayList<>();
+
+    @Override
+    protected LightProjectDescriptor getProjectDescriptor() {
+        return new LightProjectDescriptor() {
+            @Override
+            public @Nullable VirtualFile createDirForSources(@NotNull final Module module) {
+                // Give each light test a fresh temp source root so IntelliJ does not reuse deleted VFS entries.
+                return createSourceRoot(module, "src-" + UUID.randomUUID());
+            }
+        };
+    }
 
     protected boolean hasHighlight(final List<HighlightInfo> infos, final String fragment, final TextAttributesKey key) {
         final String text = myFixture.getEditor().getDocument().getText();
