@@ -55,6 +55,11 @@ public final class OftSupportedFiles {
         return SPECIFICATION_EXTENSIONS.contains(extensionOf(fileName));
     }
 
+    public static boolean isMarkdownSpecificationFileName(final String fileName) {
+        final String extension = extensionOf(fileName);
+        return "md".equals(extension) || "markdown".equals(extension);
+    }
+
     public static boolean isCoverageTagFile(final VirtualFile file) {
         return file != null && isCoverageTagFileName(file.getName());
     }

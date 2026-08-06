@@ -52,7 +52,7 @@ For installation and workflow instructions, see the [OpenFastTrace IntelliJ Plug
 The plugin currently focuses on:
 * syntax highlighting for OFT items in supported files
 * navigation support (`Go To Declaration`, symbol search, and related navigation paths)
-* completion for existing specification item IDs while editing `Covers:` entries in supported specification documents and coverage-tag targets in files supported by the OpenFastTrace Tag Importer
+* completion for existing specification item IDs while editing Markdown declaration ID fields, `Covers:` entries in supported specification documents, and coverage-tag targets in files supported by the OpenFastTrace Tag Importer
 * bundled OFT live templates for common specification items, including a scenario template
 * project-wide or selected-resource OFT tracing through custom OpenFastTrace run configurations, including pre-configured templates
 * clickable specification item IDs directly from the trace output window, including generated IDs created from coverage tags
@@ -90,7 +90,7 @@ Run configurations can select plain text output instead. In that mode, the plugi
 
 ## Live-Templates Bundled With the Plugin
 
-The plugin also bundles an `OpenFastTrace` live-template group under `Settings | Editor | Live Templates`. Use abbreviations such as `feat`, `req`, `dsn`, and `scn` in a supported editing context, then press `Tab` to insert an OFT item skeleton. The `scn` template inserts a scenario stub with placeholders for `Given`, `When`, `Then`, and the covered requirement. While the caret is still in a template's covered-item field, use basic completion to select an existing specification item ID from the project index.
+The plugin also bundles an `OpenFastTrace` live-template group under `Settings | Editor | Live Templates`. Use abbreviations such as `feat`, `req`, `dsn`, and `scn` in a supported editing context, then press `Tab` to insert an OFT item skeleton. The `scn` template inserts a scenario stub with placeholders for `Given`, `When`, `Then`, and the covered requirement. While the caret is still in a template's covered-item field, use basic completion to select an existing specification item ID from the project index. In Markdown specification documents, basic completion also works while editing the declaration ID field of an OFT item.
 
 ## Installation
 ### Runtime Dependencies

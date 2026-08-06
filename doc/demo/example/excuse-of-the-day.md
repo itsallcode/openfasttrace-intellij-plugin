@@ -54,3 +54,18 @@ Covers:
 - `scn~tell-late-work-excuse~1`
 
 Needs: impl
+
+### Test Auto-Completion
+`req~test-auto-completion~1`
+
+
+
+Covers:
+
+* [`feat~example_manual_trace_chain~1`](#)
+
+Needs: dsn
+
+
+
+

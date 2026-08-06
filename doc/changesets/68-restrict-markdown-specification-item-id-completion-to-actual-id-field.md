@@ -57,25 +57,28 @@ The terminology cleanup should follow the same rule: prefer `ID` for the canonic
 
 ### Implementation
 
-- [ ] Refine the Markdown completion context detection in `src/main/java/org/itsallcode/openfasttrace/intellijplugin/navigation/OftSpecificationCompletionProvider.java` so the shared completion path only activates in the actual declaration ID field
-- [ ] Keep the existing `Covers:` and coverage-tag completion paths unchanged while the Markdown declaration-ID path is tightened
+- [x] Refine the Markdown completion context detection in `src/main/java/org/itsallcode/openfasttrace/intellijplugin/navigation/OftSpecificationCompletionProvider.java` so the shared completion path only activates in the actual declaration ID field
+- [x] Keep the existing `Covers:` and coverage-tag completion paths unchanged while the Markdown declaration-ID path is tightened
 - [ ] Update bundled live-template text or helper metadata in `src/main/resources/liveTemplates/OpenFastTrace.xml` and `src/main/java/org/itsallcode/openfasttrace/intellijplugin/templates/OftLiveTemplates.java` only if wording needs to be aligned to `ID` and `name-part`
-- [ ] Add or adjust implementation coverage tags for the new design items and terminology updates
+- [x] Add or adjust implementation coverage tags for the new design items and terminology updates
 
 ### Verification
 
-- [ ] Add platform tests that prove completion appears in the Markdown declaration ID field and does not appear in the title field, surrounding body text, or an active live-template title entry
-- [ ] Add regression coverage showing that existing `Covers:` and coverage-tag completion behavior, ranking, and candidate selection remain unchanged
-- [ ] Add focused unit tests for the Markdown completion context detector and any live-template field helpers introduced by the fix
+- [x] Add platform tests that prove completion appears in the Markdown declaration ID field and does not appear in the title field, surrounding body text, or an active live-template title entry
+- [x] Add regression coverage showing that existing `Covers:` and coverage-tag completion behavior, ranking, and candidate selection remain unchanged
+- [x] Add focused unit tests for the Markdown completion context detector and any live-template field helpers introduced by the fix
 - [x] Keep the OpenFastTrace trace clean for the requirement and design artifacts in scope
-- [ ] Keep path coverage at or above the documented threshold
-- [ ] Keep required Gradle test, trace, packaging, and plugin verification tasks green
+- [x] Keep path coverage at or above the documented threshold
+- [x] Run `./gradlew test`
+- [x] Run `./gradlew traceRequirements`
+- [x] Run `./gradlew buildPlugin`
+- [ ] Run `./gradlew verifyPlugin`
 - [ ] Keep SonarQube Cloud quality-gate checks green
 - [ ] Keep OSS Index audit results clean
 
 ### Update User Documentation
 
-- [ ] Update `README.md` and any authoring guidance touched by this issue so the terminology uses `ID` and `name-part` consistently
+- [x] Update `README.md` and any authoring guidance touched by this issue so the terminology uses `ID` and `name-part` consistently
 
 ## Version And Changelog Update
 
