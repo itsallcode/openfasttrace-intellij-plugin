@@ -269,9 +269,10 @@ Needs: impl
 ### Specification Item Completion
 `dsn~specification-item-completion~1`
 
-The plugin provides a specification-item completion component that activates IntelliJ basic completion for supported OFT reference authoring contexts, reads declared specification item IDs from the project-local declaration index, and presents those IDs in a deterministic order based on full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches. Supported contexts include OFT item references under `Covers:` in supported specification documents, completion requests started from an active live-template placeholder when the placeholder expands inside a `Covers:` entry, and the target side of likely OFT coverage tags in source-code comments for the default file extensions supported by the upstream OpenFastTrace Tag Importer after a left-hand artifact type and arrow.
+The plugin provides a specification-item completion component that activates IntelliJ basic completion for supported OFT reference authoring contexts, reads declared specification item IDs from the project-local declaration index, and presents those IDs in a deterministic order based on full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches. Supported contexts include the actual Markdown specification-item ID field, OFT item references under `Covers:` in supported specification documents, completion requests started from an active live-template placeholder when the placeholder expands inside a `Covers:` entry, and the target side of likely OFT coverage tags in source-code comments for the default file extensions supported by the upstream OpenFastTrace Tag Importer after a left-hand artifact type and arrow. The component excludes the Markdown title field and other non-ID text by using a context detector that identifies the declaration anchor explicitly rather than relying only on document structure, and it keeps the active live-template session in place while ignoring the title placeholder until the caret reaches the actual declaration ID field.
 
 Covers:
+- `scn~complete-markdown-specification-item-id-in-declaration-id-field~1`
 - `scn~complete-specification-item-id-in-covers-section~1`
 - `scn~complete-specification-item-id-in-active-live-template-covers-field~1`
 - `scn~complete-specification-item-id-in-coverage-tag-target~1`
