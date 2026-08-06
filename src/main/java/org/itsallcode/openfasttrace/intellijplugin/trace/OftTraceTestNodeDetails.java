@@ -128,6 +128,7 @@ record OftTraceTestNodeDetails(String failureMessage, String detailText) {
                 + "Trace-link status: " + visibleStatus;
     }
 
+    // [impl -> dsn~mark-transitive-defects-in-test-runner~1]
     private static String itemFailureMessage(final LinkedSpecificationItem item, final String visibleStatus) {
         if (item.isTransitiveDefect()) {
             return "Transitive trace defect. The problem is not in this item but in one it depends on.";
@@ -140,6 +141,7 @@ record OftTraceTestNodeDetails(String failureMessage, String detailText) {
         };
     }
 
+    // [impl -> dsn~mark-transitive-defects-in-test-runner~1]
     private static String itemFailureExplanation(final LinkedSpecificationItem item, final String visibleStatus) {
         if (item.isTransitiveDefect()) {
             return "This transitive error is caused by the specification items this one depends on."

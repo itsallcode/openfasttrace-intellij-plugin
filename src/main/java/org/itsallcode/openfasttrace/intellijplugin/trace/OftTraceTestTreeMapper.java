@@ -92,7 +92,7 @@ final class OftTraceTestTreeMapper {
         final String itemStatus = itemStatus(item);
         final String itemId = item.getId().toString();
         final String itemName = itemName(item);
-        final String visibleItemName = item.isTransitiveDefect() ? "↳ " + itemName : itemName;
+        final String visibleItemName = getVisibleItemName(item, itemName);
         return new OftTraceItemNode(
                 nodeName(visibleItemName, itemStatus, !item.isDefect()),
                 itemId,
@@ -104,6 +104,11 @@ final class OftTraceTestTreeMapper {
                         .map(link -> mapLink(item, link))
                         .toList()
         );
+    }
+
+    // [impl -> dsn~mark-transitive-defects-in-test-runner~1]
+    private static String getVisibleItemName(final LinkedSpecificationItem item, final String itemName) {
+        return item.isTransitiveDefect() ? "↳ " + itemName : itemName;
     }
 
     private static List<TraceItemLinks> visibleLinksByItem(
