@@ -90,7 +90,7 @@ Run configurations can select plain text output instead. In that mode, the plugi
 
 ## Live-Templates Bundled With the Plugin
 
-The plugin also bundles an `OpenFastTrace` live-template group under `Settings | Editor | Live Templates`. Use abbreviations such as `feat`, `req`, `dsn`, and `scn` in a supported editing context, then press `Tab` to insert an OFT item skeleton. The `scn` template inserts a scenario stub with placeholders for `Given`, `When`, `Then`, and the covered requirement. While the caret is still in a template's covered-item field, use basic completion to select an existing specification item ID from the project index. In Markdown specification documents, basic completion also works while editing the declaration ID field of an OFT item.
+The plugin also bundles an `OpenFastTrace` live-template group under `Settings | Editor | Live Templates`. Use abbreviations such as `feat`, `req`, `dsn`, and `scn` in a supported editing context, then press `Tab` to insert an OFT item skeleton. The `scn` template inserts a scenario stub with placeholders for `Given`, `When`, `Then`, and the covered requirement. While the caret is still in a template's covered-item field, use basic completion to select an existing specification item ID from the project index. In Markdown specification documents, basic completion also works while editing the declaration ID field of an OFT item, and it stays off Markdown link destinations nested inside `Covers:` entries.
 
 ## Installation
 ### Runtime Dependencies

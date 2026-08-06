@@ -253,6 +253,18 @@ Covers:
 
 Needs: impl, itest
 
+### Suppress Specification Item ID Completion in Markdown Link Targets Inside Covers Entries
+`dsn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+**Given** a supported specification document contains a `Covers:` entry with a Markdown link and the caret is inside the link destination
+**When** a user invokes IntelliJ basic completion there
+**Then** the completion component does not add OpenFastTrace specification item ID suggestions inside that Markdown link destination so anchor completion can remain in control.
+
+Covers:
+- `scn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+Needs: impl, itest
+
 ### Complete Specification Item ID in Active Live Template Covers Field
 `dsn~complete-specification-item-id-in-active-live-template-covers-field~1`
 

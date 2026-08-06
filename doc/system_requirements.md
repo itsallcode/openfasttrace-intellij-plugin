@@ -320,6 +320,28 @@ Covers:
 
 Needs: scn
 
+#### Suppress Specification Item ID Completion in Markdown Link Targets Inside Covers Entries
+`req~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+The plugin does not suggest existing OpenFastTrace specification item IDs when a user invokes completion inside the destination part of a Markdown link nested in a `Covers:` entry. Users can keep the link destination available for Markdown anchor completion without OFT IDs taking over the popup.
+
+Covers:
+- `feat~oft-reference-completion~1`
+
+Needs: scn
+
+### Suppress Specification Item ID Completion in Markdown Link Targets Inside Covers Entries
+`scn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+**Given** a supported specification document contains a `Covers:` entry with a Markdown link and the caret is inside the link destination
+**When** a user invokes completion there
+**Then** the plugin does not suggest OpenFastTrace specification item IDs inside that Markdown link destination
+
+Covers:
+- `req~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+Needs: dsn
+
 #### Complete Specification Item IDs in Coverage Tag Target
 `req~complete-specification-item-ids-in-coverage-tag-target~1`
 
