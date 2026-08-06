@@ -404,6 +404,30 @@ Covers:
 
 Needs: impl, itest
 
+### Hide Transitive Defects in Test Runner UI
+`dsn~hide-transitive-defects-in-test-runner-ui~1`
+
+**Given** the trace test-runner presentation receives a structured OpenFastTrace trace result and the saved run-configuration setting disables transitive defects
+**When** it maps the trace result to SM test runner nodes
+**Then** it omits specification-item nodes that are identified as transitive defects while still creating nodes for direct defects and their trace links.
+
+Covers:
+- `scn~hide-transitive-defects-in-test-runner-ui~1`
+
+Needs: impl, itest
+
+### Hide Transitive Defects in Plain Text Output
+`dsn~hide-transitive-defects-in-plain-text-output~1`
+
+**Given** the plain-text trace presentation receives a structured OpenFastTrace trace result and the saved run-configuration setting disables transitive defects
+**When** it prepares the OFT report settings for the plain-text renderer
+**Then** it sets the base library's transitive-defect filter option so the rendered report omits transitive defects while still preserving direct-defect information and the existing summary for the remaining trace.
+
+Covers:
+- `scn~hide-transitive-defects-in-plain-text-output~1`
+
+Needs: impl, itest
+
 ### Trace Selected Project Resources
 `dsn~trace-selected-project-resources~2`
 
@@ -631,7 +655,7 @@ Covers:
 
 Needs: impl, itest
 
-No### Mark Transitive Defects in Test Runner UI
+### Mark Transitive Defects in Test Runner UI
 `dsn~mark-transitive-defects-in-test-runner~1`
 
 **Given** the trace test-runner presentation creates a specification-item test node for a defective item that is identified as a transitive defect

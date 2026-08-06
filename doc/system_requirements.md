@@ -1460,6 +1460,53 @@ Covers:
 
 Needs: dsn
 
+#### Filter Transitive Defects in Trace Result View
+`req~filter-transitive-defects-in-trace-result-view~1`
+
+The OpenFastTrace run configuration includes a `Show transitive defects` checkbox for the trace result view. When users leave the checkbox selected, the plugin shows transitive defects alongside direct defects in the configured result view. When users clear the checkbox, the plugin hides transitive defects so they can focus on the direct defects that still need fixing.
+
+Covers:
+- `feat~oft-run-configurations~2`
+- `feat~oft-test-runner-trace-results~1`
+
+Needs: scn
+
+#### Show Transitive Defects by Default in Run Configuration Templates
+`scn~show-transitive-defects-by-default-in-run-configuration-templates~1`
+
+**Given** an IntelliJ project is open and a user creates a new OpenFastTrace run configuration from one of the bundled templates
+**When** the configuration editor opens
+**Then** the `Show transitive defects` checkbox is selected by default
+
+Covers:
+- `req~filter-transitive-defects-in-trace-result-view~1`
+
+Needs: dsn
+
+#### Hide Transitive Defects in Test Runner UI
+`scn~hide-transitive-defects-in-test-runner-ui~1`
+
+**Given** an IntelliJ project is open, an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view, and the `Show transitive defects` checkbox is cleared
+**When** the user runs the configuration
+**Then** the test runner tree omits transitive defects while still showing direct defects and their trace links
+
+Covers:
+- `req~filter-transitive-defects-in-trace-result-view~1`
+
+Needs: dsn
+
+#### Hide Transitive Defects in Plain Text Output
+`scn~hide-transitive-defects-in-plain-text-output~1`
+
+**Given** an IntelliJ project is open, an `OpenFastTrace` run configuration uses the plain text result view, and the `Show transitive defects` checkbox is cleared
+**When** the user runs the configuration
+**Then** the plain text report omits transitive defects while still showing direct defects and their trace links
+
+Covers:
+- `req~filter-transitive-defects-in-trace-result-view~1`
+
+Needs: dsn
+
 ### Show Plugin Logo in JetBrains Plugin Surfaces
 `scn~show-plugin-logo-in-jetbrains-plugin-surfaces~1`
 
