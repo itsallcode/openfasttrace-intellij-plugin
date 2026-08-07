@@ -72,8 +72,8 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         assertThat(ownOutput(item), containsString("Trace status: covered"));
         assertThat(suite.isDefect(), is(false));
         assertThat(resultsViewer.getTestsRootNode().isDefect(), is(false));
-        assertThat(resultsViewer.getTotalTestCount(), is(1));
-        assertThat(resultsViewer.getFailedTestCount(), is(0));
+        assertThat(totalTestCount(resultsViewer), is(1));
+        assertThat(failedTestCount(resultsViewer), is(0));
     }
 
     // [itest->dsn~show-trace-source-files-as-test-runner-suites~1]
@@ -127,8 +127,8 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         assertThat(link.getStacktrace(), containsString("Owning item ID: impl~missing_requirement~1"));
         assertThat(link.getStacktrace(), containsString("Linked item ID: req~missing_requirement~1"));
         assertThat(link.getStacktrace(), containsString("OpenFastTrace could not find"));
-        assertThat(resultsViewer.getTotalTestCount(), is(2));
-        assertThat(resultsViewer.getFailedTestCount(), is(2));
+        assertThat(totalTestCount(resultsViewer), is(2));
+        assertThat(failedTestCount(resultsViewer), is(2));
     }
 
     // [itest->dsn~mark-transitive-defects-in-test-runner~1]
@@ -202,8 +202,8 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         assertThat(fallbackNode.getStacktrace(), is("invalid configuration"));
         assertThat(resultsViewer.getTestsRootNode().getErrorMessage(), is("OpenFastTrace trace could not start."));
         assertThat(resultsViewer.getTestsRootNode().getStacktrace(), is("invalid configuration"));
-        assertThat(resultsViewer.getTotalTestCount(), is(1));
-        assertThat(resultsViewer.getFailedTestCount(), is(1));
+        assertThat(totalTestCount(resultsViewer), is(1));
+        assertThat(failedTestCount(resultsViewer), is(1));
     }
 
     private SMTRunnerConsoleView present(final OftTraceResult result) {
@@ -261,6 +261,24 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
                 .toList();
         assertThat(matchingChildren, hasSize(1));
         return matchingChildren.getFirst();
+    }
+
+    private static int totalTestCount(final SMTestRunnerResultsForm resultsViewer) {
+        return nodesForTest(resultsViewer).size();
+    }
+
+    private static int failedTestCount(final SMTestRunnerResultsForm resultsViewer) {
+        return Math.toIntExact(nodesForTest(resultsViewer).stream()
+                .filter(SMTestProxy::isDefect)
+                .count());
+    }
+
+    private static List<SMTestProxy> nodesForTest(final SMTestRunnerResultsForm resultsViewer) {
+        final SMTestProxy root = resultsViewer.getTestsRootNode();
+        return root.getAllTests().stream()
+                .filter(test -> test != root)
+                .filter(test -> test.getParent() != root || !test.isSuite())
+                .toList();
     }
 
     private static String ownOutput(final SMTestProxy proxy) {
