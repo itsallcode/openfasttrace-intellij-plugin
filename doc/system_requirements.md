@@ -552,9 +552,9 @@ Needs: scn
 The following requirements refine the OFT test-runner trace-results feature into user-visible capabilities.
 
 #### Show Trace Source Files as Test Runner Suites
-`req~show-trace-source-files-as-test-runner-suites~1`
+`req~show-trace-source-files-as-test-runner-suites~2`
 
-The IntelliJ Test Runner UI result view shows each traced source file as a test runner suite. For traced source files below the opened project directory, the suite label uses the project-local path, for example `doc/system_requirements.md`.
+The IntelliJ Test Runner UI result view shows each traced source file as a test runner suite. For traced source files below the opened project directory, the suite label uses the project-local path, for example `doc/system_requirements.md`. Source-file suites structure the result tree and do not contribute to its logical result total or completion progress.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
@@ -562,9 +562,9 @@ Covers:
 Needs: scn
 
 #### Show Trace Specification Items as Test Runner Tests
-`req~show-trace-specification-items-as-test-runner-tests~1`
+`req~show-trace-specification-items-as-test-runner-tests~2`
 
-The IntelliJ Test Runner UI result view shows each traced specification item as a test entry below the suite for the source file that contains that item.
+The IntelliJ Test Runner UI result view shows each traced specification item as a test entry below the suite for the source file that contains that item. Each visible specification-item entry contributes exactly one logical result to the displayed total and completion progress.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
@@ -602,9 +602,9 @@ Covers:
 Needs: scn
 
 #### Show Trace Links as Test Runner Sub-Tests
-`req~show-trace-links-as-test-runner-sub-tests~1`
+`req~show-trace-links-as-test-runner-sub-tests~2`
 
-The IntelliJ Test Runner UI result view shows each incoming or outgoing trace link as a sub-test below the connected specification item for which the link is shown.
+The IntelliJ Test Runner UI result view shows each incoming or outgoing trace link as a detail child below the connected specification item for which the link is shown. Trace-link detail children do not contribute to the displayed logical result total or completion progress.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
@@ -652,9 +652,19 @@ Covers:
 Needs: scn
 
 #### Map Specification Item Trace Status to Test Runner Status
-`req~map-specification-item-trace-status-to-test-runner-status~1`
+`req~map-specification-item-trace-status-to-test-runner-status~2`
 
-The IntelliJ Test Runner UI result view treats a clean specification item as a passed test and a defective specification item as a failed test.
+The IntelliJ Test Runner UI result view treats a clean specification item with only clean visible trace links as one passed logical result. It treats a defective specification item, or an item with one or more defective visible trace links, as one failed logical result.
+
+Covers:
+- `feat~oft-test-runner-trace-results~1`
+
+Needs: scn
+
+#### Count Only Specification Items in Test Runner Results
+`req~count-only-specification-items-in-test-runner-results~1`
+
+The IntelliJ Test Runner UI result view reports logical result totals and completion progress for visible specification items only. Source-file suites and incoming or outgoing trace-link detail children remain visible in the tree but do not increase the total or independently advance completion progress.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
@@ -1544,26 +1554,26 @@ Covers:
 Needs: dsn
 
 ### Show Trace Source Files as Test Runner Suites
-`scn~show-trace-source-files-as-test-runner-suites~1`
+`scn~show-trace-source-files-as-test-runner-suites~2`
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains specification items from supported source files
 **When** the trace completes
-**Then** the test runner tree contains one suite per source file and labels source files below the opened project directory with project-local paths
+**Then** the test runner tree contains one suite per source file, labels source files below the opened project directory with project-local paths, and excludes those suites from the logical result total and completion progress.
 
 Covers:
-- `req~show-trace-source-files-as-test-runner-suites~1`
+- `req~show-trace-source-files-as-test-runner-suites~2`
 
 Needs: dsn
 
 ### Show Trace Specification Items as Test Runner Tests
-`scn~show-trace-specification-items-as-test-runner-tests~1`
+`scn~show-trace-specification-items-as-test-runner-tests~2`
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains specification items from supported source files
 **When** the trace completes
-**Then** the test runner tree contains one test entry per specification item below the suite for the source file that contains that item
+**Then** the test runner tree contains one test entry per specification item below the suite for the source file that contains that item and each visible item contributes one logical result.
 
 Covers:
-- `req~show-trace-specification-items-as-test-runner-tests~1`
+- `req~show-trace-specification-items-as-test-runner-tests~2`
 
 Needs: dsn
 
@@ -1572,7 +1582,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a specification item with a title
 **When** the trace completes
-**Then** the test runner tree shows the title as the visible specification-item name and omits the full specification item ID from the tree label
+**Then** the test runner tree shows the title as the visible specification-item name and omits the full specification item ID from the tree label.
 
 Covers:
 - `req~show-specification-item-title-in-test-runner-ui~2`
@@ -1604,14 +1614,14 @@ Covers:
 Needs: dsn
 
 ### Show Trace Links as Test Runner Sub-Tests
-`scn~show-trace-links-as-test-runner-sub-tests~1`
+`scn~show-trace-links-as-test-runner-sub-tests~2`
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and a traced specification item has incoming or outgoing trace links
 **When** the trace completes
-**Then** the test runner tree shows each incoming or outgoing trace link as a sub-test below that specification item
+**Then** the test runner tree shows each incoming or outgoing trace link as a detail child below that specification item without increasing the logical result total or completion progress.
 
 Covers:
-- `req~show-trace-links-as-test-runner-sub-tests~1`
+- `req~show-trace-links-as-test-runner-sub-tests~2`
 
 Needs: dsn
 
@@ -1632,7 +1642,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains an incoming or outgoing trace link
 **When** the trace completes
-**Then** the trace-link sub-test shows the link status in brackets only when the link status is not clean
+**Then** the trace-link sub-test shows the link status in brackets only when the link status is not clean.
 
 Covers:
 - `req~show-trace-link-status-in-test-runner-ui~2`
@@ -1644,7 +1654,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains specification items with incoming or outgoing trace links
 **When** the trace completes
-**Then** each trace-link sub-test shows whether the link is incoming or outgoing
+**Then** each trace-link sub-test shows whether the link is incoming or outgoing.
 
 Covers:
 - `req~show-trace-link-direction-in-test-runner-ui~1`
@@ -1656,7 +1666,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains incoming and outgoing trace links
 **When** the trace completes
-**Then** the trace-link sub-tests use Unicode arrows for the visible link direction
+**Then** the trace-link sub-tests use Unicode arrows for the visible link direction.
 
 Covers:
 - `req~show-unicode-trace-link-direction-in-test-runner-ui~1`
@@ -1664,14 +1674,26 @@ Covers:
 Needs: dsn
 
 ### Map Specification Item Trace Status to Test Runner Status
-`scn~map-specification-item-trace-status-to-test-runner-status~1`
+`scn~map-specification-item-trace-status-to-test-runner-status~2`
 
-**Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains clean and defective specification items
+**Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains clean and defective specification items, including an item with a defective visible trace link
 **When** the trace completes
-**Then** clean specification items are shown as passed tests and defective specification items are shown as failed tests
+**Then** each clean item with only clean visible links is shown as one passed logical result and each defective item or item with a defective visible link is shown as one failed logical result.
 
 Covers:
-- `req~map-specification-item-trace-status-to-test-runner-status~1`
+- `req~map-specification-item-trace-status-to-test-runner-status~2`
+
+Needs: dsn
+
+### Count Only Specification Items in Test Runner Results
+`scn~count-only-specification-items-in-test-runner-results~1`
+
+**Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and a clean trace result contains specification items in source-file suites with visible trace-link detail children
+**When** the trace completes
+**Then** the displayed result total equals the number of visible specification-item entries and the completion progress reaches 100%.
+
+Covers:
+- `req~count-only-specification-items-in-test-runner-results~1`
 
 Needs: dsn
 
@@ -1685,7 +1707,7 @@ Needs: dsn
 **And** the failure description tells users to fix the specification items this one depends on. 
 
 Covers:
-- `req~map-specification-item-trace-status-to-test-runner-status~1`
+- `req~map-specification-item-trace-status-to-test-runner-status~2`
 
 Needs: dsn
 
@@ -1694,7 +1716,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains clean and defective incoming or outgoing trace links
 **When** the trace completes
-**Then** clean trace links are shown as passed sub-tests and defective trace links are shown as failed sub-tests
+**Then** clean trace links are shown as passed sub-tests and defective trace links are shown as failed sub-tests.
 
 Covers:
 - `req~map-trace-link-status-to-test-runner-status~1`
@@ -1706,7 +1728,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and a source-file suite contains at least one failed specification item or trace-link sub-test
 **When** the trace completes
-**Then** the source-file suite is shown as failed
+**Then** the source-file suite is shown as failed.
 
 Covers:
 - `req~roll-up-source-file-suite-trace-status~1`
@@ -1718,7 +1740,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and at least one source-file suite contains a failed descendant
 **When** the trace completes
-**Then** the top-level trace suite is shown as failed
+**Then** the top-level trace suite is shown as failed.
 
 Covers:
 - `req~roll-up-top-level-trace-status~1`
@@ -1730,7 +1752,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a defective specification item
 **When** the user selects that specification item in the test runner tree
-**Then** the detail view explains why the specification item is defective
+**Then** the detail view explains why the specification item is defective.
 
 Covers:
 - `req~show-specification-item-defect-details-in-test-runner-ui~1`
@@ -1742,7 +1764,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a defective trace link
 **When** the user selects that trace link in the test runner tree
-**Then** the detail view explains why the trace link is defective
+**Then** the detail view explains why the trace link is defective.
 
 Covers:
 - `req~show-trace-link-defect-details-in-test-runner-ui~1`
@@ -1754,7 +1776,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a trace link
 **When** the user selects that trace link in the test runner tree
-**Then** the detail view shows the owning specification item ID, linked specification item ID, link direction, and trace-link status
+**Then** the detail view shows the owning specification item ID, linked specification item ID, link direction, and trace-link status.
 
 Covers:
 - `req~show-trace-link-id-details-in-test-runner-ui~1`
@@ -1766,7 +1788,7 @@ Needs: dsn
 
 **Given** an IntelliJ project is open and the test runner tree shows an OpenFastTrace specification item entry from that project
 **When** a user activates source navigation for that specification item entry
-**Then** the IDE opens the corresponding specification item declaration in the editor
+**Then** the IDE opens the corresponding specification item declaration in the editor.
 
 Covers:
 - `req~navigate-from-test-runner-specification-items~1`
@@ -1778,7 +1800,7 @@ Needs: dsn
 
 **Given** an IntelliJ project is open and the test runner tree shows an OpenFastTrace trace-link entry from that project
 **When** a user activates source navigation for that trace-link entry
-**Then** the IDE opens the corresponding specification item declaration or source-side coverage tag in the editor
+**Then** the IDE opens the corresponding specification item declaration or source-side coverage tag in the editor.
 
 Covers:
 - `req~navigate-from-test-runner-trace-links~1`
@@ -1790,7 +1812,7 @@ Needs: dsn
 
 **Given** an IntelliJ project is open and the test runner tree shows an OpenFastTrace source-file suite entry from that project
 **When** a user activates source navigation for that source-file suite entry
-**Then** the IDE opens the corresponding source file in the editor
+**Then** the IDE opens the corresponding source file in the editor.
 
 Covers:
 - `req~navigate-from-test-runner-source-files~1`

@@ -382,23 +382,24 @@ Covers:
 Needs: impl, itest
 
 ### Trace Test Runner Presentation
-`dsn~trace-test-runner-presentation~1`
+`dsn~trace-test-runner-presentation~2`
 
-The plugin provides a trace test-runner presentation component that maps the structured OpenFastTrace trace result to IntelliJ SM test runner nodes. It creates project-local source-file suites, sorted specification-item tests, and incoming or outgoing trace-link sub-tests; derives compact title-aware labels, Unicode direction markers, transitive-defect markers, pass/fail status, status roll-up, and item/link details from the OpenFastTrace trace status; and connects source-file, item, and link node navigation to the existing OpenFastTrace trace navigation support.
+The plugin provides a trace test-runner presentation component that maps the structured OpenFastTrace trace result to IntelliJ SM test runner nodes. It creates project-local source-file suites, sorted specification-item tests, and incoming or outgoing trace-link detail children; derives compact title-aware labels, Unicode direction markers, transitive-defect markers, pass/fail status, status roll-up, and item/link details from the OpenFastTrace trace status; and connects source-file, item, and link node navigation to the existing OpenFastTrace trace navigation support. It separately reports custom logical-result progress for visible specification items only, excluding suites and trace-link detail children from totals and progress while rolling a defective visible link into its owning item's one logical failure.
 
 Covers:
-- `scn~show-trace-source-files-as-test-runner-suites~1`
-- `scn~show-trace-specification-items-as-test-runner-tests~1`
+- `scn~show-trace-source-files-as-test-runner-suites~2`
+- `scn~show-trace-specification-items-as-test-runner-tests~2`
 - `scn~show-specification-item-title-in-test-runner-ui~2`
 - `scn~show-specification-item-id-in-test-runner-details~1`
 - `scn~sort-specification-items-in-test-runner-ui~1`
-- `scn~show-trace-links-as-test-runner-sub-tests~1`
+- `scn~show-trace-links-as-test-runner-sub-tests~2`
 - `scn~show-specification-item-status-in-test-runner-ui~2`
 - `scn~mark-transitive-defects-in-test-runner~1`
 - `scn~show-trace-link-status-in-test-runner-ui~2`
 - `scn~show-trace-link-direction-in-test-runner-ui~1`
 - `scn~show-unicode-trace-link-direction-in-test-runner-ui~1`
-- `scn~map-specification-item-trace-status-to-test-runner-status~1`
+- `scn~map-specification-item-trace-status-to-test-runner-status~2`
+- `scn~count-only-specification-items-in-test-runner-results~1`
 - `scn~map-trace-link-status-to-test-runner-status~1`
 - `scn~roll-up-source-file-suite-trace-status~1`
 - `scn~roll-up-top-level-trace-status~1`

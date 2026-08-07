@@ -584,26 +584,26 @@ Covers:
 Needs: impl, itest
 
 ### Show Trace Source Files as Test Runner Suites
-`dsn~show-trace-source-files-as-test-runner-suites~1`
+`dsn~show-trace-source-files-as-test-runner-suites~2`
 
 **Given** the trace test-runner presentation receives a structured OpenFastTrace trace result
 **When** it builds the SM test tree
-**Then** it groups traced specification items by source file and creates one SM test suite node for each source file, using a project-local suite label for source paths below the opened project directory.
+**Then** it groups traced specification items by source file and creates one SM test suite node for each source file, using a project-local suite label for source paths below the opened project directory, without reporting source-file suites as logical results or progress events.
 
 Covers:
-- `scn~show-trace-source-files-as-test-runner-suites~1`
+- `scn~show-trace-source-files-as-test-runner-suites~2`
 
 Needs: impl, itest
 
 ### Show Trace Specification Items as Test Runner Tests
-`dsn~show-trace-specification-items-as-test-runner-tests~1`
+`dsn~show-trace-specification-items-as-test-runner-tests~2`
 
 **Given** the trace test-runner presentation has created a source-file suite
 **When** it maps traced specification items from that source file
-**Then** it creates one SM test node for each specification item below that source-file suite.
+**Then** it creates one SM test node and one logical result for each visible specification item below that source-file suite.
 
 Covers:
-- `scn~show-trace-specification-items-as-test-runner-tests~1`
+- `scn~show-trace-specification-items-as-test-runner-tests~2`
 
 Needs: impl, itest
 
@@ -644,14 +644,14 @@ Covers:
 Needs: impl, itest
 
 ### Show Trace Links as Test Runner Sub-Tests
-`dsn~show-trace-links-as-test-runner-sub-tests~1`
+`dsn~show-trace-links-as-test-runner-sub-tests~2`
 
 **Given** the trace test-runner presentation has created a specification-item test node
 **When** it maps incoming and outgoing trace links connected to that item from the structured trace
-**Then** it creates one SM sub-test node for each trace link below the specification-item test node.
+**Then** it creates one SM detail child node for each trace link below the specification-item test node without adding a logical result or progress event.
 
 Covers:
-- `scn~show-trace-links-as-test-runner-sub-tests~1`
+- `scn~show-trace-links-as-test-runner-sub-tests~2`
 
 Needs: impl, itest
 
@@ -716,14 +716,26 @@ Covers:
 Needs: impl, itest
 
 ### Map Specification Item Trace Status to Test Runner Status
-`dsn~map-specification-item-trace-status-to-test-runner-status~1`
+`dsn~map-specification-item-trace-status-to-test-runner-status~2`
 
 **Given** the trace test-runner presentation has created a specification-item test node
-**When** the OpenFastTrace trace result marks that specification item as clean or defective
-**Then** it reports the SM test node as passed for a clean item and failed for a defective item.
+**When** the OpenFastTrace trace result marks that specification item or one of its visible trace links as defective
+**Then** it reports one logical result for the item as passed when both the item and its visible links are clean, or failed otherwise, while preserving the status of each visible trace-link detail node.
 
 Covers:
-- `scn~map-specification-item-trace-status-to-test-runner-status~1`
+- `scn~map-specification-item-trace-status-to-test-runner-status~2`
+
+Needs: impl, itest
+
+### Count Only Specification Items in Test Runner Results
+`dsn~count-only-specification-items-in-test-runner-results~1`
+
+**Given** the trace test-runner presentation receives a clean structured OpenFastTrace trace result with source-file suites, visible specification-item nodes, and visible trace-link detail nodes
+**When** it reports the trace result to the IntelliJ Test Runner
+**Then** it starts a custom progress category whose total and completed events are emitted only for visible specification-item nodes, so the displayed total matches those items and reaches 100% when all are clean.
+
+Covers:
+- `scn~count-only-specification-items-in-test-runner-results~1`
 
 Needs: impl, itest
 
