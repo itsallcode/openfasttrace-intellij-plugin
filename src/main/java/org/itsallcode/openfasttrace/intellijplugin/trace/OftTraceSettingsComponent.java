@@ -276,6 +276,7 @@ public final class OftTraceSettingsComponent {
         return addLabeledComponentRow(panel, constraints, row, "", component, topInset);
     }
 
+    @SuppressWarnings("java:S2164") // Float calculation acceptable here.
     private static int addHelpRow(
             final JBPanel<?> panel,
             final GridBagConstraints constraints,
@@ -288,7 +289,7 @@ public final class OftTraceSettingsComponent {
         constraints.weightx = 1.0;
         constraints.insets = new Insets(4, 0, 0, 0);
         final JBLabel helpLabel = new JBLabel(text);
-        helpLabel.setFont(helpLabel.getFont().deriveFont(helpLabel.getFont().getSize2D() - 1.0f));
+        helpLabel.setFont(helpLabel.getFont().deriveFont(helpLabel.getFont().getSize2D() - 1.0F));
         helpLabel.setForeground(helpLabel.getForeground().darker());
         panel.add(helpLabel, constraints);
         return row + 1;
