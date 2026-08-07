@@ -29,15 +29,29 @@ public final class OftTraceService {
 
     private final Oft oft;
     private final OftTraceReportRenderer reportRenderer;
+    private final boolean showTransitiveDefects;
 
     // [impl->dsn~trace-execution-service~1]
     public OftTraceService() {
-        this(Oft.create(), new OftPlainTextTraceReportRenderer());
+        this(Oft.create(), new OftPlainTextTraceReportRenderer(), true);
+    }
+
+    public OftTraceService(final boolean showTransitiveDefects) {
+        this(Oft.create(), new OftPlainTextTraceReportRenderer(), showTransitiveDefects);
     }
 
     OftTraceService(final Oft oft, final OftTraceReportRenderer reportRenderer) {
+        this(oft, reportRenderer, true);
+    }
+
+    OftTraceService(
+            final Oft oft,
+            final OftTraceReportRenderer reportRenderer,
+            final boolean showTransitiveDefects
+    ) {
         this.oft = oft;
         this.reportRenderer = reportRenderer;
+        this.showTransitiveDefects = showTransitiveDefects;
     }
 
     // [impl->dsn~show-successful-trace-output-in-ide-output-window~2]
@@ -115,10 +129,14 @@ public final class OftTraceService {
         return runWithPluginClassLoader(() -> reportRenderer.render(trace, createReportSettings()));
     }
 
-    private static ReportSettings createReportSettings() {
+    // [impl->dsn~hide-transitive-defects-in-plain-text-output~1]
+    // [impl->dsn~transitive-defect-visibility-is-controlled-by-the-run-configuration~1]
+    private ReportSettings createReportSettings() {
         return ReportSettings.builder()
                 .outputFormat(ReportConstants.DEFAULT_REPORT_FORMAT)
-                .verbosity(ReportVerbosity.FAILURE_DETAILS)
+                .verbosity(showTransitiveDefects
+                        ? ReportVerbosity.FAILURE_DETAILS
+                        : ReportVerbosity.DIRECT_FAILURE_DETAILS)
                 .colorScheme(ColorScheme.COLOR)
                 .detailsSectionDisplay(DetailsSectionDisplay.COLLAPSE)
                 .build();

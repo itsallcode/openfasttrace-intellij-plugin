@@ -51,6 +51,7 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
                 state.getArtifactTypesText(),
                 state.getTagsText(),
                 state.isIncludeUntagged(),
+                state.isShowTransitiveDefects(),
                 parseResultView(state.getResultView())
         );
     }
@@ -63,6 +64,7 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
         state.setArtifactTypesText(snapshot.artifactTypesText());
         state.setTagsText(snapshot.tagsText());
         state.setIncludeUntagged(snapshot.includeUntagged());
+        state.setShowTransitiveDefects(snapshot.showTransitiveDefects());
         state.setResultView(snapshot.resultView().name());
     }
 
@@ -114,6 +116,7 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
         private String artifactTypesText = OftTraceSettingsSnapshot.DEFAULT.artifactTypesText();
         private String tagsText = OftTraceSettingsSnapshot.DEFAULT.tagsText();
         private boolean includeUntagged = OftTraceSettingsSnapshot.DEFAULT.includeUntagged();
+        private boolean showTransitiveDefects = OftTraceSettingsSnapshot.DEFAULT.showTransitiveDefects();
         private String resultView = OftTraceSettingsSnapshot.DEFAULT.resultView().name();
 
         public String getTraceScopeMode() {
@@ -170,6 +173,14 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
 
         public void setIncludeUntagged(final boolean includeUntagged) {
             this.includeUntagged = includeUntagged;
+        }
+
+        public boolean isShowTransitiveDefects() {
+            return showTransitiveDefects;
+        }
+
+        public void setShowTransitiveDefects(final boolean showTransitiveDefects) {
+            this.showTransitiveDefects = showTransitiveDefects;
         }
 
         public String getResultView() {

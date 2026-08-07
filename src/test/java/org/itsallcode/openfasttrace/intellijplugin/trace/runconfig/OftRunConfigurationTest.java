@@ -29,7 +29,10 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
     public void testGivenNewRunConfigurationWhenReadingSnapshotThenItDefaultsToTestRunner() {
         final OftRunConfiguration configuration = createConfiguration("Test");
 
-        assertThat(configuration.snapshot().resultView(), is(OftTraceResultView.TEST_RUNNER));
+        Assertions.assertAll(
+                () -> assertThat(configuration.snapshot().resultView(), is(OftTraceResultView.TEST_RUNNER)),
+                () -> assertThat(configuration.snapshot().showTransitiveDefects(), is(true))
+        );
     }
 
     // [itest->dsn~select-test-runner-trace-result-view~1]
@@ -44,6 +47,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 "dsn",
                 "mvp",
                 true,
+                false,
                 OftTraceResultView.TEST_RUNNER
         );
 
@@ -58,6 +62,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 () -> assertThat(stored.artifactTypesText(), is(snapshot.artifactTypesText())),
                 () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
                 () -> assertThat(stored.includeUntagged(), is(snapshot.includeUntagged())),
+                () -> assertThat(stored.showTransitiveDefects(), is(snapshot.showTransitiveDefects())),
                 () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
     }
@@ -75,6 +80,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 "dsn",
                 "mvp",
                 true,
+                false,
                 OftTraceResultView.TEST_RUNNER
         );
         configuration.updateFrom(snapshot);
@@ -94,6 +100,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 () -> assertThat(stored.artifactTypesText(), is(snapshot.artifactTypesText())),
                 () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
                 () -> assertThat(stored.includeUntagged(), is(snapshot.includeUntagged())),
+                () -> assertThat(stored.showTransitiveDefects(), is(snapshot.showTransitiveDefects())),
                 () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
     }
@@ -106,7 +113,10 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
 
         configuration.readExternal(new Element("configuration"));
 
-        assertThat(configuration.snapshot().resultView(), is(OftTraceResultView.TEST_RUNNER));
+        Assertions.assertAll(
+                () -> assertThat(configuration.snapshot().resultView(), is(OftTraceResultView.TEST_RUNNER)),
+                () -> assertThat(configuration.snapshot().showTransitiveDefects(), is(true))
+        );
     }
 
     // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
@@ -121,7 +131,10 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
 
         configuration.readExternal(element);
 
-        assertThat(configuration.snapshot().resultView(), is(OftTraceResultView.TEST_RUNNER));
+        Assertions.assertAll(
+                () -> assertThat(configuration.snapshot().resultView(), is(OftTraceResultView.TEST_RUNNER)),
+                () -> assertThat(configuration.snapshot().showTransitiveDefects(), is(true))
+        );
     }
 
     // [itest->dsn~openfasttrace-run-configuration-icon~1]
@@ -170,7 +183,8 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 false,
                 false,
                 "doc/",
-                "feat, req, scn, bconstr"
+                "feat, req, scn, bconstr",
+                true
         );
     }
 
@@ -181,7 +195,8 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 false,
                 false,
                 "doc/",
-                "feat, req, scn, bconstr, arch, dsn, constr, bld"
+                "feat, req, scn, bconstr, arch, dsn, constr, bld",
+                true
         );
     }
 
@@ -192,7 +207,8 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 true,
                 true,
                 "doc/",
-                ""
+                "",
+                true
         );
     }
 
@@ -203,17 +219,20 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 false,
                 false,
                 ".",
-                ""
+                "",
+                true
         );
     }
 
+    // [itest->dsn~show-transitive-defects-by-default-in-run-configuration-templates~1]
     private void assertTemplateSettings(
             final String templateName,
             final boolean wholeProject,
             final boolean includeSourceRoots,
             final boolean includeTestRoots,
             final String additionalPathsText,
-            final String artifactTypesText
+            final String artifactTypesText,
+            final boolean showTransitiveDefects
     ) {
         final OftRunConfiguration configuration = createConfigurationFromTemplate(templateName);
         final OftTraceSettingsSnapshot snapshot = configuration.snapshot();
@@ -227,7 +246,8 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 () -> assertThat(snapshot.additionalPathsText(), is(additionalPathsText)),
                 () -> assertThat(snapshot.artifactTypesText(), is(artifactTypesText)),
                 () -> assertThat(snapshot.tagsText(), is("")),
-                () -> assertThat(snapshot.includeUntagged(), is(false))
+                () -> assertThat(snapshot.includeUntagged(), is(false)),
+                () -> assertThat(snapshot.showTransitiveDefects(), is(showTransitiveDefects))
         );
     }
 

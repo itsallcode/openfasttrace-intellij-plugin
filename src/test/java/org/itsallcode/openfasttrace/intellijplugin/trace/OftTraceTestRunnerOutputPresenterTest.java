@@ -22,7 +22,6 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigu
 import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationFactory;
 import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationType;
 import org.jspecify.annotations.NonNull;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -73,8 +72,8 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         assertThat(ownOutput(item), containsString("Trace status: covered"));
         assertThat(suite.isDefect(), is(false));
         assertThat(resultsViewer.getTestsRootNode().isDefect(), is(false));
-        assertThat(resultsViewer.getTotalTestCount(), is(1));
-        assertThat(resultsViewer.getFailedTestCount(), is(0));
+        assertThat(totalTestCount(resultsViewer), is(1));
+        assertThat(failedTestCount(resultsViewer), is(0));
     }
 
     // [itest->dsn~show-trace-source-files-as-test-runner-suites~1]
@@ -128,8 +127,8 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         assertThat(link.getStacktrace(), containsString("Owning item ID: impl~missing_requirement~1"));
         assertThat(link.getStacktrace(), containsString("Linked item ID: req~missing_requirement~1"));
         assertThat(link.getStacktrace(), containsString("OpenFastTrace could not find"));
-        assertThat(resultsViewer.getTotalTestCount(), is(2));
-        assertThat(resultsViewer.getFailedTestCount(), is(2));
+        assertThat(totalTestCount(resultsViewer), is(2));
+        assertThat(failedTestCount(resultsViewer), is(2));
     }
 
     // [itest->dsn~mark-transitive-defects-in-test-runner~1]
@@ -165,6 +164,28 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
                 () -> assertThat(resultsViewer.getTestsRootNode().isDefect(), is(true)));
     }
 
+    // [itest->dsn~hide-transitive-defects-in-test-runner-ui~1]
+    // [itest->dsn~trace-test-runner-presentation~1]
+    public void testGivenTransitiveDefectTraceResultWhenTransitiveDefectsAreHiddenThenItOmitsTransitiveItems()
+            throws IOException {
+        writeUncleanTraceChainProject(Path.of(Objects.requireNonNull(getProject().getBasePath())));
+
+        final OftTraceResult result = new OftTraceService(false).traceProject(
+                OftTraceInputs.wholeProject(Path.of(Objects.requireNonNull(getProject().getBasePath())), List.of(), List.of()),
+                OftTraceProgress.NONE
+        );
+        final SMTRunnerConsoleView console = present(result, false);
+        final SMTestRunnerResultsForm resultsViewer = console.getResultsViewer();
+        final SMTestProxy suite = resultsViewer.getTestsRootNode().getChildren().getFirst();
+
+        assertAll(
+                () -> assertThat(suite.getChildren(), hasSize(1)),
+                () -> assertThat(suite.getChildren().getFirst().getName(), is("Design (uncovered)")),
+                () -> assertThat(suite.getChildren().getFirst().isDefect(), is(true)),
+                () -> assertThat(resultsViewer.getTestsRootNode().isDefect(), is(true))
+        );
+    }
+
     public void testGivenResultWithoutStructuredTraceWhenPresentedThenItCreatesFailedFallbackNode() {
         final SMTRunnerConsoleView console = present(OftTraceResult.invalidInput("invalid configuration"));
         final SMTestRunnerResultsForm resultsViewer = console.getResultsViewer();
@@ -181,17 +202,24 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         assertThat(fallbackNode.getStacktrace(), is("invalid configuration"));
         assertThat(resultsViewer.getTestsRootNode().getErrorMessage(), is("OpenFastTrace trace could not start."));
         assertThat(resultsViewer.getTestsRootNode().getStacktrace(), is("invalid configuration"));
-        assertThat(resultsViewer.getTotalTestCount(), is(1));
-        assertThat(resultsViewer.getFailedTestCount(), is(1));
+        assertThat(totalTestCount(resultsViewer), is(1));
+        assertThat(failedTestCount(resultsViewer), is(1));
     }
 
     private SMTRunnerConsoleView present(final OftTraceResult result) {
+        return present(result, true);
+    }
+
+    private SMTRunnerConsoleView present(final OftTraceResult result, final boolean showTransitiveDefects) {
         final AtomicReference<SMTRunnerConsoleView> consoleRef = new AtomicReference<>();
-        final OftTraceTestRunnerOutputPresenter presenter = new OftTraceTestRunnerOutputPresenter(project -> {
-            final SMTRunnerConsoleView console = createConsole();
-            consoleRef.set(console);
-            return console;
-        });
+        final OftTraceTestRunnerOutputPresenter presenter = new OftTraceTestRunnerOutputPresenter(
+                project -> {
+                    final SMTRunnerConsoleView console = createConsole();
+                    consoleRef.set(console);
+                    return console;
+                },
+                showTransitiveDefects
+        );
 
         EdtTestUtil.runInEdtAndWait(() -> presenter.show(
                 getProject(),
@@ -235,11 +263,29 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         return matchingChildren.getFirst();
     }
 
+    private static int totalTestCount(final SMTestRunnerResultsForm resultsViewer) {
+        return nodesForTest(resultsViewer).size();
+    }
+
+    private static int failedTestCount(final SMTestRunnerResultsForm resultsViewer) {
+        return Math.toIntExact(nodesForTest(resultsViewer).stream()
+                .filter(SMTestProxy::isDefect)
+                .count());
+    }
+
+    private static List<SMTestProxy> nodesForTest(final SMTestRunnerResultsForm resultsViewer) {
+        final SMTestProxy root = resultsViewer.getTestsRootNode();
+        return root.getAllTests().stream()
+                .filter(test -> test != root)
+                .filter(test -> test.getParent() != root || !test.isSuite())
+                .toList();
+    }
+
     private static String ownOutput(final SMTestProxy proxy) {
         final StringBuilder output = new StringBuilder();
         proxy.printOwnPrintablesOn(new Printer() {
             @Override
-            public void print(final @NonNull String text, final ConsoleViewContentType contentType) {
+            public void print(final @NonNull String text, final @NonNull ConsoleViewContentType contentType) {
                 output.append(text);
             }
 

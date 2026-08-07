@@ -40,6 +40,7 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 "dsn",
                 "mvp",
                 true,
+                false,
                 OftTraceResultView.TEST_RUNNER
         );
         configuration.updateFrom(snapshot);
@@ -56,6 +57,7 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 () -> assertThat(uiSettings.artifactTypesText(), is(snapshot.artifactTypesText())),
                 () -> assertThat(uiSettings.tagsText(), is(snapshot.tagsText())),
                 () -> assertThat(uiSettings.includeUntagged(), is(snapshot.includeUntagged())),
+                () -> assertThat(uiSettings.showTransitiveDefects(), is(snapshot.showTransitiveDefects())),
                 () -> assertThat(uiSettings.resultView(), is(snapshot.resultView()))
         );
     }
@@ -72,6 +74,7 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 "req",
                 "tag",
                 true,
+                false,
                 OftTraceResultView.TEST_RUNNER
         );
         editor.component.setSettings(snapshot);
@@ -88,6 +91,7 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 () -> assertThat(stored.artifactTypesText(), is(snapshot.artifactTypesText())),
                 () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
                 () -> assertThat(stored.includeUntagged(), is(snapshot.includeUntagged())),
+                () -> assertThat(stored.showTransitiveDefects(), is(snapshot.showTransitiveDefects())),
                 () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
     }
@@ -103,6 +107,7 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 "",
                 "",
                 false,
+                true,
                 OftTraceResultView.TEST_RUNNER
         ));
 

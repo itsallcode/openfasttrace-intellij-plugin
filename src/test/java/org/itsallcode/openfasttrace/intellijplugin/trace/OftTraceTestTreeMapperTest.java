@@ -318,6 +318,27 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
+    // [itest->dsn~hide-transitive-defects-in-test-runner-ui~1]
+    // [itest->dsn~trace-test-runner-presentation~1]
+    @Test
+    void testGivenTransitiveDefectsWhenMappingWithHiddenTransitivesThenItOmitsThem(@TempDir final Path temporaryDirectory)
+            throws IOException {
+        writeUncleanTraceChainProject(temporaryDirectory);
+
+        final Trace trace = new OftTraceService().traceProject(
+                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
+                OftTraceProgress.NONE
+        ).trace().orElseThrow();
+        final OftTraceTestTree tree = OftTraceTestTreeMapper.map(trace, null, false);
+        final OftTraceSuiteNode suite = tree.suites().getFirst();
+
+        Assertions.assertAll(
+                () -> assertThat(suite.items(), hasSize(1)),
+                () -> assertThat(suite.items().getFirst().name(), is("Design (uncovered)")),
+                () -> assertThat(tree.failed(), is(true))
+        );
+    }
+
     // [itest->dsn~trace-test-runner-presentation~1]
     // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
     // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]

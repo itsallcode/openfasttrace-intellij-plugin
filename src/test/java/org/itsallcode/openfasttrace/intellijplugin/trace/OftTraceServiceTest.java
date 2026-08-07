@@ -161,6 +161,28 @@ class OftTraceServiceTest {
         );
     }
 
+    // [itest->dsn~hide-transitive-defects-in-plain-text-output~1]
+    @Test
+    void testGivenUncleanTraceChainWhenTracingWithoutTransitiveDefectsThenItOmitsTransitiveItemDetails(
+            @TempDir final Path temporaryDirectory
+    )
+            throws IOException {
+        writeUncleanTraceChainProject(temporaryDirectory);
+
+        final OftTraceResult result = new OftTraceService(false).traceProject(
+                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
+                OftTraceProgress.NONE
+        );
+        final String renderedOutput = stripAnsi(result.output());
+
+        Assertions.assertAll(
+                () -> assertThat(result.isSuccessful(), is(false)),
+                () -> assertThat(renderedOutput, Matchers.containsString("dsn~chain_design~1")),
+                () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("↳ Feature"))),
+                () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("Feature (uncovered)")))
+        );
+    }
+
     @Test
     void testGivenRuntimeExceptionWhenTracingThenItReturnsAnErrorResult(@TempDir final Path temporaryDirectory) {
         final Oft oft = (Oft) Proxy.newProxyInstance(

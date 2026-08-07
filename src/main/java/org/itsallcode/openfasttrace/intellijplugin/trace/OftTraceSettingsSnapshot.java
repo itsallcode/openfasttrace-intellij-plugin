@@ -11,6 +11,7 @@ public record OftTraceSettingsSnapshot(
         String artifactTypesText,
         String tagsText,
         boolean includeUntagged,
+        boolean showTransitiveDefects,
         OftTraceResultView resultView
 ) {
     public static final OftTraceSettingsSnapshot DEFAULT = new OftTraceSettingsSnapshot(
@@ -21,6 +22,7 @@ public record OftTraceSettingsSnapshot(
             "",
             "",
             false,
+            true,
             OftTraceResultView.TEST_RUNNER
     );
 
@@ -43,7 +45,31 @@ public record OftTraceSettingsSnapshot(
                 artifactTypesText,
                 tagsText,
                 false,
+                true,
                 DEFAULT.resultView()
+        );
+    }
+
+    public OftTraceSettingsSnapshot(
+            final OftTraceScopeMode scopeMode,
+            final boolean includeSourceRoots,
+            final boolean includeTestRoots,
+            final String additionalPathsText,
+            final String artifactTypesText,
+            final String tagsText,
+            final boolean includeUntagged,
+            final OftTraceResultView resultView
+    ) {
+        this(
+                scopeMode,
+                includeSourceRoots,
+                includeTestRoots,
+                additionalPathsText,
+                artifactTypesText,
+                tagsText,
+                includeUntagged,
+                true,
+                resultView
         );
     }
 
@@ -64,6 +90,7 @@ public record OftTraceSettingsSnapshot(
                 artifactTypesText,
                 tagsText,
                 false,
+                true,
                 resultView
         );
     }

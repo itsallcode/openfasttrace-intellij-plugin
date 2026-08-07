@@ -52,8 +52,10 @@ public final class OftRunProfileState implements RunProfileState {
         }
 
         final ProcessHandler processHandler = new NopProcessHandler();
+        final OftTraceService traceService = new OftTraceService(settings.showTransitiveDefects());
+        // [impl->dsn~transitive-defect-visibility-is-controlled-by-the-run-configuration~1]
         final OftTraceRunner traceRunner = new OftTraceBackgroundRunner(
-                new OftTraceService(),
+                traceService,
                 executionPresentation.outputPresenter(),
                 processHandler
         );
@@ -95,7 +97,10 @@ public final class OftRunProfileState implements RunProfileState {
         );
         final SMTRunnerConsoleView console = new SMTRunnerConsoleView(properties);
         console.initUI();
-        final OftTraceOutputPresenter outputPresenter = new OftTraceTestRunnerOutputPresenter(p -> console);
+        final OftTraceOutputPresenter outputPresenter = new OftTraceTestRunnerOutputPresenter(
+                p -> console,
+                settings.showTransitiveDefects()
+        );
         return new ExecutionPresentation(console, outputPresenter);
     }
 

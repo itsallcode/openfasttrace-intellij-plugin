@@ -13,9 +13,18 @@ import java.util.function.Function;
 
 public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPresenter {
     private final Function<Project, SMTRunnerConsoleView> consoleFactory;
+    private final boolean showTransitiveDefects;
 
     public OftTraceTestRunnerOutputPresenter(final Function<Project, SMTRunnerConsoleView> consoleFactory) {
+        this(consoleFactory, true);
+    }
+
+    public OftTraceTestRunnerOutputPresenter(
+            final Function<Project, SMTRunnerConsoleView> consoleFactory,
+            final boolean showTransitiveDefects
+    ) {
         this.consoleFactory = consoleFactory;
+        this.showTransitiveDefects = showTransitiveDefects;
     }
 
     // [impl->dsn~trace-test-runner-presentation~1]
@@ -29,7 +38,8 @@ public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPr
         final PresentationOutcome outcome = result.trace()
                 .map(trace -> showTrace(project, resultsViewer, root, OftTraceTestTreeMapper.map(
                         trace,
-                        project.getBasePath()
+                        project.getBasePath(),
+                        showTransitiveDefects
                 )))
                 .orElseGet(() -> showResultWithoutTrace(console, resultsViewer, root, result));
         if (outcome.failed()) {

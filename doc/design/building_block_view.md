@@ -461,6 +461,11 @@ scale 2
         .               | <i>(comma-separated, empty = all)
         .               |  [ ] Include untagged items
         .               | .
+        Defects         |  [X] Include transitive defects
+     }
+     ---
+     {
+        .               | .
         Result view:    | ()  Plain text output
         .               | (X) IntelliJ Test Runner UI
         .               | .
@@ -473,3 +478,5 @@ scale 2
 }
 @endsalt
 ```
+
+The filter area uses a hierarchical layout: section headers introduce the group, each filter row keeps its label in the first column and its input in the second column, and the helper text or checkbox rows align underneath the corresponding input. If that arrangement needs another adjustment later, the next iteration should refine the existing hierarchy and row constraints instead of restarting the dialog layout from zero.
