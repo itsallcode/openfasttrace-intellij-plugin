@@ -38,16 +38,12 @@ public final class OftTraceSettingsComponent {
     private final JBRadioButton plainTextResultViewRadioButton =
             new JBRadioButton("Plain text output");
     private final JBRadioButton testRunnerResultViewRadioButton =
-            new JBRadioButton("IntelliJ Test Runner UI");
+            new JBRadioButton("IntelliJ test runner UI");
     private final JBLabel resolvedRelativeToLabel = new JBLabel();
     private final JBTextArea validationMessagesArea = new JBTextArea();
     private final Path projectRoot;
     private final boolean showResultViewSelection;
     private final JPanel panel;
-
-    public OftTraceSettingsComponent(final Path projectRoot) {
-        this(projectRoot, false);
-    }
 
     public OftTraceSettingsComponent(final Path projectRoot, final boolean showResultViewSelection) {
         this.projectRoot = projectRoot;
@@ -97,25 +93,25 @@ public final class OftTraceSettingsComponent {
 
         int row = 0;
         row = addSectionHeader(bodyPanel, bodyConstraints, row, "Trace Scope");
-        row = addTopRow(bodyPanel, bodyConstraints, row, wholeProjectRadioButton);
-        row = addTopRow(bodyPanel, bodyConstraints, row, selectedResourcesRadioButton);
-        row = addIndentedRow(bodyPanel, bodyConstraints, row, includeSourceRootsCheckBox);
-        row = addIndentedRow(bodyPanel, bodyConstraints, row, includeTestRootsCheckBox);
+        row = addComponentRow(bodyPanel, bodyConstraints, row, wholeProjectRadioButton, 0, 0);
+        row = addComponentRow(bodyPanel, bodyConstraints, row, selectedResourcesRadioButton, 4, 0);
+        row = addComponentRow(bodyPanel, bodyConstraints, row, includeSourceRootsCheckBox, 4, 18);
+        row = addComponentRow(bodyPanel, bodyConstraints, row, includeTestRootsCheckBox, 4, 18);
         row = addAdditionalPathsBlock(bodyPanel, bodyConstraints, row, scrollPane);
 
         row = addSectionSeparator(bodyPanel, bodyConstraints, row);
         row = addSectionHeader(bodyPanel, bodyConstraints, row, "Filters");
-        row = addFilterRow(bodyPanel, bodyConstraints, row, "Artifact types:", artifactTypesField);
+        row = addLabeledComponentRow(bodyPanel, bodyConstraints, row, "Artifact types:", artifactTypesField, 8);
         row = addHelpRow(bodyPanel, bodyConstraints, row, "comma-separated, empty = all");
-        row = addFilterRow(bodyPanel, bodyConstraints, row, "Tags:", tagsField);
+        row = addLabeledComponentRow(bodyPanel, bodyConstraints, row, "Tags:", tagsField, 8);
         row = addHelpRow(bodyPanel, bodyConstraints, row, "comma-separated, empty = all");
-        row = addCheckboxRow(bodyPanel, bodyConstraints, row, includeUntaggedCheckBox);
-        row = addCheckboxRow(bodyPanel, bodyConstraints, row, showTransitiveDefectsCheckBox);
+        row = addIndentedComponentRow(bodyPanel, bodyConstraints, row, includeUntaggedCheckBox, 4);
+        row = addLabeledComponentRow(bodyPanel, bodyConstraints, row, "Defects:", showTransitiveDefectsCheckBox, 4);
         if (showResultViewSelection) {
             row = addSectionSeparator(bodyPanel, bodyConstraints, row);
             row = addSectionHeader(bodyPanel, bodyConstraints, row, "Result view");
-            row = addIndentedRow(bodyPanel, bodyConstraints, row, plainTextResultViewRadioButton);
-            row = addIndentedRow(bodyPanel, bodyConstraints, row, testRunnerResultViewRadioButton);
+            row = addComponentRow(bodyPanel, bodyConstraints, row, plainTextResultViewRadioButton, 4, 18);
+            addComponentRow(bodyPanel, bodyConstraints, row, testRunnerResultViewRadioButton, 4, 18);
         }
 
         panel = new JBPanel<>(new BorderLayout());
@@ -156,16 +152,6 @@ public final class OftTraceSettingsComponent {
         plainTextResultViewRadioButton.setSelected(settings.resultView() == OftTraceResultView.PLAIN_TEXT);
         testRunnerResultViewRadioButton.setSelected(settings.resultView() == OftTraceResultView.TEST_RUNNER);
         updateSelectedResourcesEnabledState();
-    }
-
-    public boolean isSelectedResourcesEnabled() {
-        return includeSourceRootsCheckBox.isEnabled()
-                && includeTestRootsCheckBox.isEnabled()
-                && additionalPathsTextArea.isEnabled();
-    }
-
-    public String resolvedRelativeToText() {
-        return resolvedRelativeToLabel.getText();
     }
 
     public String validationMessagesText() {
@@ -209,32 +195,19 @@ public final class OftTraceSettingsComponent {
         validationMessagesArea.setVisible(!validationMessagesArea.getText().isEmpty());
     }
 
-    private static int addTopRow(
+    private static int addComponentRow(
             final JBPanel<?> panel,
             final GridBagConstraints constraints,
             final int row,
-            final JComponent component
+            final JComponent component,
+            final int topInset,
+            final int leftInset
     ) {
         constraints.gridy = row;
         constraints.gridx = 0;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.weightx = 1.0;
-        constraints.insets = new Insets(row == 0 ? 0 : 4, 0, 0, 0);
-        panel.add(component, constraints);
-        return row + 1;
-    }
-
-    private static int addIndentedRow(
-            final JBPanel<?> panel,
-            final GridBagConstraints constraints,
-            final int row,
-            final JComponent component
-    ) {
-        constraints.gridy = row;
-        constraints.gridx = 0;
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.weightx = 1.0;
-        constraints.insets = new Insets(4, 18, 0, 0);
+        constraints.insets = new Insets(topInset, leftInset, 0, 0);
         panel.add(component, constraints);
         return row + 1;
     }
@@ -270,26 +243,37 @@ public final class OftTraceSettingsComponent {
         return row + 1;
     }
 
-    private int addFilterRow(
+    private int addLabeledComponentRow(
             final JBPanel<?> panel,
             final GridBagConstraints constraints,
             final int row,
             final String label,
-            final JComponent field
+            final JComponent field,
+            final int topInset
     ) {
         constraints.gridy = row;
         constraints.gridx = 0;
         constraints.gridwidth = 1;
         constraints.weightx = 0.0;
-        constraints.insets = new Insets(row == 0 ? 0 : 8, 0, 0, 8);
+        constraints.insets = new Insets(topInset, 0, 0, 8);
         panel.add(new JBLabel(label), constraints);
 
         constraints.gridx = 1;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.weightx = 1.0;
-        constraints.insets = new Insets(row == 0 ? 0 : 8, 0, 0, 0);
+        constraints.insets = new Insets(topInset, 0, 0, 0);
         panel.add(field, constraints);
         return row + 1;
+    }
+
+    private int addIndentedComponentRow(
+            final JBPanel<?> panel,
+            final GridBagConstraints constraints,
+            final int row,
+            final JComponent component,
+            final int topInset
+    ) {
+        return addLabeledComponentRow(panel, constraints, row, "", component, topInset);
     }
 
     private int addHelpRow(
@@ -307,21 +291,6 @@ public final class OftTraceSettingsComponent {
         helpLabel.setFont(helpLabel.getFont().deriveFont(helpLabel.getFont().getSize2D() - 1.0f));
         helpLabel.setForeground(helpLabel.getForeground().darker());
         panel.add(helpLabel, constraints);
-        return row + 1;
-    }
-
-    private int addCheckboxRow(
-            final JBPanel<?> panel,
-            final GridBagConstraints constraints,
-            final int row,
-            final JComponent component
-    ) {
-        constraints.gridy = row;
-        constraints.gridx = 1;
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.weightx = 1.0;
-        constraints.insets = new Insets(4, 0, 0, 0);
-        panel.add(component, constraints);
         return row + 1;
     }
 
