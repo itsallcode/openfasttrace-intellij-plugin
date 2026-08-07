@@ -7,15 +7,16 @@ import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.JBTextField;
-import com.intellij.util.ui.FormBuilder;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
 import java.nio.file.Path;
 
 public final class OftTraceSettingsComponent {
@@ -32,6 +33,8 @@ public final class OftTraceSettingsComponent {
     private final JBTextField tagsField = new JBTextField();
     private final JBCheckBox includeUntaggedCheckBox =
             new JBCheckBox("Include untagged items");
+    private final JBCheckBox showTransitiveDefectsCheckBox =
+            new JBCheckBox("Show transitive defects");
     private final JBRadioButton plainTextResultViewRadioButton =
             new JBRadioButton("Plain text output");
     private final JBRadioButton testRunnerResultViewRadioButton =
@@ -83,38 +86,40 @@ public final class OftTraceSettingsComponent {
         validationMessagesArea.setWrapStyleWord(true);
         final JComponent scrollPane = new JBScrollPane(additionalPathsTextArea);
         scrollPane.setPreferredSize(new Dimension(420, 110));
-        final JBPanel<?> additionalPathsPanel = new JBPanel<>(new BorderLayout(0, 4));
-        additionalPathsPanel.add(
-                new JBLabel("Additional project-relative files or directories (one per line)"),
-                BorderLayout.NORTH
-        );
-        additionalPathsPanel.add(scrollPane, BorderLayout.CENTER);
-        final JBPanel<?> additionalPathsFeedbackPanel = new JBPanel<>(new BorderLayout(0, 4));
-        additionalPathsFeedbackPanel.add(resolvedRelativeToLabel, BorderLayout.NORTH);
-        additionalPathsFeedbackPanel.add(validationMessagesArea, BorderLayout.CENTER);
-        additionalPathsPanel.add(additionalPathsFeedbackPanel, BorderLayout.SOUTH);
-        final FormBuilder formBuilder = FormBuilder.createFormBuilder()
-                .addComponent(wholeProjectRadioButton)
-                .addComponent(selectedResourcesRadioButton)
-                .addComponent(includeSourceRootsCheckBox, 1)
-                .addComponent(includeTestRootsCheckBox, 1)
-                .addComponent(additionalPathsPanel, 1)
-                .addSeparator()
-                .addLabeledComponent("Artifact types:", artifactTypesField)
-                .addTooltip("comma-separated, empty = all")
-                .addLabeledComponent("Tags:", tagsField)
-                .addTooltip("comma-separated, empty = all")
-                .addLabeledComponent("", includeUntaggedCheckBox);
+        final JBPanel<?> bodyPanel = new JBPanel<>();
+        bodyPanel.setLayout(new GridBagLayout());
+        final GridBagConstraints bodyConstraints = new GridBagConstraints();
+        bodyConstraints.gridx = 0;
+        bodyConstraints.weightx = 1.0;
+        bodyConstraints.fill = GridBagConstraints.HORIZONTAL;
+        bodyConstraints.anchor = GridBagConstraints.WEST;
+        bodyConstraints.insets = new Insets(0, 0, 0, 0);
+
+        int row = 0;
+        row = addSectionHeader(bodyPanel, bodyConstraints, row, "Trace Scope");
+        row = addTopRow(bodyPanel, bodyConstraints, row, wholeProjectRadioButton);
+        row = addTopRow(bodyPanel, bodyConstraints, row, selectedResourcesRadioButton);
+        row = addIndentedRow(bodyPanel, bodyConstraints, row, includeSourceRootsCheckBox);
+        row = addIndentedRow(bodyPanel, bodyConstraints, row, includeTestRootsCheckBox);
+        row = addAdditionalPathsBlock(bodyPanel, bodyConstraints, row, scrollPane);
+
+        row = addSectionSeparator(bodyPanel, bodyConstraints, row);
+        row = addSectionHeader(bodyPanel, bodyConstraints, row, "Filters");
+        row = addFilterRow(bodyPanel, bodyConstraints, row, "Artifact types:", artifactTypesField);
+        row = addHelpRow(bodyPanel, bodyConstraints, row, "comma-separated, empty = all");
+        row = addFilterRow(bodyPanel, bodyConstraints, row, "Tags:", tagsField);
+        row = addHelpRow(bodyPanel, bodyConstraints, row, "comma-separated, empty = all");
+        row = addCheckboxRow(bodyPanel, bodyConstraints, row, includeUntaggedCheckBox);
+        row = addCheckboxRow(bodyPanel, bodyConstraints, row, showTransitiveDefectsCheckBox);
         if (showResultViewSelection) {
-            formBuilder
-                    .addSeparator()
-                    .addComponent(new JBLabel("Result view"))
-                    .addComponent(plainTextResultViewRadioButton, 1)
-                    .addComponent(testRunnerResultViewRadioButton, 1);
+            row = addSectionSeparator(bodyPanel, bodyConstraints, row);
+            row = addSectionHeader(bodyPanel, bodyConstraints, row, "Result view");
+            row = addIndentedRow(bodyPanel, bodyConstraints, row, plainTextResultViewRadioButton);
+            row = addIndentedRow(bodyPanel, bodyConstraints, row, testRunnerResultViewRadioButton);
         }
-        panel = formBuilder
-                .addComponentFillVertically(new JPanel(), 0)
-                .getPanel();
+
+        panel = new JBPanel<>(new BorderLayout());
+        panel.add(bodyPanel, BorderLayout.NORTH);
         setSettings(OftTraceSettingsSnapshot.DEFAULT);
     }
 
@@ -133,6 +138,7 @@ public final class OftTraceSettingsComponent {
                 artifactTypesField.getText(),
                 tagsField.getText(),
                 includeUntaggedCheckBox.isSelected(),
+                showTransitiveDefectsCheckBox.isSelected(),
                 selectedResultView()
         );
     }
@@ -146,6 +152,7 @@ public final class OftTraceSettingsComponent {
         artifactTypesField.setText(settings.artifactTypesText());
         tagsField.setText(settings.tagsText());
         includeUntaggedCheckBox.setSelected(settings.includeUntagged());
+        showTransitiveDefectsCheckBox.setSelected(settings.showTransitiveDefects());
         plainTextResultViewRadioButton.setSelected(settings.resultView() == OftTraceResultView.PLAIN_TEXT);
         testRunnerResultViewRadioButton.setSelected(settings.resultView() == OftTraceResultView.TEST_RUNNER);
         updateSelectedResourcesEnabledState();
@@ -190,11 +197,167 @@ public final class OftTraceSettingsComponent {
         if (!selectedResourcesRadioButton.isSelected() || projectRoot == null) {
             resolvedRelativeToLabel.setText("");
             validationMessagesArea.setText("");
+            resolvedRelativeToLabel.setVisible(false);
+            validationMessagesArea.setVisible(false);
             return;
         }
         final OftAdditionalTracePathValidation validation =
                 OftAdditionalTracePathValidation.validate(projectRoot, additionalPathsTextArea.getText());
         resolvedRelativeToLabel.setText(validation.resolvedRelativeToText());
         validationMessagesArea.setText(String.join(System.lineSeparator(), validation.messages()));
+        resolvedRelativeToLabel.setVisible(!resolvedRelativeToLabel.getText().isEmpty());
+        validationMessagesArea.setVisible(!validationMessagesArea.getText().isEmpty());
+    }
+
+    private static int addTopRow(
+            final JBPanel<?> panel,
+            final GridBagConstraints constraints,
+            final int row,
+            final JComponent component
+    ) {
+        constraints.gridy = row;
+        constraints.gridx = 0;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.weightx = 1.0;
+        constraints.insets = new Insets(row == 0 ? 0 : 4, 0, 0, 0);
+        panel.add(component, constraints);
+        return row + 1;
+    }
+
+    private static int addIndentedRow(
+            final JBPanel<?> panel,
+            final GridBagConstraints constraints,
+            final int row,
+            final JComponent component
+    ) {
+        constraints.gridy = row;
+        constraints.gridx = 0;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.weightx = 1.0;
+        constraints.insets = new Insets(4, 18, 0, 0);
+        panel.add(component, constraints);
+        return row + 1;
+    }
+
+    private int addAdditionalPathsBlock(
+            final JBPanel<?> panel,
+            final GridBagConstraints constraints,
+            final int row,
+            final JComponent scrollPane
+    ) {
+        constraints.gridy = row;
+        constraints.gridx = 0;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.weightx = 1.0;
+        constraints.insets = new Insets(8, 0, 0, 0);
+
+        final JBPanel<?> additionalPathsPanel = new JBPanel<>(new BorderLayout(0, 4));
+        additionalPathsPanel.add(
+                new JBLabel("Additional project-relative files or directories (one per line)"),
+                BorderLayout.NORTH
+        );
+
+        final JBPanel<?> validationPanel = new JBPanel<>(new BorderLayout(0, 2));
+        validationPanel.add(resolvedRelativeToLabel, BorderLayout.NORTH);
+        validationPanel.add(validationMessagesArea, BorderLayout.CENTER);
+
+        final JBPanel<?> contentPanel = new JBPanel<>(new BorderLayout(0, 4));
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
+        contentPanel.add(validationPanel, BorderLayout.SOUTH);
+
+        additionalPathsPanel.add(contentPanel, BorderLayout.CENTER);
+        panel.add(additionalPathsPanel, constraints);
+        return row + 1;
+    }
+
+    private int addFilterRow(
+            final JBPanel<?> panel,
+            final GridBagConstraints constraints,
+            final int row,
+            final String label,
+            final JComponent field
+    ) {
+        constraints.gridy = row;
+        constraints.gridx = 0;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0.0;
+        constraints.insets = new Insets(row == 0 ? 0 : 8, 0, 0, 8);
+        panel.add(new JBLabel(label), constraints);
+
+        constraints.gridx = 1;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.weightx = 1.0;
+        constraints.insets = new Insets(row == 0 ? 0 : 8, 0, 0, 0);
+        panel.add(field, constraints);
+        return row + 1;
+    }
+
+    private int addHelpRow(
+            final JBPanel<?> panel,
+            final GridBagConstraints constraints,
+            final int row,
+            final String text
+    ) {
+        constraints.gridy = row;
+        constraints.gridx = 1;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.weightx = 1.0;
+        constraints.insets = new Insets(4, 0, 0, 0);
+        final JBLabel helpLabel = new JBLabel(text);
+        helpLabel.setFont(helpLabel.getFont().deriveFont(helpLabel.getFont().getSize2D() - 1.0f));
+        helpLabel.setForeground(helpLabel.getForeground().darker());
+        panel.add(helpLabel, constraints);
+        return row + 1;
+    }
+
+    private int addCheckboxRow(
+            final JBPanel<?> panel,
+            final GridBagConstraints constraints,
+            final int row,
+            final JComponent component
+    ) {
+        constraints.gridy = row;
+        constraints.gridx = 1;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.weightx = 1.0;
+        constraints.insets = new Insets(4, 0, 0, 0);
+        panel.add(component, constraints);
+        return row + 1;
+    }
+
+    private int addSectionSeparator(
+            final JBPanel<?> panel,
+            final GridBagConstraints constraints,
+            final int row
+    ) {
+        constraints.gridy = row;
+        constraints.gridx = 0;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.weightx = 1.0;
+        constraints.insets = new Insets(12, 0, 8, 0);
+        panel.add(createSeparator(), constraints);
+        return row + 1;
+    }
+
+    private int addSectionHeader(
+            final JBPanel<?> panel,
+            final GridBagConstraints constraints,
+            final int row,
+            final String text
+    ) {
+        constraints.gridy = row;
+        constraints.gridx = 0;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.weightx = 1.0;
+        constraints.insets = new Insets(0, 0, 2, 0);
+        final JBLabel label = new JBLabel(text);
+        final Font font = label.getFont();
+        label.setFont(font.deriveFont(Font.BOLD, font.getSize2D()));
+        panel.add(label, constraints);
+        return row + 1;
+    }
+
+    private static JComponent createSeparator() {
+        return new JSeparator(SwingConstants.HORIZONTAL);
     }
 }
