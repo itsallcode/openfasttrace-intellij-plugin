@@ -243,7 +243,7 @@ public final class OftTraceSettingsComponent {
         return row + 1;
     }
 
-    private int addLabeledComponentRow(
+    private static int addLabeledComponentRow(
             final JBPanel<?> panel,
             final GridBagConstraints constraints,
             final int row,
@@ -266,7 +266,7 @@ public final class OftTraceSettingsComponent {
         return row + 1;
     }
 
-    private int addIndentedComponentRow(
+    private static int addIndentedComponentRow(
             final JBPanel<?> panel,
             final GridBagConstraints constraints,
             final int row,
@@ -276,7 +276,7 @@ public final class OftTraceSettingsComponent {
         return addLabeledComponentRow(panel, constraints, row, "", component, topInset);
     }
 
-    private int addHelpRow(
+    private static int addHelpRow(
             final JBPanel<?> panel,
             final GridBagConstraints constraints,
             final int row,
@@ -294,7 +294,7 @@ public final class OftTraceSettingsComponent {
         return row + 1;
     }
 
-    private int addSectionSeparator(
+    private static int addSectionSeparator(
             final JBPanel<?> panel,
             final GridBagConstraints constraints,
             final int row
@@ -308,7 +308,7 @@ public final class OftTraceSettingsComponent {
         return row + 1;
     }
 
-    private int addSectionHeader(
+    private static int addSectionHeader(
             final JBPanel<?> panel,
             final GridBagConstraints constraints,
             final int row,

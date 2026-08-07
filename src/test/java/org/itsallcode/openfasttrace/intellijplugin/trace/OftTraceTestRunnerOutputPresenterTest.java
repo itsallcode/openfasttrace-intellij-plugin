@@ -22,8 +22,6 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigu
 import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationFactory;
 import org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationType;
 import org.jspecify.annotations.NonNull;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -269,7 +267,7 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         final StringBuilder output = new StringBuilder();
         proxy.printOwnPrintablesOn(new Printer() {
             @Override
-            public void print(final @NonNull String text, final ConsoleViewContentType contentType) {
+            public void print(final @NonNull String text, final @NonNull ConsoleViewContentType contentType) {
                 output.append(text);
             }
 
