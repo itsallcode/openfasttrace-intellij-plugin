@@ -7,7 +7,7 @@ import java.util.List;
 record OftTraceTestTree(List<OftTraceSuiteNode> suites) {
     int testCount() {
         return suites.stream()
-                .mapToInt(OftTraceSuiteNode::testCount)
+                .mapToInt(suite -> suite.items().size())
                 .sum();
     }
 
@@ -17,9 +17,7 @@ record OftTraceTestTree(List<OftTraceSuiteNode> suites) {
 
     record OftTraceSuiteNode(String name, @Nullable String sourcePath, List<OftTraceItemNode> items) {
         int testCount() {
-            return items.stream()
-                    .mapToInt(OftTraceItemNode::testCount)
-                    .sum();
+            return items.size();
         }
 
         boolean failed() {
@@ -38,10 +36,6 @@ record OftTraceTestTree(List<OftTraceSuiteNode> suites) {
             OftTraceTestNodeDetails details,
             List<OftTraceLinkNode> links
     ) {
-        int testCount() {
-            return 1 + links.size();
-        }
-
         boolean failed() {
             return defective || links.stream().anyMatch(OftTraceLinkNode::failed);
         }

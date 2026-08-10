@@ -66,39 +66,39 @@ item for the single logical failure outcome.
 - [x] Update `doc/design/runtime_view.md` with separate design items for item-only custom progress and rolling visible-link defects up to an owning item; each runtime design item covers one scenario.
 - [x] Update `doc/design/building_block_view.md` so the Test Runner presentation declares that it separates logical item progress from link-detail rendering.
 - [x] Revise the aggregate `dsn~trace-test-runner-presentation` description and its implementation/test trace links if its semantics change.
-- [ ] Stop and ask user for a review of the design.
+- [x] Stop and ask user for a review of the design.
 
 ### Implementation
 
-- [ ] Change `OftTraceTestTree` counting so `testCount()` counts visible specification items only, never source-file suites or links; retain link collections and item failure roll-up.
-- [ ] Extend `OftTraceTestRunnerOutputPresenter` to report the item-only custom total and one custom started/failed/finished lifecycle per visible specification item, never for source-file suites or links.
-- [ ] Retain normal SM events for source suites, item nodes, and trace-link child nodes so hierarchy, details, navigation, and existing pass/fail rendering remain unchanged.
-- [ ] Ensure a defective item or any defective visible link produces exactly one failed custom-progress result for its owning specification item.
-- [ ] Keep fallback presentation for results without a structured `Trace` unchanged unless IntelliJ custom-progress semantics require an isolated compatibility adjustment.
+- [x] Change `OftTraceTestTree` counting so `testCount()` counts visible specification items only, never source-file suites or links; retain link collections and item failure roll-up.
+- [x] Extend `OftTraceTestRunnerOutputPresenter` to report the item-only custom total and one custom started/failed/finished lifecycle per visible specification item, never for source-file suites or links.
+- [x] Retain normal SM events for source suites, item nodes, and trace-link child nodes so hierarchy, details, navigation, and existing pass/fail rendering remain unchanged.
+- [x] Ensure a defective item or any defective visible link produces exactly one failed custom-progress result for its owning specification item.
+- [x] Keep fallback presentation for results without a structured `Trace` unchanged unless IntelliJ custom-progress semantics require an isolated compatibility adjustment.
 
 ### Verification
 
-- [ ] Update tree-mapper tests to prove source-file suites and link children contribute no logical results, while linked trace items contribute one result each and link children remain present with their status.
-- [ ] Add presenter tests for a clean trace with multiple source-file suites and linked items: item-only total and 100% completion.
-- [ ] Add presenter tests for a defective link: unchanged visible link failure plus one failed logical owning-item result.
-- [ ] Keep tests for source suites, item/link labels, defect details, navigation, transitive-defect filtering, and result-without-trace fallback green.
-- [ ] Use JUnit 5 and Hamcrest; follow given-when-then test names, single/assert-all assertion guidance, and parameter-validation rules where applicable.
-- [ ] Keep path coverage at or above 80%.
-- [ ] Keep the OpenFastTrace trace clean for affected `feat`, `req`, `scn`, `dsn`, `impl`, and `itest` artifacts.
-- [ ] Run `./gradlew test`.
-- [ ] Run `./gradlew check`.
+- [x] Update tree-mapper tests to prove source-file suites and link children contribute no logical results, while linked trace items contribute one result each and link children remain present with their status.
+- [x] Add presenter tests for a clean trace with multiple source-file suites and linked items: item-only total and 100% completion.
+- [x] Add presenter tests for a defective link: unchanged visible link failure plus one failed logical owning-item result.
+- [x] Keep tests for source suites, item/link labels, defect details, navigation, transitive-defect filtering, and result-without-trace fallback green.
+- [x] Use JUnit 5 and Hamcrest; follow given-when-then test names, single/assert-all assertion guidance, and parameter-validation rules where applicable.
+- [x] Keep path coverage at or above 80%.
+- [x] Keep the OpenFastTrace trace clean for affected `feat`, `req`, `scn`, `dsn`, `impl`, and `itest` artifacts.
+- [x] Run `./gradlew test`.
+- [x] Run `./gradlew check`.
 - [ ] Run `./gradlew verifyPlugin`.
 - [ ] Keep the SonarQube Cloud quality gate green after CI analysis.
 
 ### Update User Documentation
 
-- [ ] Update `README.md` if its Test Runner description needs to explain that totals and progress count specification items, while source-file suites and links are structural/detail nodes.
+- [x] Update `README.md` if its Test Runner description needs to explain that totals and progress count specification items, while source-file suites and links are structural/detail nodes.
 
 ## Version and Changelog Update
 
-- [ ] Check whether the current build version and the latest GitHub release are both `0.10.0` before preparing the release.
-- [ ] Treat GH-74 as a bugfix and raise the version to `0.10.1` if that check confirms `0.10.0` is the current release.
-- [ ] Add the `0.10.1` changelog entry with GH-74 under `## Bugfix`.
-- [ ] Determine the resolved `org.itsallcode.openfasttrace:openfasttrace` version from Gradle dependency metadata.
-- [ ] Add `## Bundled OpenFastTrace` and the resolved library version immediately after the release summary and before the issue category.
-- [ ] Update the release date when releasing and ensure the issue list contains `#74: Fix Test Runner count to include specification items only`.
+- [x] Check whether the current build version and the latest GitHub release are both `0.10.0`; the build was `0.10.0`, while the latest GitHub release was `0.8.0`.
+- [x] Treat GH-74 as a bugfix and raise the project development version to `0.10.1`.
+- [x] Add the `0.10.1` changelog entry with GH-74 under `## Bugfix`.
+- [x] Determine the resolved `org.itsallcode.openfasttrace:openfasttrace` version from Gradle dependency metadata: `4.8.0`.
+- [x] Add `## Bundled OpenFastTrace` and the resolved library version immediately after the release summary and before the issue category.
+- [x] Update the release date to `2026-08-07` and ensure the issue list contains `#74: Fix Test Runner count to include specification items only`.

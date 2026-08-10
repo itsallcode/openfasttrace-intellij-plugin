@@ -48,7 +48,7 @@ class OftTraceServiceTest {
                 () -> assertThat(result.output(), Matchers.containsString("\u001B[")),
                 () -> assertThat(renderedOutput, Matchers.containsString("ok -")),
                 () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("not ok"))),
-                // [itest->dsn~trace-test-runner-presentation~1]
+                // [itest->dsn~trace-test-runner-presentation~2]
                 () -> assertThat(result.trace().isPresent(), is(true))
         );
     }
@@ -105,7 +105,7 @@ class OftTraceServiceTest {
                 () -> assertThat(renderedOutput, Matchers.containsString("not ok")),
                 () -> assertThat(renderedOutput, Matchers.containsString("req~trace_output_requirement~1")),
                 () -> assertThat(result.output(), Matchers.containsString("\u001B[")),
-                // [itest->dsn~trace-test-runner-presentation~1]
+                // [itest->dsn~trace-test-runner-presentation~2]
                 () -> assertThat(result.trace().isPresent(), is(true))
         );
     }
@@ -210,7 +210,7 @@ class OftTraceServiceTest {
                 () -> assertThat(result.statusMessage(), is("OpenFastTrace trace failed unexpectedly.")),
                 () -> assertThat(result.output(), Matchers.containsString("OpenFastTrace trace failed for input path")),
                 () -> assertThat(result.output(), Matchers.containsString("IllegalStateException: boom")),
-                // [itest->dsn~trace-test-runner-presentation~1]
+                // [itest->dsn~trace-test-runner-presentation~2]
                 () -> assertThat(result.trace().isEmpty(), is(true))
         );
     }

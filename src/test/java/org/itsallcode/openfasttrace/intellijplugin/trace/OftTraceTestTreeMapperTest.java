@@ -29,8 +29,8 @@ import static org.hamcrest.Matchers.startsWith;
 class OftTraceTestTreeMapperTest {
     private static final String PROJECT_BASE = "/workspace/openfasttrace-intellij-plugin";
 
-    // [itest->dsn~trace-test-runner-presentation~1]
-    // [itest->dsn~show-trace-source-files-as-test-runner-suites~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
+    // [itest->dsn~show-trace-source-files-as-test-runner-suites~2]
     // [itest->dsn~roll-up-source-file-suite-trace-status~1]
     // [itest->dsn~roll-up-top-level-trace-status~1]
     @Test
@@ -56,8 +56,8 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
-    // [itest->dsn~show-trace-source-files-as-test-runner-suites~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
+    // [itest->dsn~show-trace-source-files-as-test-runner-suites~2]
     // [itest->dsn~navigate-from-test-runner-source-files~1]
     @Test
     void testGivenAbsoluteTraceItemPathsBelowProjectWhenMappingThenItCreatesSuitesWithProjectLocalPaths() {
@@ -100,16 +100,16 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
-    // [itest->dsn~show-trace-specification-items-as-test-runner-tests~1]
-    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
+    // [itest->dsn~show-trace-specification-items-as-test-runner-tests~2]
+    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~2]
     // [itest->dsn~show-specification-item-title-in-test-runner-ui~2]
     // [itest->dsn~show-specification-item-id-in-test-runner-details~1]
     // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
     // [itest->dsn~show-trace-link-status-in-test-runner-ui~2]
     // [itest->dsn~show-trace-link-direction-in-test-runner-ui~1]
     // [itest->dsn~show-unicode-trace-link-direction-in-test-runner-ui~1]
-    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
+    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~2]
     // [itest->dsn~map-trace-link-status-to-test-runner-status~1]
     // [itest->dsn~show-trace-link-id-details-in-test-runner-ui~1]
     @Test
@@ -140,7 +140,6 @@ class OftTraceTestTreeMapperTest {
                 () -> assertThat(requirementNode.details().detailText(),
                         containsString("Specification item ID: req~covered_requirement~1")),
                 () -> assertThat(requirementNode.details().detailText(), containsString("Trace status: covered")),
-                () -> assertThat(requirementNode.testCount(), is(2)),
                 () -> assertThat(requirementNode.links(), hasSize(1)),
                 () -> assertThat(requirementNode.links().getFirst().name(),
                         is("⊙← Covered requirement test")),
@@ -158,8 +157,8 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
-    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
+    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~2]
     // [itest->dsn~show-trace-link-direction-in-test-runner-ui~1]
     // [itest->dsn~show-unicode-trace-link-direction-in-test-runner-ui~1]
     @Test
@@ -216,7 +215,7 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
     // [itest->dsn~sort-specification-items-in-test-runner-ui~1]
     @Test
     void testGivenUnsortedSpecificationItemsInOneSourceFileWhenMappingThenItSortsItemsByIdParts() {
@@ -242,12 +241,12 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
-    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
+    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~2]
     // [itest->dsn~show-trace-link-status-in-test-runner-ui~2]
     // [itest->dsn~show-trace-link-direction-in-test-runner-ui~1]
     // [itest->dsn~show-unicode-trace-link-direction-in-test-runner-ui~1]
-    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
+    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~2]
     // [itest->dsn~map-trace-link-status-to-test-runner-status~1]
     // [itest->dsn~roll-up-source-file-suite-trace-status~1]
     // [itest->dsn~roll-up-top-level-trace-status~1]
@@ -281,9 +280,9 @@ class OftTraceTestTreeMapperTest {
     }
 
     // [itest->dsn~mark-transitive-defects-in-test-runner~1]
-    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
     // [itest->dsn~mark-transitive-defects-in-test-runner~1]
-    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
     // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
     // [itest->dsn~show-specification-item-defect-details-in-test-runner-ui~1]
     // [itest->dsn~roll-up-source-file-suite-trace-status~1]
@@ -319,7 +318,7 @@ class OftTraceTestTreeMapperTest {
     }
 
     // [itest->dsn~hide-transitive-defects-in-test-runner-ui~1]
-    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
     @Test
     void testGivenTransitiveDefectsWhenMappingWithHiddenTransitivesThenItOmitsThem(@TempDir final Path temporaryDirectory)
             throws IOException {
@@ -339,9 +338,9 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
     // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
-    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
+    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~2]
     // [itest->dsn~show-specification-item-defect-details-in-test-runner-ui~1]
     @Test
     void testGivenUncoveredRequirementWhenMappingThenItCreatesFailedItemNodeWithUncoveredStatus() {
