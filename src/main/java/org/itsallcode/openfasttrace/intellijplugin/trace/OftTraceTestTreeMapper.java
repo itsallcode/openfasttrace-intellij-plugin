@@ -35,18 +35,18 @@ final class OftTraceTestTreeMapper {
     private OftTraceTestTreeMapper() {
     }
 
-    // [impl->dsn~trace-test-runner-presentation~1]
-    // [impl->dsn~show-trace-source-files-as-test-runner-suites~1]
-    // [impl->dsn~show-trace-specification-items-as-test-runner-tests~1]
+    // [impl->dsn~trace-test-runner-presentation~2]
+    // [impl->dsn~show-trace-source-files-as-test-runner-suites~2]
+    // [impl->dsn~show-trace-specification-items-as-test-runner-tests~2]
     // [impl->dsn~show-specification-item-title-in-test-runner-ui~2]
     // [impl->dsn~show-specification-item-id-in-test-runner-details~1]
     // [impl->dsn~sort-specification-items-in-test-runner-ui~1]
-    // [impl->dsn~show-trace-links-as-test-runner-sub-tests~1]
+    // [impl->dsn~show-trace-links-as-test-runner-sub-tests~2]
     // [impl->dsn~show-specification-item-status-in-test-runner-ui~2]
     // [impl->dsn~show-trace-link-status-in-test-runner-ui~2]
     // [impl->dsn~show-trace-link-direction-in-test-runner-ui~1]
     // [impl->dsn~show-unicode-trace-link-direction-in-test-runner-ui~1]
-    // [impl->dsn~map-specification-item-trace-status-to-test-runner-status~1]
+    // [impl->dsn~map-specification-item-trace-status-to-test-runner-status~2]
     // [impl->dsn~map-trace-link-status-to-test-runner-status~1]
     // [impl->dsn~show-specification-item-defect-details-in-test-runner-ui~1]
     // [impl->dsn~show-trace-link-defect-details-in-test-runner-ui~1]

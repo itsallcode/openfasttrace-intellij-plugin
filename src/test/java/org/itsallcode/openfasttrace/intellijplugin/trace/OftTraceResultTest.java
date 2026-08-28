@@ -26,7 +26,7 @@ class OftTraceResultTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
     @Test
     void testGivenSuccessfulOrDefectiveTraceResultThenItExposesStructuredTraceData() {
         final Trace trace = emptyTrace();
@@ -37,7 +37,7 @@ class OftTraceResultTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
     @Test
     void testGivenResultWithoutACompletedTraceThenItDoesNotExposeStructuredTraceData() {
         Assertions.assertAll(

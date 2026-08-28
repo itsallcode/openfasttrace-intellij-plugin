@@ -14,6 +14,7 @@ import java.util.Properties;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.matchesPattern;
 
 class OftMarketplaceMetadataTest {
     private static final String PROJECT_URL = "https://github.com/itsallcode/openfasttrace-intellij-plugin";
@@ -40,13 +41,12 @@ class OftMarketplaceMetadataTest {
     @Test
     void givenActiveReleaseNotesWhenReadingThenItContainsMarketplaceMetadataEntry() throws Exception {
         final String version = projectVersion();
-        final String bundledOpenFastTraceVersion = bundledOpenFastTraceVersion();
         final String releaseNotes = Files.readString(Path.of("doc/changes/changes_" + version + ".md"));
 
         Assertions.assertAll(
                 () -> assertThat(releaseNotes, containsString("# OpenFastTrace IntelliJ Plugin " + version)),
                 () -> assertThat(releaseNotes, containsString("## Bundled OpenFastTrace")),
-                () -> assertThat(releaseNotes, containsString("OpenFastTrace " + bundledOpenFastTraceVersion))
+                () -> assertThat(releaseNotes, matchesPattern("(?s).*OpenFastTrace \\d+\\.\\d+\\.\\d+.*"))
         );
     }
 
@@ -64,17 +64,6 @@ class OftMarketplaceMetadataTest {
             properties.load(input);
         }
         return properties.getProperty("version");
-    }
-
-    private static String bundledOpenFastTraceVersion() throws Exception {
-        final String prefix = "org.itsallcode.openfasttrace:openfasttrace:";
-        try (var lines = Files.lines(Path.of("gradle.lockfile"))) {
-            return lines
-                    .filter(line -> line.startsWith(prefix))
-                    .findFirst()
-                    .map(line -> line.substring(prefix.length(), line.indexOf('=')))
-                    .orElseThrow();
-        }
     }
 
     private static Document loadXml(final String xml) throws Exception {

@@ -12,6 +12,8 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestTree.OftTra
 import java.util.function.Function;
 
 public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPresenter {
+    private static final String SPECIFICATION_ITEM_PROGRESS_CATEGORY = "OpenFastTrace specification items";
+
     private final Function<Project, SMTRunnerConsoleView> consoleFactory;
     private final boolean showTransitiveDefects;
 
@@ -27,7 +29,8 @@ public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPr
         this.showTransitiveDefects = showTransitiveDefects;
     }
 
-    // [impl->dsn~trace-test-runner-presentation~1]
+    // [impl->dsn~trace-test-runner-presentation~2]
+    // [impl->dsn~count-only-specification-items-in-test-runner-results~1]
     @Override
     public void show(final Project project, final String contentTitle, final OftTraceResult result) {
         final SMTRunnerConsoleView console = consoleFactory.apply(project);
@@ -55,7 +58,7 @@ public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPr
             final SMTestProxy.SMRootTestProxy root,
             final OftTraceTestTree tree
     ) {
-        resultsViewer.onTestsCountInSuite(tree.testCount());
+        resultsViewer.onCustomProgressTestsCategory(SPECIFICATION_ITEM_PROGRESS_CATEGORY, tree.testCount());
         for (final OftTraceSuiteNode suite : tree.suites()) {
             showSuite(project, resultsViewer, root, suite);
         }
@@ -91,20 +94,19 @@ public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPr
             final SMTestProxy parent,
             final OftTraceItemNode item
     ) {
+        resultsViewer.onCustomProgressTestStarted();
         final boolean expandable = itemHasLinks(item);
         final SMTestProxy itemProxy = new OftTraceTestProxy(project, item.name(), expandable, item.navigationId());
         parent.addChild(itemProxy);
         if (expandable) {
             itemProxy.setSuiteStarted();
-            resultsViewer.onSuiteStarted(itemProxy);
         } else {
             itemProxy.setStarted();
-            resultsViewer.onTestStarted(itemProxy);
         }
+        resultsViewer.onSuiteStarted(itemProxy);
         if (item.failed()) {
             markFailed(itemProxy, item.failureDetails());
-            // Expandable item nodes are suite-shaped, but the item status itself still counts as a test.
-            resultsViewer.onTestFailed(itemProxy);
+            resultsViewer.onCustomProgressTestFailed();
         } else {
             addPassedDetails(itemProxy, item.details());
         }
@@ -112,11 +114,8 @@ public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPr
             showLink(project, resultsViewer, itemProxy, link);
         }
         itemProxy.setFinished();
-        if (expandable) {
-            resultsViewer.onSuiteFinished(itemProxy);
-        } else {
-            resultsViewer.onTestFinished(itemProxy);
-        }
+        resultsViewer.onSuiteFinished(itemProxy);
+        resultsViewer.onCustomProgressTestFinished();
     }
 
     private static boolean itemHasLinks(final OftTraceItemNode item) {
@@ -131,7 +130,15 @@ public final class OftTraceTestRunnerOutputPresenter implements OftTraceOutputPr
     ) {
         final SMTestProxy linkProxy = new OftTraceTestProxy(project, link.name(), false, link.navigationId());
         parent.addChild(linkProxy);
-        showTestNode(resultsViewer, linkProxy, link.failed(), link.details());
+        linkProxy.setStarted();
+        resultsViewer.onSuiteStarted(linkProxy);
+        if (link.failed()) {
+            markFailed(linkProxy, link.details());
+        } else {
+            addPassedDetails(linkProxy, link.details());
+        }
+        linkProxy.setFinished();
+        resultsViewer.onSuiteFinished(linkProxy);
     }
 
     private static void showTestNode(

@@ -43,15 +43,17 @@ public final class OftRunProfileState implements RunProfileState {
 
         final String contentTitle = "OpenFastTrace Trace: " + environment.getRunProfile().getName();
         final ExecutionPresentation executionPresentation = createExecutionPresentation(project, executor);
+        final ProcessHandler processHandler = new NopProcessHandler();
+        processHandler.startNotify();
 
         // [impl->dsn~trace-action-integration~3]
         if (!resolution.isValid()) {
             executionPresentation.outputPresenter()
                     .show(project, contentTitle, OftTraceResult.invalidInput(resolution.errorMessage()));
-            return new DefaultExecutionResult(executionPresentation.console(), new NopProcessHandler());
+            processHandler.detachProcess();
+            return new DefaultExecutionResult(executionPresentation.console(), processHandler);
         }
 
-        final ProcessHandler processHandler = new NopProcessHandler();
         final OftTraceService traceService = new OftTraceService(settings.showTransitiveDefects());
         // [impl->dsn~transitive-defect-visibility-is-controlled-by-the-run-configuration~1]
         final OftTraceRunner traceRunner = new OftTraceBackgroundRunner(

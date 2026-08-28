@@ -24,7 +24,7 @@ For the MVP, the plugin operates only on the files of the currently opened IDE p
 
 The MVP supports OpenFastTrace specification items in Markdown and reStructuredText documents with the suffixes `.md`, `.markdown`, and `.rst`.
 
-The MVP also supports OpenFastTrace coverage tags in source, configuration, and markup files supported by the OFT tag importer. The current list of supported file extensions is defined in the [OpenFastTrace user guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md#supported-file-extensions) and is referenced there instead of being duplicated in this design document.
+The MVP also supports OpenFastTrace coverage tags in source, configuration, and markup files supported by the OFT tag importer. The current list of supported file extensions is defined in the [OpenFastTrace user guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide/user_guide.md#supported-file-extensions) and is referenced there instead of being duplicated in this design document.
 
 ## External Interfaces
 

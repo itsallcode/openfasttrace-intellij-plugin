@@ -37,15 +37,15 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-// [itest->dsn~trace-test-runner-presentation~1]
+// [itest->dsn~trace-test-runner-presentation~2]
 public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTestCase {
-    // [itest->dsn~show-trace-source-files-as-test-runner-suites~1]
-    // [itest->dsn~show-trace-specification-items-as-test-runner-tests~1]
+    // [itest->dsn~show-trace-source-files-as-test-runner-suites~2]
+    // [itest->dsn~show-trace-specification-items-as-test-runner-tests~2]
     // [itest->dsn~show-specification-item-title-in-test-runner-ui~2]
     // [itest->dsn~show-specification-item-id-in-test-runner-details~1]
     // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
     // [itest->dsn~navigate-from-test-runner-source-files~1]
-    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
+    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~2]
     // [itest->dsn~roll-up-source-file-suite-trace-status~1]
     // [itest->dsn~roll-up-top-level-trace-status~1]
     public void testGivenSuccessfulTraceResultWhenPresentedThenItCreatesPassedTestRunnerNodes() {
@@ -76,12 +76,12 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         assertThat(failedTestCount(resultsViewer), is(0));
     }
 
-    // [itest->dsn~show-trace-source-files-as-test-runner-suites~1]
-    // [itest->dsn~show-trace-specification-items-as-test-runner-tests~1]
-    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~1]
+    // [itest->dsn~show-trace-source-files-as-test-runner-suites~2]
+    // [itest->dsn~show-trace-specification-items-as-test-runner-tests~2]
+    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~2]
     // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
     // [itest->dsn~show-trace-link-status-in-test-runner-ui~2]
-    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
+    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~2]
     // [itest->dsn~map-trace-link-status-to-test-runner-status~1]
     // [itest->dsn~roll-up-source-file-suite-trace-status~1]
     // [itest->dsn~roll-up-top-level-trace-status~1]
@@ -129,10 +129,43 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
         assertThat(link.getStacktrace(), containsString("OpenFastTrace could not find"));
         assertThat(totalTestCount(resultsViewer), is(2));
         assertThat(failedTestCount(resultsViewer), is(2));
+        assertThat(resultsViewer.getTotalTestCount(), is(1));
+        assertThat(resultsViewer.getFinishedTestCount(), is(1));
+        assertThat(resultsViewer.getFailedTestCount(), is(1));
+    }
+
+    // [itest->dsn~count-only-specification-items-in-test-runner-results~1]
+    // [itest->dsn~show-trace-source-files-as-test-runner-suites~2]
+    // [itest->dsn~show-trace-specification-items-as-test-runner-tests~2]
+    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~2]
+    public void testGivenCleanTraceWithLinkedItemsInMultipleSuitesWhenPresentedThenItCountsOnlyItems() {
+        final LinkedSpecificationItem requirement = titledItem(
+                "req~covered_requirement~1",
+                projectLocalPath("doc/requirements.md"),
+                "Covered requirement"
+        );
+        final LinkedSpecificationItem implementation = titledItem(
+                "impl~covered_requirement~1",
+                projectLocalPath("src/CoveredRequirement.java"),
+                "Covered requirement implementation"
+        );
+        implementation.addLinkToItemWithStatus(requirement, LinkStatus.COVERS);
+
+        final SMTestRunnerResultsForm resultsViewer = present(OftTraceResult.success(
+                "ok",
+                trace(requirement, implementation)
+        )).getResultsViewer();
+
+        assertAll(
+                () -> assertThat(resultsViewer.getTestsRootNode().getChildren(), hasSize(2)),
+                () -> assertThat(resultsViewer.getTotalTestCount(), is(2)),
+                () -> assertThat(resultsViewer.getFinishedTestCount(), is(2)),
+                () -> assertThat(resultsViewer.getFailedTestCount(), is(0))
+        );
     }
 
     // [itest->dsn~mark-transitive-defects-in-test-runner~1]
-    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
     // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
     // [itest->dsn~show-specification-item-defect-details-in-test-runner-ui~1]
     // [itest->dsn~roll-up-source-file-suite-trace-status~1]
@@ -165,7 +198,7 @@ public class OftTraceTestRunnerOutputPresenterTest extends AbstractOftPlatformTe
     }
 
     // [itest->dsn~hide-transitive-defects-in-test-runner-ui~1]
-    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
     public void testGivenTransitiveDefectTraceResultWhenTransitiveDefectsAreHiddenThenItOmitsTransitiveItems()
             throws IOException {
         writeUncleanTraceChainProject(Path.of(Objects.requireNonNull(getProject().getBasePath())));
