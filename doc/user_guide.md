@@ -4,7 +4,7 @@ This guide explains how to install and use the OpenFastTrace IntelliJ plugin in 
 
 The plugin helps you author OpenFastTrace (OFT) documents, navigate between specification items and coverage links, and run OFT traces without leaving the IDE.
 
-For the OFT syntax and tracing concepts themselves, see the [OpenFastTrace User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md).
+For the OFT syntax and tracing concepts themselves, see the [OpenFastTrace User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide/user_guide.md).
 
 ## Install The Plugin
 

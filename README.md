@@ -30,7 +30,7 @@ SonarCloud status:
 
 **User Guides**
 * [OpenFastTrace IntelliJ Plugin User Guide](doc/user_guide.md)
-* [OpenFastTrace User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md)
+* [OpenFastTrace User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide/user_guide.md)
 * [OpenFastTrace in IDE Help Action](src/main/java/org/itsallcode/openfasttrace/intellijplugin/help/OpenFastTraceUserGuide.java)
 * [OpenFastTrace IntelliJ Plugin Demo](doc/demo/plugin-demo.md)
 
