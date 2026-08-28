@@ -1,6 +1,6 @@
 # OpenFastTrace IntelliJ Plugin 0.9.0, released 2026-08-07
 
-Version 0.9.0 adds run-configuration templates, improves Test Runner defect presentation, and updates the bundled OpenFastTrace library to 4.8.0.
+Version 0.9.0 adds run-configuration templates, improves Test Runner defect presentation, and updates the bundled OpenFastTrace library to 4.9.0.
 
 The plugin description and release notes now provide clearer Marketplace metadata. The release workflow verifies the packaged plugin before creating the GitHub release artifact.
 
@@ -8,7 +8,7 @@ The Test Runner distinguishes direct and transitive defects, optionally hides tr
 
 ## Bundled OpenFastTrace
 
-OpenFastTrace 4.8.0
+OpenFastTrace 4.9.0
 
 ## Features
 
