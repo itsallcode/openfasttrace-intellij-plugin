@@ -1,23 +1,30 @@
-# OpenFastTrace IntelliJ Plugin 0.9.0, released 2026-06-27
+# OpenFastTrace IntelliJ Plugin 0.9.0, released 2026-08-07
 
-Version 0.9.0 introduces specialized run configuration templates and improves the metadata shown by JetBrains plugin surfaces. Before installing or updating the plugin, users can now see a clearer overview of what OpenFastTrace support does in the IDE and read the current release notes from the maintained project changelog.
+Version 0.9.0 adds run-configuration templates, improves Test Runner defect presentation, and updates the bundled OpenFastTrace library to 4.8.0.
 
-Users can now quickly set up common OpenFastTrace scanning scenarios using pre-configured templates when creating a new run configuration:
-* **User requirements**: Scans `doc/` for core artifact types (`feat, req, scn, bconstr`).
-* **Design and above**: Scans `doc/` for all artifact types, including design and build artifacts.
-* **Typical project**: Scans `doc/` and all project source directories.
-* **Unfiltered**: Scans the entire project without any filters.
+The plugin description and release notes now provide clearer Marketplace metadata. The release workflow verifies the packaged plugin before creating the GitHub release artifact.
 
-The `Tools | OpenFastTrace | Trace Project` menu has been removed, as the new run configuration templates provide a more flexible and discoverable way to start an OpenFastTrace scan.
+The Test Runner distinguishes direct and transitive defects, optionally hides transitive defects, and counts specification items only. Source-file suites and trace-link details remain visible without inflating totals or progress.
 
 ## Bundled OpenFastTrace
 
-OpenFastTrace 4.5.0
+OpenFastTrace 4.8.0
 
 ## Features
 
 * #61: Replace global OFT scan with specialized run configuration templates
+* #66: Mark transitive defects with a visible `↳` prefix in the Test Runner UI
+* #72: Filter transitive defects in the run configuration
 
 ## Documentation
 
 * #51: Complete Marketplace-facing plugin metadata
+
+## Build Maintenance
+
+* #49: Run plugin verification in the release workflow
+
+## Bugfix
+
+* #39: Re-enable the tag-filter test
+* #74: Count specification items only in the Test Runner
