@@ -107,7 +107,8 @@ public final class OftTraceInputResolver {
                 inputPath,
                 settings.artifactTypes(),
                 settings.tags(),
-                settings.includeUntagged()
+                settings.includeUntagged(),
+                settings.selectedStatuses()
         ));
     }
 
@@ -125,7 +126,8 @@ public final class OftTraceInputResolver {
                     projectRoot,
                     settings.artifactTypes(),
                     settings.tags(),
-                    settings.includeUntagged()
+                    settings.includeUntagged(),
+                    settings.selectedStatuses()
             ));
         }
         final LinkedHashSet<Path> inputs = new LinkedHashSet<>();
@@ -155,7 +157,8 @@ public final class OftTraceInputResolver {
                 List.copyOf(inputs),
                 settings.artifactTypes(),
                 settings.tags(),
-                settings.includeUntagged()
+                settings.includeUntagged(),
+                settings.selectedStatuses()
         ));
     }
 
@@ -222,7 +225,8 @@ public final class OftTraceInputResolver {
                 List.of(resolvedPath),
                 settings.artifactTypes(),
                 settings.tags(),
-                settings.includeUntagged()
+                settings.includeUntagged(),
+                settings.selectedStatuses()
         ));
     }
 

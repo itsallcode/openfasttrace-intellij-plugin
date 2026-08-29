@@ -480,13 +480,15 @@ Covers:
 Needs: scn
 
 #### OpenFastTrace Run Configuration Templates
-`req~openfasttrace-run-configuration-templates~1`
+`req~openfasttrace-run-configuration-templates~2`
 
 The plugin provides pre-configured templates when creating new OpenFastTrace run configurations. These templates allow users to quickly set up common scanning scenarios. The following templates are available:
 - **User requirements**: Scans `doc/`, excludes source directories, filters for artifact types: `feat, req, scn, bconstr`.
 - **Design and above**: Scans `doc/`, excludes source directories, filters for artifact types: `feat, req, scn, bconstr, arch, dsn, constr`.
 - **Typical project**: Scans `doc/` and all project source directories, with no artifact type filtering.
 - **Unfiltered**: Scans the entire project (`.`) with no filters.
+
+Each template includes only specification items with the `Approved` status by default.
 
 Covers:
 - `feat~oft-run-configurations~2`
@@ -507,6 +509,16 @@ Needs: scn
 `req~filter-trace-by-tags~1`
 
 When using an OpenFastTrace run configuration, the plugin lets users filter the trace results by tags. Users can specify a comma-separated list of tags to focus the trace on tagged specification items and can select an `Include untagged items` checkbox below the Tags field to also include specification items without tags.
+
+Covers:
+- `feat~oft-run-configurations~2`
+
+Needs: scn
+
+#### Filter Trace by Specification Item Statuses
+`req~filter-trace-by-item-statuses~1`
+
+The OpenFastTrace run configuration provides a checkbox for each supported specification item status: `Draft`, `Proposed`, `Approved`, and `Rejected`. Users can select one or more statuses to include in the trace. The plugin saves the selection with the run configuration and requires at least one status to remain selected.
 
 Covers:
 - `feat~oft-run-configurations~2`
@@ -1431,14 +1443,15 @@ Covers:
 Needs: dsn
 
 ### Use Run Configuration Templates
-`scn~use-run-configuration-templates~1`
+`scn~use-run-configuration-templates~2`
 
 **Given** an IntelliJ project is open
-**When** a user creates a new OpenFastTrace run configuration from a template (e.g., "User Requirements")
-**Then** the IDE creates the configuration with the template's pre-configured scope and filters.
+**When** a user creates a new OpenFastTrace run configuration from any provided template
+**Then** the IDE creates the configuration with the template's pre-configured scope and filters
+**And** selects only the `Approved` specification item status.
 
 Covers:
-- `req~openfasttrace-run-configuration-templates~1`
+- `req~openfasttrace-run-configuration-templates~2`
 
 Needs: dsn
 
@@ -1487,6 +1500,30 @@ Needs: dsn
 
 Covers:
 - `req~filter-trace-by-tags~1`
+
+Needs: dsn
+
+### Filter Run Configuration by Specification Item Statuses
+`scn~filter-run-configuration-by-item-statuses~1`
+
+**Given** an IntelliJ project is open and an OpenFastTrace run configuration has the `Draft` and `Proposed` status checkboxes selected
+**When** a user runs that configuration
+**Then** the resulting trace includes only specification items with the `Draft` or `Proposed` status
+
+Covers:
+- `req~filter-trace-by-item-statuses~1`
+
+Needs: dsn
+
+### Reject Run Configuration Without a Specification Item Status
+`scn~reject-run-configuration-without-item-status~1`
+
+**Given** a user edits an OpenFastTrace run configuration
+**When** the user clears all four specification item status checkboxes
+**Then** the IDE reports that at least one status must be selected and prevents the invalid configuration from being applied or run.
+
+Covers:
+- `req~filter-trace-by-item-statuses~1`
 
 Needs: dsn
 

@@ -1,6 +1,7 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace.runconfig;
 
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsComponent;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,10 @@ public final class OftRunConfigurationSettingsEditor extends SettingsEditor<OftR
     }
 
     @Override
-    protected void applyEditorTo(@NotNull final OftRunConfiguration configuration) {
+    protected void applyEditorTo(@NotNull final OftRunConfiguration configuration) throws ConfigurationException {
+        if (!component.hasSelectedStatuses()) {
+            throw new ConfigurationException(OftRunConfiguration.STATUS_SELECTION_ERROR);
+        }
         configuration.updateFrom(component.getSettings());
     }
 

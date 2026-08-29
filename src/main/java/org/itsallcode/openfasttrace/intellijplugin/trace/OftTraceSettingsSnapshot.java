@@ -1,7 +1,11 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
+
+import org.itsallcode.openfasttrace.api.core.ItemStatus;
 
 public record OftTraceSettingsSnapshot(
         OftTraceScopeMode scopeMode,
@@ -12,8 +16,10 @@ public record OftTraceSettingsSnapshot(
         String tagsText,
         boolean includeUntagged,
         boolean showTransitiveDefects,
+        Set<ItemStatus> selectedStatuses,
         OftTraceResultView resultView
 ) {
+    public static final Set<ItemStatus> DEFAULT_STATUSES = Set.of(ItemStatus.APPROVED);
     public static final OftTraceSettingsSnapshot DEFAULT = new OftTraceSettingsSnapshot(
             OftTraceScopeMode.WHOLE_PROJECT,
             true,
@@ -23,11 +29,65 @@ public record OftTraceSettingsSnapshot(
             "",
             false,
             true,
+            DEFAULT_STATUSES,
             OftTraceResultView.TEST_RUNNER
     );
 
     private static final Pattern LINE_SEPARATOR = Pattern.compile("\\R");
     public static final Pattern COMMA = Pattern.compile(",");
+
+    public OftTraceSettingsSnapshot {
+        Objects.requireNonNull(selectedStatuses, "selectedStatuses");
+        selectedStatuses = Set.copyOf(selectedStatuses);
+        if (selectedStatuses.isEmpty()) {
+            throw new IllegalArgumentException("At least one specification item status must be selected.");
+        }
+    }
+
+    public OftTraceSettingsSnapshot(
+            final OftTraceScopeMode scopeMode,
+            final boolean includeSourceRoots,
+            final boolean includeTestRoots,
+            final String additionalPathsText,
+            final String artifactTypesText,
+            final String tagsText,
+            final Set<ItemStatus> selectedStatuses,
+            final OftTraceResultView resultView
+    ) {
+        this(
+                scopeMode,
+                includeSourceRoots,
+                includeTestRoots,
+                additionalPathsText,
+                artifactTypesText,
+                tagsText,
+                false,
+                true,
+                selectedStatuses,
+                resultView
+        );
+    }
+
+    public OftTraceSettingsSnapshot(
+            final OftTraceScopeMode scopeMode,
+            final boolean includeSourceRoots,
+            final boolean includeTestRoots,
+            final String additionalPathsText,
+            final String artifactTypesText,
+            final String tagsText,
+            final OftTraceResultView resultView
+    ) {
+        this(
+                scopeMode,
+                includeSourceRoots,
+                includeTestRoots,
+                additionalPathsText,
+                artifactTypesText,
+                tagsText,
+                DEFAULT_STATUSES,
+                resultView
+        );
+    }
 
     public OftTraceSettingsSnapshot(
             final OftTraceScopeMode scopeMode,
@@ -46,7 +106,33 @@ public record OftTraceSettingsSnapshot(
                 tagsText,
                 false,
                 true,
+                DEFAULT_STATUSES,
                 DEFAULT.resultView()
+        );
+    }
+
+    public OftTraceSettingsSnapshot(
+            final OftTraceScopeMode scopeMode,
+            final boolean includeSourceRoots,
+            final boolean includeTestRoots,
+            final String additionalPathsText,
+            final String artifactTypesText,
+            final String tagsText,
+            final boolean includeUntagged,
+            final boolean showTransitiveDefects,
+            final OftTraceResultView resultView
+    ) {
+        this(
+                scopeMode,
+                includeSourceRoots,
+                includeTestRoots,
+                additionalPathsText,
+                artifactTypesText,
+                tagsText,
+                includeUntagged,
+                showTransitiveDefects,
+                DEFAULT_STATUSES,
+                resultView
         );
     }
 
@@ -69,28 +155,7 @@ public record OftTraceSettingsSnapshot(
                 tagsText,
                 includeUntagged,
                 true,
-                resultView
-        );
-    }
-
-    public OftTraceSettingsSnapshot(
-            final OftTraceScopeMode scopeMode,
-            final boolean includeSourceRoots,
-            final boolean includeTestRoots,
-            final String additionalPathsText,
-            final String artifactTypesText,
-            final String tagsText,
-            final OftTraceResultView resultView
-    ) {
-        this(
-                scopeMode,
-                includeSourceRoots,
-                includeTestRoots,
-                additionalPathsText,
-                artifactTypesText,
-                tagsText,
-                false,
-                true,
+                DEFAULT_STATUSES,
                 resultView
         );
     }

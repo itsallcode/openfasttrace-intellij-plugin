@@ -435,6 +435,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
     }
 
     // [itest->dsn~rename-specification-item-id~1]
+    // [itest->dsn~show-renamed-specification-item-id-in-navigation~1]
     public void testGivenSpecificationItemWhenRenamedThenTheDeclarationReferencesAndIndexUpdate() {
         final PsiFile declarationFile = myFixture.addFileToProject("doc/spec.md", """
                 req~<caret>old_name~1
@@ -445,11 +446,10 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
                 Covers:
                 - req~old_name~1
                 """);
-        final PsiFile coverageFile = myFixture.addFileToProject("src/Main.java", """
-                // [impl~rename_target~1->req~old_name~1]
-                class Main {
-                }
-                """);
+        final PsiFile coverageFile = myFixture.addFileToProject("src/Main.java",
+                "// [impl~rename_target~1" + "->req~old_name~1]" + System.lineSeparator()
+                + "class Main {" + System.lineSeparator()
+                + "}" + System.lineSeparator());
         myFixture.configureFromExistingVirtualFile(declarationFile.getVirtualFile());
 
         EdtTestUtil.runInEdtAndWait(() -> WriteCommandAction.runWriteCommandAction(

@@ -44,6 +44,7 @@ class OftSupportedFilesTest {
             "source.php", "source.pl", "source.pm", "source.py",
             "suite.robot",
             "diagram.pu", "diagram.puml", "diagram.plantuml",
+            "documentation.dox",
             "source.r", "source.rs",
             "source.sh", "source.bash", "source.zsh",
             "source.sv", "source.v", "defs.inc",

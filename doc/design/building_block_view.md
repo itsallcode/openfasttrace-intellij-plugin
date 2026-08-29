@@ -342,16 +342,18 @@ Covers:
 Needs: bld, itest
 
 ### Trace Configuration Integration
-`dsn~trace-configuration-integration~2`
+`dsn~trace-configuration-integration~3`
 
-The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings through dedicated run configurations. It provides pre-configured templates for common scanning scenarios. It exposes those settings through the run configuration editor, resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria, stores the run-configuration result-view selection, treats the IntelliJ Test Runner UI as the result-view default when no selection is stored, and owns the plugin resource used as the OpenFastTrace run-configuration icon.
+The plugin provides a trace-configuration component that stores OpenFastTrace trace-scope settings through dedicated run configurations. It provides pre-configured templates for common scanning scenarios, each initialized to include only approved specification items. It exposes those settings through the run configuration editor, persists a non-empty set of selected `ItemStatus` values, rejects configurations without a selected status, resolves the selected-resource options and filters into a normalized OpenFastTrace input set and filter criteria, stores the run-configuration result-view selection, treats the IntelliJ Test Runner UI as the result-view default when no selection is stored, and owns the plugin resource used as the OpenFastTrace run-configuration icon.
 
 Covers:
 - `scn~test-runner-as-default-run-configuration-result-view~1`
 - `scn~select-plain-text-trace-result-view~1`
 - `scn~select-test-runner-trace-result-view~1`
 - `scn~show-openfasttrace-icon-for-run-configurations~1`
-- `scn~use-run-configuration-templates~1`
+- `scn~use-run-configuration-templates~2`
+- `scn~filter-run-configuration-by-item-statuses~1`
+- `scn~reject-run-configuration-without-item-status~1`
 
 Needs: impl, itest
 
@@ -481,6 +483,10 @@ scale 2
      }
      ---
      {
+        .               | .
+        Statuses:       | [ ] Draft  [ ] Proposed
+        .               | [X] Approved  [ ] Rejected
+        .               | <i>(at least one required)
         .               | .
         Result view:    | ()  Plain text output
         .               | (X) IntelliJ Test Runner UI

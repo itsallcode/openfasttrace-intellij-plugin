@@ -7,6 +7,8 @@ import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.JBTextField;
+import org.itsallcode.openfasttrace.api.core.ItemStatus;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -18,6 +20,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.nio.file.Path;
+import java.util.EnumSet;
+import java.util.Set;
 
 public final class OftTraceSettingsComponent {
     private final JBRadioButton wholeProjectRadioButton =
@@ -33,6 +37,10 @@ public final class OftTraceSettingsComponent {
     private final JBTextField tagsField = new JBTextField();
     private final JBCheckBox includeUntaggedCheckBox =
             new JBCheckBox("Include untagged items");
+    private final JBCheckBox draftStatusCheckBox = new JBCheckBox("Draft");
+    private final JBCheckBox proposedStatusCheckBox = new JBCheckBox("Proposed");
+    private final JBCheckBox approvedStatusCheckBox = new JBCheckBox("Approved");
+    private final JBCheckBox rejectedStatusCheckBox = new JBCheckBox("Rejected");
     private final JBCheckBox showTransitiveDefectsCheckBox =
             new JBCheckBox("Show transitive defects");
     private final JBRadioButton plainTextResultViewRadioButton =
@@ -106,7 +114,12 @@ public final class OftTraceSettingsComponent {
         row = addLabeledComponentRow(bodyPanel, bodyConstraints, row, "Tags:", tagsField, 8);
         row = addHelpRow(bodyPanel, bodyConstraints, row, "comma-separated, empty = all");
         row = addIndentedComponentRow(bodyPanel, bodyConstraints, row, includeUntaggedCheckBox, 4);
-        row = addLabeledComponentRow(bodyPanel, bodyConstraints, row, "Defects:", showTransitiveDefectsCheckBox, 4);
+        row = addLabeledComponentRow(bodyPanel, bodyConstraints, row, "Statuses:", draftStatusCheckBox, 8);
+        row = addIndentedComponentRow(bodyPanel, bodyConstraints, row, proposedStatusCheckBox, 4);
+        row = addIndentedComponentRow(bodyPanel, bodyConstraints, row, approvedStatusCheckBox, 4);
+        row = addIndentedComponentRow(bodyPanel, bodyConstraints, row, rejectedStatusCheckBox, 4);
+        row = addHelpRow(bodyPanel, bodyConstraints, row, "at least one status required");
+        row = addLabeledComponentRow(bodyPanel, bodyConstraints, row, "Defects:", showTransitiveDefectsCheckBox, 8);
         if (showResultViewSelection) {
             row = addSectionSeparator(bodyPanel, bodyConstraints, row);
             row = addSectionHeader(bodyPanel, bodyConstraints, row, "Result view");
@@ -135,6 +148,7 @@ public final class OftTraceSettingsComponent {
                 tagsField.getText(),
                 includeUntaggedCheckBox.isSelected(),
                 showTransitiveDefectsCheckBox.isSelected(),
+                selectedStatuses(),
                 selectedResultView()
         );
     }
@@ -149,6 +163,10 @@ public final class OftTraceSettingsComponent {
         tagsField.setText(settings.tagsText());
         includeUntaggedCheckBox.setSelected(settings.includeUntagged());
         showTransitiveDefectsCheckBox.setSelected(settings.showTransitiveDefects());
+        setStatusSelected(ItemStatus.DRAFT, settings.selectedStatuses().contains(ItemStatus.DRAFT));
+        setStatusSelected(ItemStatus.PROPOSED, settings.selectedStatuses().contains(ItemStatus.PROPOSED));
+        setStatusSelected(ItemStatus.APPROVED, settings.selectedStatuses().contains(ItemStatus.APPROVED));
+        setStatusSelected(ItemStatus.REJECTED, settings.selectedStatuses().contains(ItemStatus.REJECTED));
         plainTextResultViewRadioButton.setSelected(settings.resultView() == OftTraceResultView.PLAIN_TEXT);
         testRunnerResultViewRadioButton.setSelected(settings.resultView() == OftTraceResultView.TEST_RUNNER);
         updateSelectedResourcesEnabledState();
@@ -156,6 +174,48 @@ public final class OftTraceSettingsComponent {
 
     public String validationMessagesText() {
         return validationMessagesArea.getText();
+    }
+
+    public boolean hasSelectedStatuses() {
+        return !selectedStatuses().isEmpty();
+    }
+
+    public Set<ItemStatus> selectedStatuses() {
+        final EnumSet<ItemStatus> statuses = EnumSet.noneOf(ItemStatus.class);
+        addSelectedStatus(statuses, ItemStatus.DRAFT, draftStatusCheckBox);
+        addSelectedStatus(statuses, ItemStatus.PROPOSED, proposedStatusCheckBox);
+        addSelectedStatus(statuses, ItemStatus.APPROVED, approvedStatusCheckBox);
+        addSelectedStatus(statuses, ItemStatus.REJECTED, rejectedStatusCheckBox);
+        return Set.copyOf(statuses);
+    }
+
+    @VisibleForTesting
+    public void setStatusSelected(final ItemStatus status, final boolean selected) {
+        statusCheckBox(status).setSelected(selected);
+    }
+
+    @VisibleForTesting
+    public String statusLabel(final ItemStatus status) {
+        return statusCheckBox(status).getText();
+    }
+
+    private static void addSelectedStatus(
+            final EnumSet<ItemStatus> statuses,
+            final ItemStatus status,
+            final JBCheckBox checkBox
+    ) {
+        if (checkBox.isSelected()) {
+            statuses.add(status);
+        }
+    }
+
+    private JBCheckBox statusCheckBox(final ItemStatus status) {
+        return switch (status) {
+            case DRAFT -> draftStatusCheckBox;
+            case PROPOSED -> proposedStatusCheckBox;
+            case APPROVED -> approvedStatusCheckBox;
+            case REJECTED -> rejectedStatusCheckBox;
+        };
     }
 
     private void updateSelectedResourcesEnabledState() {

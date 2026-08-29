@@ -526,13 +526,13 @@ Covers:
 Needs: impl, itest
 
 ### Use Run Configuration Templates
-`dsn~use-run-configuration-templates~1`
+`dsn~use-run-configuration-templates~2`
 
 **When** a user creates a new OpenFastTrace run configuration from a template
-**Then** the `OftRunConfigurationFactory` that matches the selected template creates a new `OftRunConfiguration` and initializes it with the pre-defined template settings.
+**Then** the `OftRunConfigurationFactory` that matches the selected template creates a new `OftRunConfiguration`, initializes it with the pre-defined scope and filters, and selects only `ItemStatus.APPROVED`.
 
 Covers:
-- `scn~use-run-configuration-templates~1`
+- `scn~use-run-configuration-templates~2`
 
 Needs: impl, itest
 
@@ -571,6 +571,30 @@ Covers:
 - `scn~filter-run-configuration-by-untagged-items~1`
 
 Needs: impl, itest
+
+### Filter Trace by Specification Item Statuses
+`dsn~filter-trace-by-item-statuses~1`
+
+**Given** an OpenFastTrace run configuration contains a non-empty set of selected `ItemStatus` values
+**When** the trace-execution service builds the OpenFastTrace import filter
+**Then** it passes the selected set to `FilterSettings.Builder.wantedStatuses(...)` so OpenFastTrace includes only specification items with a selected status.
+
+Covers:
+- `scn~filter-run-configuration-by-item-statuses~1`
+
+Needs: impl, itest, utest
+
+### Reject Run Configuration Without a Specification Item Status
+`dsn~reject-run-configuration-without-item-status~1`
+
+**Given** all specification item status checkboxes in the OpenFastTrace run configuration editor are cleared
+**When** IntelliJ validates the edited configuration for Apply or Run
+**Then** the settings editor and run configuration report a configuration error stating that at least one status must be selected, and the trace execution boundary also rejects invalid persisted state defensively.
+
+Covers:
+- `scn~reject-run-configuration-without-item-status~1`
+
+Needs: impl, itest, utest
 
 ### Test Runner as Default Run Configuration Result View
 `dsn~test-runner-as-default-run-configuration-result-view~1`

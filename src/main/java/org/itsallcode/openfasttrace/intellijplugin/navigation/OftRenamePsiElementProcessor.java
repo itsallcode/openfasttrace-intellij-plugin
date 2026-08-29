@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.Objects;
 
 // [impl->dsn~specification-item-rename~1]
+// [impl->dsn~rename-specification-item-id~1]
+// [impl->dsn~show-renamed-specification-item-id-in-navigation~1]
 public final class OftRenamePsiElementProcessor extends RenamePsiElementProcessor {
     @Override
     public boolean canProcessElement(final PsiElement element) {

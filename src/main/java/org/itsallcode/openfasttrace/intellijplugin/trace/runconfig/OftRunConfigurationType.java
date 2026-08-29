@@ -8,7 +8,7 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
 
 // [impl->dsn~openfasttrace-run-configuration~2]
-// [impl->dsn~use-run-configuration-templates~1]
+// [impl->dsn~use-run-configuration-templates~2]
 // [impl->dsn~show-transitive-defects-by-default-in-run-configuration-templates~1]
 public final class OftRunConfigurationType extends ConfigurationTypeBase {
     public static final String ID = "OpenFastTraceRunConfiguration";
