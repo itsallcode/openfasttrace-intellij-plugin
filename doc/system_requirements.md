@@ -88,6 +88,13 @@ The plugin lets users search specification items by name across the project and 
 
 Needs: req
 
+### Rename OpenFastTrace Specification Item ID
+`feat~rename-oft-specification-item~1`
+
+The plugin lets users rename a declared OpenFastTrace specification item ID through IntelliJ's native rename refactoring. Users can change the item ID from its declaration and keep the project's OFT references aligned with that rename.
+
+Needs: req
+
 ### Open OFT User Guide
 `feat~open-oft-user-guide~1`
 
@@ -255,6 +262,20 @@ The plugin opens the covered OpenFastTrace specification item when a user invoke
 
 Covers:
 - `feat~go-to-specification-item~1`
+
+Needs: scn
+
+### Rename OpenFastTrace Specification Item ID
+`req~rename-oft-specification-item-with-intellij-refactoring~1`
+
+The plugin integrates OpenFastTrace specification item declarations with IntelliJ's rename refactoring so users can rename a declaration's OpenFastTrace item ID through the IDE's standard rename action.
+
+Rationale:
+
+Users should be able to rely on IntelliJ's ordinary rename workflow instead of a custom OFT-specific rename dialog or refactoring action.
+
+Covers:
+- `feat~rename-oft-specification-item~1`
 
 Needs: scn
 
@@ -459,13 +480,15 @@ Covers:
 Needs: scn
 
 #### OpenFastTrace Run Configuration Templates
-`req~openfasttrace-run-configuration-templates~1`
+`req~openfasttrace-run-configuration-templates~2`
 
 The plugin provides pre-configured templates when creating new OpenFastTrace run configurations. These templates allow users to quickly set up common scanning scenarios. The following templates are available:
 - **User requirements**: Scans `doc/`, excludes source directories, filters for artifact types: `feat, req, scn, bconstr`.
 - **Design and above**: Scans `doc/`, excludes source directories, filters for artifact types: `feat, req, scn, bconstr, arch, dsn, constr`.
 - **Typical project**: Scans `doc/` and all project source directories, with no artifact type filtering.
 - **Unfiltered**: Scans the entire project (`.`) with no filters.
+
+Each template includes only specification items with the `Approved` status by default.
 
 Covers:
 - `feat~oft-run-configurations~2`
@@ -486,6 +509,16 @@ Needs: scn
 `req~filter-trace-by-tags~1`
 
 When using an OpenFastTrace run configuration, the plugin lets users filter the trace results by tags. Users can specify a comma-separated list of tags to focus the trace on tagged specification items and can select an `Include untagged items` checkbox below the Tags field to also include specification items without tags.
+
+Covers:
+- `feat~oft-run-configurations~2`
+
+Needs: scn
+
+#### Filter Trace by Specification Item Statuses
+`req~filter-trace-by-item-statuses~1`
+
+The OpenFastTrace run configuration provides a checkbox for each supported specification item status: `Draft`, `Proposed`, `Approved`, and `Rejected`. Users can select one or more statuses to include in the trace. The plugin saves the selection with the run configuration and requires at least one status to remain selected.
 
 Covers:
 - `feat~oft-run-configurations~2`
@@ -1038,6 +1071,42 @@ Covers:
 
 Needs: dsn
 
+### Rename OpenFastTrace Specification Item Declaration ID
+`scn~rename-oft-specification-item-declaration~1`
+
+**Given** a project contains a declared OpenFastTrace specification item `req~old_name~1`
+**When** a user invokes the IDE's standard rename refactoring on the declaration header and changes the item ID to `req~new_name~1`
+**Then** the editor updates the declaration to `req~new_name~1`
+
+Covers:
+- `req~rename-oft-specification-item-with-intellij-refactoring~1`
+
+Needs: dsn
+
+### Update OpenFastTrace References After Rename
+`scn~update-oft-references-after-rename~1`
+
+**Given** a project contains the declared specification item `req~old_name~1` and OFT references to it in `Covers:` entries and coverage tags
+**When** a user renames the declaration's OpenFastTrace item ID to `req~new_name~1` through IntelliJ's native rename workflow
+**Then** the IDE updates the resolved OFT references so they point to `req~new_name~1`
+
+Covers:
+- `req~rename-oft-specification-item-with-intellij-refactoring~1`
+
+Needs: dsn
+
+### Show Renamed OpenFastTrace Item in Navigation
+`scn~show-renamed-oft-item-in-navigation~1`
+
+**Given** a project contained `req~old_name~1` and a user renames that declaration's OpenFastTrace item ID to `req~new_name~1`
+**When** the user searches for `req~new_name~1` through `Go to Symbol` or `Search Everywhere`
+**Then** the IDE shows `req~new_name~1` as the indexed declaration and does not show `req~old_name~1` as an index-driven navigation result
+
+Covers:
+- `req~rename-oft-specification-item-with-intellij-refactoring~1`
+
+Needs: dsn
+
 ### OFT Reference Completion
 
 The following scenarios describe completion support while editing OFT references in `Covers:` sections and coverage-tag targets. Markdown declaration ID completion is described in the feature block below.
@@ -1374,14 +1443,15 @@ Covers:
 Needs: dsn
 
 ### Use Run Configuration Templates
-`scn~use-run-configuration-templates~1`
+`scn~use-run-configuration-templates~2`
 
 **Given** an IntelliJ project is open
-**When** a user creates a new OpenFastTrace run configuration from a template (e.g., "User Requirements")
-**Then** the IDE creates the configuration with the template's pre-configured scope and filters.
+**When** a user creates a new OpenFastTrace run configuration from any provided template
+**Then** the IDE creates the configuration with the template's pre-configured scope and filters
+**And** selects only the `Approved` specification item status.
 
 Covers:
-- `req~openfasttrace-run-configuration-templates~1`
+- `req~openfasttrace-run-configuration-templates~2`
 
 Needs: dsn
 
@@ -1430,6 +1500,30 @@ Needs: dsn
 
 Covers:
 - `req~filter-trace-by-tags~1`
+
+Needs: dsn
+
+### Filter Run Configuration by Specification Item Statuses
+`scn~filter-run-configuration-by-item-statuses~1`
+
+**Given** an IntelliJ project is open and an OpenFastTrace run configuration has the `Draft` and `Proposed` status checkboxes selected
+**When** a user runs that configuration
+**Then** the resulting trace includes only specification items with the `Draft` or `Proposed` status
+
+Covers:
+- `req~filter-trace-by-item-statuses~1`
+
+Needs: dsn
+
+### Reject Run Configuration Without a Specification Item Status
+`scn~reject-run-configuration-without-item-status~1`
+
+**Given** a user edits an OpenFastTrace run configuration
+**When** the user clears all four specification item status checkboxes
+**Then** the IDE reports that at least one status must be selected and prevents the invalid configuration from being applied or run.
+
+Covers:
+- `req~filter-trace-by-item-statuses~1`
 
 Needs: dsn
 

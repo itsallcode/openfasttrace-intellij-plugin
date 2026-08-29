@@ -2,12 +2,14 @@ package org.itsallcode.openfasttrace.intellijplugin.navigation;
 
 import com.intellij.patterns.ElementPattern;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.PsiReferenceRegistrar;
 import com.intellij.util.ProcessingContext;
 import org.itsallcode.openfasttrace.intellijplugin.AbstractOftPlatformTestCase;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItem;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
@@ -110,6 +112,26 @@ public class OftReferenceContributorTest extends AbstractOftPlatformTestCase {
                 specificationReferenceProvider().getReferencesByElement(requiredElementAt(3), new ProcessingContext());
 
         assertThat(references.length, is(0));
+    }
+
+    public void testGivenSpecificationIdReferenceWhenMultiResolvingThenItReturnsResults() {
+        myFixture.addFileToProject("doc/spec.md", """
+                req~target_for_multiresolve~1
+                Needs: dsn
+                """);
+        final PsiFile referencingFile = myFixture.configureByText("Main.java",
+                "// " + "[" + "impl->req~target_for_multiresolve~1]\n");
+        final OftSpecificationItem target = new OftSpecificationItem("req", "target_for_multiresolve", 1);
+        final OftSpecificationIdReference reference = new OftSpecificationIdReference(
+                referencingFile,
+                new com.intellij.openapi.util.TextRange(10, 39),
+                target,
+                true
+        );
+
+        final com.intellij.psi.ResolveResult[] results = reference.multiResolve(false);
+
+        assertThat(results.length, is(1));
     }
 
     private PsiReferenceProvider coverageTagReferenceProvider() {

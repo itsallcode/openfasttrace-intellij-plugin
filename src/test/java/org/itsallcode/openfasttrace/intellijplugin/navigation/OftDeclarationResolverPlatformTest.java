@@ -13,6 +13,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 public class OftDeclarationResolverPlatformTest extends AbstractOftPlatformTestCase {
+    public void testGivenNullElementWhenFindingDeclaredItemThenItReturnsEmpty() {
+        assertThat(OftDeclarationResolver.findDeclaredItem(null).isEmpty(), is(true));
+    }
+
     public void testGivenElementInUnsupportedFileWhenFindingDeclaredItemThenItReturnsEmpty() {
         myFixture.configureByText("Main.java", "class Main {}");
 

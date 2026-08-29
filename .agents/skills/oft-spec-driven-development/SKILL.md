@@ -12,7 +12,7 @@ Work from specification to implementation. Treat the requirements, design, and q
 Use these repository conventions unless the user explicitly says this project differs:
 
 - System requirements live in `doc/system_requirements.md` and use OpenFastTrace notation.
-- Design lives in `doc/design.md` and its referenced arc42 chapters under `doc/design/`.
+- Design lives in `doc/design/design.md` and its referenced arc42 chapters under `doc/design/`.
 - Per-issue implementation plans live in `doc/changesets/` using `<issue-number>-<short-kebab-title>.md`.
 - Quality requirements are authoritative for code, tests, tracing, and build gates. See `doc/design/quality_requirements.md`.
 
@@ -35,7 +35,7 @@ When the user gives you a new issue link, derive the work plan from:
 
 1. the issue or ticket itself
 2. `doc/system_requirements.md`
-3. `doc/design.md` and the relevant linked design chapters
+3. `../../../doc/design/design.md` and the relevant linked design chapters
 4. the quality requirements document
 5. the current code and tests
 
@@ -55,7 +55,7 @@ If the ticket conflicts with the existing specification or design, surface that 
 Before drafting or editing a changeset, inspect:
 
 - `doc/system_requirements.md`
-- `doc/design.md`
+- `../../../doc/design/design.md`
 - the specific design chapters relevant to the issue
 - `doc/design/quality_requirements.md`
 - `doc/changesets/README.md`

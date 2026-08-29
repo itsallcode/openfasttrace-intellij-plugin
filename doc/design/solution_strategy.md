@@ -26,6 +26,8 @@ Reference authoring assistance for Markdown declaration IDs, `Covers:` entries, 
 
 This strategy reduces custom code, lowers maintenance effort, and improves cross-IDE compatibility because the implementation stays aligned with the platform abstractions that JetBrains supports across products.
 
+Rename refactoring follows the same principle. The plugin treats the declaration-side OFT item ID as the rename target and relies on IntelliJ's built-in rename refactoring flow to discover and update usages. Because `Covers:` entries and coverage tags already resolve through the declaration/reference model, rename can reuse that same PSI and index machinery instead of introducing a separate OFT-specific rename engine. This keeps the user workflow close to IntelliJ's ordinary symbol rename behavior while still updating the canonical OFT item ID and its resolved references consistently.
+
 ## OFT Specification Item Index
 
 The index distinguishes rigorously between OpenFastTrace declarations and OpenFastTrace coverage occurrences. That distinction is the foundation for correct IDE navigation.
@@ -45,6 +47,8 @@ The OFT to JetBrains mapping is therefore as follows:
 - An occurrence of an OFT item ID inside an OFT coverage tag in source code is also a reference from that source location to a declared item.
 - A `Go to Symbol` result is produced from indexed declarations only. Coverage occurrences are not separate symbol results.
 
+That same mapping also applies to rename. The declaration-side OFT item ID is the symbol that users rename; coverage occurrences remain references that the platform can update through standard refactoring usage tracking. The index must therefore continue to key declarations by the canonical full OFT item ID after rename, so search and navigation expose the renamed item and the previous ID no longer appears as a declaration result.
+
 This mapping also clarifies what the index stores. The symbol-facing index stores declarations keyed by the canonical full OFT item ID. Additional lookup keys such as the name part may be stored as aliases for search convenience, but they do not replace the canonical identity. The artifact type prefix such as `req`, `dsn`, or `impl` is part of that identity and may additionally be surfaced as presentation metadata, grouping information, or a type label in result lists.
 
 For IntelliJ's search and navigation facilities, the declaration index is the source of truth for `Go to Symbol` and `Search Everywhere`. JetBrains documents [Go to Symbol](https://plugins.jetbrains.com/docs/intellij/go-to-class-and-go-to-symbol.html) as a contributor that feeds the IDE with names and matching `NavigationItem` instances, typically PSI elements. The plugin contributes declaration elements, not synthetic wrappers around arbitrary text matches and not coverage occurrences. This keeps symbol search aligned with the IDE expectation that a search result names something that is actually declared somewhere in the project.
@@ -60,6 +64,8 @@ The next increment extends that editor support with in-process OpenFastTrace tra
 This phased approach keeps the initial editor support small while still allowing the product to grow into project-level validation. It also limits the first tracing increment to established IDE concepts such as actions, progress indicators, and plain text output before the plugin invests in richer report interpretation such as Problems-view integration.
 
 The trace-path configuration increment keeps that action-centric workflow but moves trace input selection into the run configuration editor. The plugin resolves either the whole project directory or a whitelist-style input set assembled from IntelliJ source roots, IntelliJ test roots, and additional project-relative paths. This matches OpenFastTrace's input model while keeping trace configuration reproducible without relying on ad-hoc per-run path selection.
+
+Run configurations also select the specification item maturity statuses included in a trace. The plugin persists a non-empty set of OpenFastTrace `ItemStatus` values, initializes each configuration template with only `Approved`, and passes the selection to OpenFastTrace's import filter. OpenFastTrace remains responsible for interpreting and filtering item statuses; the plugin only provides configuration, validation, and transport to the library boundary.
 
 ## ANSI-Colored Trace Output
 

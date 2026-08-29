@@ -5,6 +5,8 @@ import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.LocatableConfigurationBase;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunProfileState;
+import com.intellij.execution.configurations.RuntimeConfigurationError;
+import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
@@ -14,15 +16,22 @@ import com.intellij.util.xmlb.XmlSerializer;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceResultView;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
+import org.itsallcode.openfasttrace.api.core.ItemStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jdom.Element;
 import org.jspecify.annotations.NonNull;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-// [impl->dsn~trace-configuration-integration~2]
+// [impl->dsn~trace-configuration-integration~3]
+// [impl->dsn~reject-run-configuration-without-item-status~1]
 public final class OftRunConfiguration extends LocatableConfigurationBase<OftRunProfileState> {
+    static final String STATUS_SELECTION_ERROR = "At least one specification item status must be selected.";
     private final State state = new State();
 
     public OftRunConfiguration(final Project project, final ConfigurationFactory factory, final String name) {
@@ -52,6 +61,7 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
                 state.getTagsText(),
                 state.isIncludeUntagged(),
                 state.isShowTransitiveDefects(),
+                parseStatuses(state.getSelectedStatusesText()),
                 parseResultView(state.getResultView())
         );
     }
@@ -65,7 +75,15 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
         state.setTagsText(snapshot.tagsText());
         state.setIncludeUntagged(snapshot.includeUntagged());
         state.setShowTransitiveDefects(snapshot.showTransitiveDefects());
+        state.setSelectedStatusesText(formatStatuses(snapshot.selectedStatuses()));
         state.setResultView(snapshot.resultView().name());
+    }
+
+    @Override
+    public void checkConfiguration() throws RuntimeConfigurationException {
+        if (parseStatuses(state.getSelectedStatusesText()).isEmpty()) {
+            throw new RuntimeConfigurationError(STATUS_SELECTION_ERROR);
+        }
     }
 
     @Override
@@ -108,6 +126,33 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
         }
     }
 
+    private static Set<ItemStatus> parseStatuses(final String value) {
+        if (value == null) {
+            return OftTraceSettingsSnapshot.DEFAULT_STATUSES;
+        }
+        if (value.isBlank()) {
+            return Set.of();
+        }
+        try {
+            final EnumSet<ItemStatus> statuses = EnumSet.noneOf(ItemStatus.class);
+            OftTraceSettingsSnapshot.COMMA.splitAsStream(value)
+                    .map(String::trim)
+                    .filter(status -> !status.isEmpty())
+                    .map(ItemStatus::parseString)
+                    .forEach(statuses::add);
+            return Set.copyOf(statuses);
+        } catch (final IllegalArgumentException ignored) {
+            return OftTraceSettingsSnapshot.DEFAULT_STATUSES;
+        }
+    }
+
+    private static String formatStatuses(final Set<ItemStatus> statuses) {
+        return Arrays.stream(ItemStatus.values())
+                .filter(statuses::contains)
+                .map(ItemStatus::toString)
+                .collect(Collectors.joining(","));
+    }
+
     private static final class State implements Serializable {
         private String traceScopeMode = OftTraceSettingsSnapshot.DEFAULT.scopeMode().name();
         private boolean includeSourceRoots = OftTraceSettingsSnapshot.DEFAULT.includeSourceRoots();
@@ -117,6 +162,7 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
         private String tagsText = OftTraceSettingsSnapshot.DEFAULT.tagsText();
         private boolean includeUntagged = OftTraceSettingsSnapshot.DEFAULT.includeUntagged();
         private boolean showTransitiveDefects = OftTraceSettingsSnapshot.DEFAULT.showTransitiveDefects();
+        private String selectedStatusesText = formatStatuses(OftTraceSettingsSnapshot.DEFAULT_STATUSES);
         private String resultView = OftTraceSettingsSnapshot.DEFAULT.resultView().name();
 
         public String getTraceScopeMode() {
@@ -181,6 +227,14 @@ public final class OftRunConfiguration extends LocatableConfigurationBase<OftRun
 
         public void setShowTransitiveDefects(final boolean showTransitiveDefects) {
             this.showTransitiveDefects = showTransitiveDefects;
+        }
+
+        public String getSelectedStatusesText() {
+            return selectedStatusesText;
+        }
+
+        public void setSelectedStatusesText(final String selectedStatusesText) {
+            this.selectedStatusesText = selectedStatusesText;
         }
 
         public String getResultView() {

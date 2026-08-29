@@ -25,7 +25,7 @@ Use the plugin ZIP from the release assets. Do not install the GitHub-generated 
 
 Later versions will hopefully be available via the marketplace. For now manual installation and update is unfortunately still necessary.
 
-![OpenFastTrace plugin installed in the IDE plugin settings](user_guide/images/plugin-installed.png)
+![OpenFastTrace plugin installed in the IDE plugin settings](plugin-installed.png)
 
 ### Run A Development Build
 
@@ -41,7 +41,7 @@ The sandbox IDE starts with the locally built plugin installed.
 
 Open the project that contains your OFT specification documents and source files. The plugin works on the files in the opened IntelliJ project and uses the IDE index for search, navigation, and completion.
 
-The checked-in demo project under [doc/demo/example](demo/example) is a small practice project. The guided walkthrough is in [doc/demo/plugin-demo.md](demo/plugin-demo.md).
+The checked-in demo project under [doc/demo/example](../../demo/example) is a small practice project. The guided walkthrough is in [doc/demo/plugin-demo.md](../../demo/plugin-demo.md).
 
 ## Recognize OFT Content
 
@@ -55,7 +55,7 @@ It also highlights OFT coverage tags in source, configuration, and markup files 
 
 OFT files remain ordinary project files. The plugin only adds editor support, navigation, completion, and trace execution.
 
-![Highlighted OpenFastTrace specification items in a Markdown document](user_guide/images/syntax-highlighting.png)
+![Highlighted OpenFastTrace specification items in a Markdown document](syntax-highlighting.png)
 
 ## Find Specification Items
 
@@ -67,7 +67,7 @@ Use IntelliJ symbol search to find OFT specification item declarations across th
 
 The IDE opens the specification document at the item declaration.
 
-![OpenFastTrace specification items in IntelliJ symbol search](user_guide/images/go-to-symbol.png)
+![OpenFastTrace specification items in IntelliJ symbol search](go-to-symbol.png)
 
 ## Navigate Between Items
 
@@ -102,7 +102,7 @@ The `scn` template inserts a Given-When-Then scenario skeleton. Templates with a
 
 Use basic completion while editing a Markdown declaration ID field or the OFT item text inside a `Covers:` entry to select an existing specification item ID from the project index. Markdown link destinations nested inside `Covers:` entries stay available for Markdown anchor completion instead.
 
-![OpenFastTrace reference completion in a Covers entry](user_guide/images/reference-completion.png)
+![OpenFastTrace reference completion in a Covers entry](reference-completion.png)
 
 Completion also works on the target side of a likely OFT coverage tag after the left-hand artifact type and arrow. For example, in a supported source file, start the tag and invoke completion after the arrow.
 
@@ -135,9 +135,15 @@ Use OpenFastTrace run configurations when you need multiple repeatable trace set
 
 1. Open the run/debug configuration menu.
 2. Choose `Edit Configurations...`.
-3. Add a new `OpenFastTrace` configuration.
-4. Configure the trace scope, artifact types, tags, whether to include untagged items, and the result view.
-5. Save and run the configuration from the IDE toolbar.
+3. Pick a template configuration.
+4. Add a new `OpenFastTrace` configuration.
+5. Configure
+   * trace scope
+   * artifact types
+   * tags / whether to include untagged items
+   * status filters
+6. Pick the result view.
+7. Save and run the configuration from the IDE toolbar.
 
 Run configurations provide the same trace-scope controls in the configuration editor.
 
@@ -150,7 +156,7 @@ Use run configurations for recurring workflows such as tracing only a subsystem,
 
 To include specification items without tags, select `Include untagged items` directly below the Tags field.
 
-![OpenFastTrace run configuration editor](user_guide/images/run-configurations.png)
+![OpenFastTrace run configuration editor](run-configurations.png)
 
 ## Read Trace Results
 
@@ -170,7 +176,7 @@ Transitive defects in the tree are prefixed with `↳` so they are easy to disti
 
 Plain text output is useful when you want the raw OFT report. Specification item IDs in the plain text output are clickable when the plugin can resolve them to project files.
 
-![OpenFastTrace trace result in the IntelliJ Test Runner UI](user_guide/images/test-runner-results.png)
+![OpenFastTrace trace result in the IntelliJ Test Runner UI](test-runner-results.png)
 
 ## Open The OpenFastTrace User Guide
 
@@ -178,7 +184,7 @@ Use `Help | OpenFastTrace User Guide` to open the upstream OpenFastTrace user gu
 
 Use that guide when you need details about OFT syntax, trace reports, importers, coverage tags, and command-line tracing outside the IntelliJ plugin.
 
-![OpenFastTrace user guide opened in an integrated IDE browser tab](user_guide/images/help-user-guide.png)
+![OpenFastTrace user guide opened in an integrated IDE browser tab](help-user-guide.png)
 
 ## Troubleshooting
 
@@ -214,6 +220,6 @@ Keep real product requirements, design items, implementation tags, and tests out
 
 ## Practice The Workflow
 
-For a guided live demonstration, use [doc/demo/plugin-demo.md](demo/plugin-demo.md) with the isolated example project in [doc/demo/example](demo/example).
+For a guided live demonstration, use [doc/demo/plugin-demo.md](../../demo/plugin-demo.md) with the isolated example project in [doc/demo/example](../../demo/example).
 
 The demo walks through syntax highlighting, symbol search, live templates, completion, navigation, red and green trace results, source-side coverage tags, and the Help-menu guide action.

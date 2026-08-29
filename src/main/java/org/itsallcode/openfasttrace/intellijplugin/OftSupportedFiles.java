@@ -68,6 +68,14 @@ public final class OftSupportedFiles {
         return TAG_IMPORTER_EXTENSIONS.contains(extensionOf(fileName));
     }
 
+    public static Set<String> specificationExtensions() {
+        return SPECIFICATION_EXTENSIONS;
+    }
+
+    public static Set<String> coverageTagExtensions() {
+        return TAG_IMPORTER_EXTENSIONS;
+    }
+
     private static String extensionOf(final String fileName) {
         final int lastDot = fileName.lastIndexOf('.');
         if (lastDot < 0 || lastDot == fileName.length() - 1) {

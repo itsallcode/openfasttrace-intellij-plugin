@@ -10,11 +10,14 @@ import org.itsallcode.openfasttrace.intellijplugin.OftIcons;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceResultView;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceScopeMode;
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
+import org.itsallcode.openfasttrace.api.core.ItemStatus;
+import com.intellij.execution.configurations.RuntimeConfigurationError;
 import org.jdom.Element;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -25,7 +28,7 @@ import static org.hamcrest.Matchers.sameInstance;
 // [itest->dsn~openfasttrace-run-configuration~2]
 public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
     // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
-    // [itest->dsn~trace-configuration-integration~2]
+    // [itest->dsn~trace-configuration-integration~3]
     public void testGivenNewRunConfigurationWhenReadingSnapshotThenItDefaultsToTestRunner() {
         final OftRunConfiguration configuration = createConfiguration("Test");
 
@@ -36,7 +39,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
     }
 
     // [itest->dsn~select-test-runner-trace-result-view~1]
-    // [itest->dsn~trace-configuration-integration~2]
+    // [itest->dsn~trace-configuration-integration~3]
     public void testGivenRunConfigurationWhenUpdatingFromSnapshotThenItStoresTheSettings() {
         final OftRunConfiguration configuration = createConfiguration("Test");
         final OftTraceSettingsSnapshot snapshot = new OftTraceSettingsSnapshot(
@@ -48,6 +51,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 "mvp",
                 true,
                 false,
+                Set.of(ItemStatus.DRAFT, ItemStatus.PROPOSED),
                 OftTraceResultView.TEST_RUNNER
         );
 
@@ -63,12 +67,13 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
                 () -> assertThat(stored.includeUntagged(), is(snapshot.includeUntagged())),
                 () -> assertThat(stored.showTransitiveDefects(), is(snapshot.showTransitiveDefects())),
+                () -> assertThat(stored.selectedStatuses(), is(snapshot.selectedStatuses())),
                 () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
     }
 
     // [itest->dsn~select-test-runner-trace-result-view~1]
-    // [itest->dsn~trace-configuration-integration~2]
+    // [itest->dsn~trace-configuration-integration~3]
     public void testGivenRunConfigurationWithSettingsWhenWritingAndReadingExternalThenItPreservesSettings()
             throws WriteExternalException, InvalidDataException {
         final OftRunConfiguration configuration = createConfiguration("Test");
@@ -81,6 +86,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 "mvp",
                 true,
                 false,
+                Set.of(ItemStatus.DRAFT, ItemStatus.REJECTED),
                 OftTraceResultView.TEST_RUNNER
         );
         configuration.updateFrom(snapshot);
@@ -101,12 +107,13 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
                 () -> assertThat(stored.includeUntagged(), is(snapshot.includeUntagged())),
                 () -> assertThat(stored.showTransitiveDefects(), is(snapshot.showTransitiveDefects())),
+                () -> assertThat(stored.selectedStatuses(), is(snapshot.selectedStatuses())),
                 () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
     }
 
     // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
-    // [itest->dsn~trace-configuration-integration~2]
+    // [itest->dsn~trace-configuration-integration~3]
     public void testGivenRunConfigurationWithNoStoredResultViewWhenReadingExternalThenItDefaultsToTestRunner()
             throws InvalidDataException {
         final OftRunConfiguration configuration = createConfiguration("Test");
@@ -115,12 +122,13 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
 
         Assertions.assertAll(
                 () -> assertThat(configuration.snapshot().resultView(), is(OftTraceResultView.TEST_RUNNER)),
-                () -> assertThat(configuration.snapshot().showTransitiveDefects(), is(true))
+                () -> assertThat(configuration.snapshot().showTransitiveDefects(), is(true)),
+                () -> assertThat(configuration.snapshot().selectedStatuses(), is(Set.of(ItemStatus.APPROVED)))
         );
     }
 
     // [itest->dsn~test-runner-as-default-run-configuration-result-view~1]
-    // [itest->dsn~trace-configuration-integration~2]
+    // [itest->dsn~trace-configuration-integration~3]
     public void testGivenRunConfigurationWithInvalidStoredResultViewWhenReadingExternalThenItDefaultsToTestRunner()
             throws InvalidDataException {
         final Element element = new Element("configuration");
@@ -147,7 +155,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
         );
     }
 
-    // [itest->dsn~use-run-configuration-templates~1]
+    // [itest->dsn~use-run-configuration-templates~2]
     public void testGivenRunConfigurationTypeWhenCheckingFactoriesThenItContainsAllTemplates() {
         final OftRunConfigurationType type = new OftRunConfigurationType();
         final String[] factoryNames = Arrays.stream(type.getConfigurationFactories())
@@ -162,7 +170,7 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
         ));
     }
 
-    // [itest->dsn~trace-configuration-integration~2]
+    // [itest->dsn~trace-configuration-integration~3]
     public void testGivenRunConfigurationTypeWhenCheckingFactorySingletonPolicyThenItDisallowsMultipleInstances() {
         final OftRunConfigurationType type = new OftRunConfigurationType();
 
@@ -247,8 +255,57 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
                 () -> assertThat(snapshot.artifactTypesText(), is(artifactTypesText)),
                 () -> assertThat(snapshot.tagsText(), is("")),
                 () -> assertThat(snapshot.includeUntagged(), is(false)),
-                () -> assertThat(snapshot.showTransitiveDefects(), is(showTransitiveDefects))
+                () -> assertThat(snapshot.showTransitiveDefects(), is(showTransitiveDefects)),
+                () -> assertThat(snapshot.selectedStatuses(), is(Set.of(ItemStatus.APPROVED)))
         );
+    }
+
+    // [itest->dsn~reject-run-configuration-without-item-status~1]
+    public void testGivenNoStoredStatusWhenCheckingConfigurationThenItReportsTypeAndMessage()
+            throws InvalidDataException {
+        final Element element = new Element("configuration");
+        element.addContent(new Element("option")
+                .setAttribute("name", "selectedStatusesText")
+                .setAttribute("value", ""));
+        final OftRunConfiguration configuration = createConfiguration("Test");
+        configuration.readExternal(element);
+
+        final RuntimeConfigurationError exception = Assertions.assertThrows(
+                RuntimeConfigurationError.class,
+                configuration::checkConfiguration
+        );
+
+        assertThat(exception.getMessage(), is(OftRunConfiguration.STATUS_SELECTION_ERROR));
+    }
+
+    public void testGivenInvalidStoredStatusWhenReadingExternalThenItDefaultsToApproved()
+            throws InvalidDataException {
+        final Element element = new Element("configuration");
+        element.addContent(new Element("option")
+                .setAttribute("name", "selectedStatusesText")
+                .setAttribute("value", "NOT_A_VALID_STATUS"));
+        final OftRunConfiguration configuration = createConfiguration("Test");
+        configuration.readExternal(element);
+
+        assertThat(configuration.snapshot().selectedStatuses(), is(Set.of(ItemStatus.APPROVED)));
+    }
+
+    public void testGivenInvalidStoredScopeModeWhenReadingExternalThenItDefaultsToDefaultScopeMode()
+            throws InvalidDataException {
+        final Element element = new Element("configuration");
+        element.addContent(new Element("option")
+                .setAttribute("name", "traceScopeMode")
+                .setAttribute("value", "INVALID_SCOPE"));
+        final OftRunConfiguration configuration = createConfiguration("Test");
+        configuration.readExternal(element);
+
+        assertThat(configuration.snapshot().scopeMode(), is(OftTraceSettingsSnapshot.DEFAULT.scopeMode()));
+    }
+
+    public void testGivenRunConfigurationWhenReadingSuggestedNameThenItMatchesFactoryName() {
+        final OftRunConfiguration configuration = createConfiguration("Custom Name");
+
+        assertThat(configuration.suggestedName(), is("User requirements"));
     }
 
     private OftRunConfiguration createConfiguration(final String name) {

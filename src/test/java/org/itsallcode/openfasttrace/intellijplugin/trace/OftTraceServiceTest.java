@@ -1,6 +1,7 @@
 package org.itsallcode.openfasttrace.intellijplugin.trace;
 
 import org.itsallcode.openfasttrace.core.Oft;
+import org.itsallcode.openfasttrace.api.core.ItemStatus;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.net.URLClassLoader;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 import java.util.regex.Pattern;
 
@@ -237,6 +239,45 @@ class OftTraceServiceTest {
         );
     }
 
+    // [itest->dsn~filter-trace-by-item-statuses~1]
+    @Test
+    void testGivenSingleStatusFilterWhenTracingThenItIncludesOnlyMatchingItems(
+            @TempDir final Path temporaryDirectory
+    ) throws IOException {
+        writeSpecificationItemsWithAllStatuses(temporaryDirectory);
+
+        final OftTraceResult result = new OftTraceService().traceProject(
+                OftTraceInputs.wholeProject(
+                        temporaryDirectory,
+                        List.of(),
+                        List.of(),
+                        Set.of(ItemStatus.DRAFT)
+                ),
+                OftTraceProgress.NONE
+        );
+
+        assertThat(stripAnsi(result.output()), Matchers.containsString("ok - 1 total"));
+    }
+
+    // [itest->dsn~filter-trace-by-item-statuses~1]
+    @Test
+    void testGivenMultipleStatusFiltersWhenTracingThenItIncludesAllMatchingItems(
+            @TempDir final Path temporaryDirectory
+    ) throws IOException {
+        writeSpecificationItemsWithAllStatuses(temporaryDirectory);
+
+        final OftTraceResult result = new OftTraceService().traceProject(
+                OftTraceInputs.wholeProject(
+                        temporaryDirectory,
+                        List.of(),
+                        List.of(),
+                        Set.of(ItemStatus.DRAFT, ItemStatus.PROPOSED)
+                ),
+                OftTraceProgress.NONE
+        );
+
+        assertThat(stripAnsi(result.output()), Matchers.containsString("ok - 2 total"));
+    }
 
     private static Stream<Arguments> tagFilterScenarios() {
         return Stream.of(
@@ -407,6 +448,31 @@ class OftTraceServiceTest {
 
                 ### Untagged Requirement
                 `req~untagged_requirement~1`
+                """
+        );
+    }
+
+    private void writeSpecificationItemsWithAllStatuses(final Path projectRoot) throws IOException {
+        Files.writeString(
+                projectRoot.resolve("statuses.md"),
+                """
+                ### Draft
+                `req~draft_item~1`
+
+                Status: draft
+
+                ### Proposed
+                `req~proposed_item~1`
+
+                Status: proposed
+
+                ### Approved
+                `req~approved_item~1`
+
+                ### Rejected
+                `req~rejected_item~1`
+
+                Status: rejected
                 """
         );
     }

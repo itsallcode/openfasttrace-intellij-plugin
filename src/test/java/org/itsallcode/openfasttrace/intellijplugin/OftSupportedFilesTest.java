@@ -44,6 +44,7 @@ class OftSupportedFilesTest {
             "source.php", "source.pl", "source.pm", "source.py",
             "suite.robot",
             "diagram.pu", "diagram.puml", "diagram.plantuml",
+            "documentation.dox",
             "source.r", "source.rs",
             "source.sh", "source.bash", "source.zsh",
             "source.sv", "source.v", "defs.inc",
@@ -77,6 +78,14 @@ class OftSupportedFilesTest {
         assertThat(
                 java.util.List.of(OftSupportedFiles.isSpecificationFile(null), OftSupportedFiles.isCoverageTagFile(null)),
                 is(java.util.List.of(false, false))
+        );
+    }
+
+    @Test
+    void givenSupportedFileExtensionSetsWhenReadingThenTheyContainExpectedExtensions() {
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> assertThat(OftSupportedFiles.specificationExtensions().contains("md"), is(true)),
+                () -> assertThat(OftSupportedFiles.coverageTagExtensions().contains("java"), is(true))
         );
     }
 

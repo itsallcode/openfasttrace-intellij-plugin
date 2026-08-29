@@ -59,6 +59,7 @@ public final class OftTraceService {
     // [impl->dsn~show-failing-trace-output-in-ide-output-window~1]
     // [impl->dsn~preserve-defect-count-for-unclean-trace-chain-in-output-window~1]
     // [impl->dsn~filter-trace-by-artifact-types-and-tags~1]
+    // [impl->dsn~filter-trace-by-item-statuses~1]
     public OftTraceResult traceProject(final OftTraceInputs inputs, final OftTraceProgress progress) {
         try {
             progress.phase("Importing OpenFastTrace items...", 0.15D);
@@ -67,6 +68,7 @@ public final class OftTraceService {
             if (!inputs.artifactTypes().isEmpty()) {
                 filterSettings.artifactTypes(Set.copyOf(inputs.artifactTypes()));
             }
+            filterSettings.wantedStatuses(inputs.selectedStatuses());
             final Set<String> tags = createTagFilter(inputs);
             if (!tags.isEmpty()) {
                 filterSettings.tags(tags);
