@@ -21,7 +21,10 @@ import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSyntaxCore;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftTextSpan;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 // [impl->dsn~specification-item-rename~1]
@@ -94,10 +97,15 @@ public final class OftRenamePsiElementProcessor extends RenamePsiElementProcesso
             return;
         }
         final CharSequence fileText = psiFile.getViewProvider().getContents();
+        final List<OftTextSpan> spans = new ArrayList<>();
         for (OftSpecificationItemMatch match : OftSyntaxCore.findDefinitionSpecificationItems(fileText)) {
             if (oldName.equals(match.item().id())) {
-                replaceSpan(document, match.span(), newText);
+                spans.add(match.span());
             }
+        }
+        spans.sort(Comparator.comparingInt(OftTextSpan::startOffset).reversed());
+        for (OftTextSpan span : spans) {
+            replaceSpan(document, span, newText);
         }
         PsiDocumentManager.getInstance(element.getProject()).commitDocument(document);
     }
@@ -151,12 +159,17 @@ public final class OftRenamePsiElementProcessor extends RenamePsiElementProcesso
         if (document == null) {
             return;
         }
+        final List<OftTextSpan> spans = new ArrayList<>();
         for (OftSpecificationItemMatch match : OftDeclarationResolver.findCoveredSpecificationItems(
                 psiFile.getViewProvider().getContents()
         )) {
             if (oldName.equals(match.item().id())) {
-                replaceSpan(document, match.span(), newName);
+                spans.add(match.span());
             }
+        }
+        spans.sort(Comparator.comparingInt(OftTextSpan::startOffset).reversed());
+        for (OftTextSpan span : spans) {
+            replaceSpan(document, span, newName);
         }
         PsiDocumentManager.getInstance(project).commitDocument(document);
     }
@@ -176,14 +189,19 @@ public final class OftRenamePsiElementProcessor extends RenamePsiElementProcesso
             return;
         }
         final CharSequence fileText = psiFile.getViewProvider().getContents();
+        final List<OftTextSpan> spans = new ArrayList<>();
         for (OftCoverageTagMatch match : OftSyntaxCore.findCoverageTags(fileText)) {
             if (oldName.equals(match.tag().target().id())) {
-                replaceSpan(document, match.targetSpan(), newName);
+                spans.add(match.targetSpan());
             }
             if (oldName.equals(match.tag().effectiveSource().id())
                     && isFullIdText(fileText, match.sourceSpan())) {
-                replaceSpan(document, match.sourceSpan(), newName);
+                spans.add(match.sourceSpan());
             }
+        }
+        spans.sort(Comparator.comparingInt(OftTextSpan::startOffset).reversed());
+        for (OftTextSpan span : spans) {
+            replaceSpan(document, span, newName);
         }
         PsiDocumentManager.getInstance(project).commitDocument(document);
     }

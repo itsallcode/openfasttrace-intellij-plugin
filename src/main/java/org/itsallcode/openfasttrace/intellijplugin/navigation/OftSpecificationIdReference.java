@@ -1,11 +1,11 @@
 package org.itsallcode.openfasttrace.intellijplugin.navigation;
 
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiPolyVariantReferenceBase;
 import com.intellij.psi.ResolveResult;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItem;
@@ -36,8 +36,9 @@ class OftSpecificationIdReference extends PsiPolyVariantReferenceBase<PsiElement
         if (!renameable) {
             return myElement;
         }
-        final Document document = FileDocumentManager.getInstance()
-                .getDocument(myElement.getContainingFile().getVirtualFile());
+        final Project project = myElement.getProject();
+        final PsiFile containingFile = myElement.getContainingFile();
+        final Document document = PsiDocumentManager.getInstance(project).getDocument(containingFile);
         final TextRange elementRange = myElement.getTextRange();
         if (document == null || elementRange == null) {
             return myElement;
@@ -45,7 +46,6 @@ class OftSpecificationIdReference extends PsiPolyVariantReferenceBase<PsiElement
         final TextRange rangeInElement = getRangeInElement();
         final int startOffset = elementRange.getStartOffset() + rangeInElement.getStartOffset();
         final int endOffset = elementRange.getStartOffset() + rangeInElement.getEndOffset();
-        final Project project = myElement.getProject();
         document.replaceString(startOffset, endOffset, newElementName);
         PsiDocumentManager.getInstance(project).commitDocument(document);
         return myElement;

@@ -81,6 +81,14 @@ class OftSupportedFilesTest {
         );
     }
 
+    @Test
+    void givenSupportedFileExtensionSetsWhenReadingThenTheyContainExpectedExtensions() {
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> assertThat(OftSupportedFiles.specificationExtensions().contains("md"), is(true)),
+                () -> assertThat(OftSupportedFiles.coverageTagExtensions().contains("java"), is(true))
+        );
+    }
+
     @SuppressWarnings("unchecked")
     private static List<String> tagImporterDefaultExtensions() throws ReflectiveOperationException {
         final Field field = TagImporterFactory.class.getDeclaredField("SUPPORTED_DEFAULT_EXTENSIONS");

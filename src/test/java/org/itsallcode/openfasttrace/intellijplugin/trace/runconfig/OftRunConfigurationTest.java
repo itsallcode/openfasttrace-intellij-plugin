@@ -278,6 +278,36 @@ public class OftRunConfigurationTest extends AbstractOftPlatformTestCase {
         assertThat(exception.getMessage(), is(OftRunConfiguration.STATUS_SELECTION_ERROR));
     }
 
+    public void testGivenInvalidStoredStatusWhenReadingExternalThenItDefaultsToApproved()
+            throws InvalidDataException {
+        final Element element = new Element("configuration");
+        element.addContent(new Element("option")
+                .setAttribute("name", "selectedStatusesText")
+                .setAttribute("value", "NOT_A_VALID_STATUS"));
+        final OftRunConfiguration configuration = createConfiguration("Test");
+        configuration.readExternal(element);
+
+        assertThat(configuration.snapshot().selectedStatuses(), is(Set.of(ItemStatus.APPROVED)));
+    }
+
+    public void testGivenInvalidStoredScopeModeWhenReadingExternalThenItDefaultsToDefaultScopeMode()
+            throws InvalidDataException {
+        final Element element = new Element("configuration");
+        element.addContent(new Element("option")
+                .setAttribute("name", "traceScopeMode")
+                .setAttribute("value", "INVALID_SCOPE"));
+        final OftRunConfiguration configuration = createConfiguration("Test");
+        configuration.readExternal(element);
+
+        assertThat(configuration.snapshot().scopeMode(), is(OftTraceSettingsSnapshot.DEFAULT.scopeMode()));
+    }
+
+    public void testGivenRunConfigurationWhenReadingSuggestedNameThenItMatchesFactoryName() {
+        final OftRunConfiguration configuration = createConfiguration("Custom Name");
+
+        assertThat(configuration.suggestedName(), is("User requirements"));
+    }
+
     private OftRunConfiguration createConfiguration(final String name) {
         final OftRunConfigurationType type = new OftRunConfigurationType();
         final OftRunConfigurationFactory factory = (OftRunConfigurationFactory) type.getConfigurationFactories()[0];
