@@ -14,11 +14,8 @@ import com.intellij.usageView.UsageInfo;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.itsallcode.openfasttrace.intellijplugin.OftSupportedFiles;
-import org.itsallcode.openfasttrace.intellijplugin.syntax.OftFragmentStatus;
-import org.itsallcode.openfasttrace.intellijplugin.syntax.OftCoverageTagMatch;
-import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItemMatch;
-import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSyntaxCore;
-import org.itsallcode.openfasttrace.intellijplugin.syntax.OftTextSpan;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.*;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -32,12 +29,12 @@ import java.util.Objects;
 // [impl->dsn~show-renamed-specification-item-id-in-navigation~1]
 public final class OftRenamePsiElementProcessor extends RenamePsiElementProcessor {
     @Override
-    public boolean canProcessElement(final PsiElement element) {
+    public boolean canProcessElement(final @NonNull PsiElement element) {
         return isSpecificationElement(element);
     }
 
     @Override
-    public PsiElement substituteElementToRename(final PsiElement element, final com.intellij.openapi.editor.Editor editor) {
+    public PsiElement substituteElementToRename(final @NonNull PsiElement element, final com.intellij.openapi.editor.Editor editor) {
         if (editor == null || !isSpecificationElement(element)) {
             return element;
         }
@@ -60,8 +57,8 @@ public final class OftRenamePsiElementProcessor extends RenamePsiElementProcesso
 
     @Override
     public void renameElement(
-            final PsiElement element,
-            final String newName,
+            final @NonNull PsiElement element,
+            final @NonNull String newName,
             final UsageInfo @Nullable [] usages,
             final RefactoringElementListener listener
     ) throws IncorrectOperationException {
@@ -72,7 +69,7 @@ public final class OftRenamePsiElementProcessor extends RenamePsiElementProcesso
             throw new IncorrectOperationException("Invalid OpenFastTrace specification item ID: " + newName);
         }
         final String oldName = OftDeclarationResolver.findDeclaredItem(element)
-                .map(item -> item.id())
+                .map(OftSpecificationItem::id)
                 .orElseThrow(() -> new IncorrectOperationException(
                         "OpenFastTrace specification item declaration not found at rename target."
                 ));
@@ -115,34 +112,33 @@ public final class OftRenamePsiElementProcessor extends RenamePsiElementProcesso
     }
 
     private static void updateProjectReferences(final Project project, final String oldName, final String newName) {
-        ProjectFileIndex.getInstance(project).iterateContent(file -> updateFileIfRelevant(project, file, oldName,
-                newName));
+        ProjectFileIndex.getInstance(project).iterateContent(file -> {
+            updateFileIfRelevant(project, file, oldName, newName);
+            return true;
+        });
     }
 
-    private static boolean updateFileIfRelevant(
+    private static void updateFileIfRelevant(
             final Project project,
             final VirtualFile file,
             final String oldName,
             final String newName
     ) {
         if (!file.isValid()) {
-            return true;
+            return;
         }
         if (file.isDirectory()) {
             for (VirtualFile child : file.getChildren()) {
                 updateFileIfRelevant(project, child, oldName, newName);
             }
-            return true;
+            return;
         }
         final String fileName = file.getName();
         if (OftSupportedFiles.isSpecificationFileName(fileName)) {
             updateSpecificationFile(project, file, oldName, newName);
         } else if (OftSupportedFiles.isCoverageTagFileName(fileName)) {
             updateCoverageTagFile(project, file, oldName, newName);
-        } else {
-            // Intentionally empty
         }
-        return true;
     }
 
     private static void updateSpecificationFile(
