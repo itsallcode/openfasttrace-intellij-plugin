@@ -29,7 +29,7 @@ SonarCloud status:
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=org.itsallcode.openfasttrace%3Aopenfasttrace-intellij-plugin&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=org.itsallcode.openfasttrace%3Aopenfasttrace-intellij-plugin)
 
 **User Guides**
-* [OpenFastTrace IntelliJ Plugin User Guide](doc/user_guide.md)
+* [OpenFastTrace IntelliJ Plugin User Guide](doc/user_guide/images/user_guide.md)
 * [OpenFastTrace User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide/user_guide.md)
 * [OpenFastTrace in IDE Help Action](src/main/java/org/itsallcode/openfasttrace/intellijplugin/help/OpenFastTraceUserGuide.java)
 * [OpenFastTrace IntelliJ Plugin Demo](doc/demo/plugin-demo.md)
@@ -40,14 +40,14 @@ SonarCloud status:
 
 **Information for Contributors**
 * [System Requirements](doc/system_requirements.md)
-* [Design Documentation](doc/design.md)
+* [Design Documentation](doc/design/design.md)
 * [Architecture Decisions](doc/design/architecture_decisions.md)
 * [Change Sets](doc/changesets/README.md)
 
 ## Using the Plugin
 Use an IntelliJ Platform IDE and install/build this plugin to get OFT support while editing project files.
 
-For installation and workflow instructions, see the [OpenFastTrace IntelliJ Plugin User Guide](doc/user_guide.md).
+For installation and workflow instructions, see the [OpenFastTrace IntelliJ Plugin User Guide](doc/user_guide/images/user_guide.md).
 
 The plugin currently focuses on:
 * syntax highlighting for OFT items in supported files
@@ -60,7 +60,7 @@ The plugin currently focuses on:
 * quick access to the OpenFastTrace user guide from the IDE help menu
 
 For expected behavior and scope details, see:
-* [User Guide](doc/user_guide.md)
+* [User Guide](doc/user_guide/images/user_guide.md)
 * [System Requirements](doc/system_requirements.md)
 * [Runtime View](doc/design/runtime_view.md)
 * [Plugin Demo Script](doc/demo/plugin-demo.md)
@@ -108,7 +108,7 @@ The plugin logo asset `src/main/resources/META-INF/pluginIcon.svg` and the run-c
 ## Development
 To understand product intent and implementation scope, start with:
 * [System Requirements](doc/system_requirements.md)
-* [Design](doc/design.md)
+* [Design](doc/design/design.md)
 * [Change Log](doc/changes/changelog.md)
 
 To run the local pre-release checks, including automated tests and IntelliJ

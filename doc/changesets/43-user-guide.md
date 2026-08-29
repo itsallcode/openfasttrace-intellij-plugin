@@ -2,7 +2,7 @@
 
 ## Goal
 
-Create a use-case-centric user guide for the OpenFastTrace IntelliJ plugin under `doc/user_guide.md`.
+Create a use-case-centric user guide for the OpenFastTrace IntelliJ plugin under `../user_guide/images/user_guide.md`.
 
 The guide should move the user-facing usage documentation out of the short README overview and give users a practical path for installation, authoring, navigation, tracing, run configurations, and trace-result inspection.
 
@@ -10,7 +10,7 @@ The guide should move the user-facing usage documentation out of the short READM
 
 In scope:
 
-* create `doc/user_guide.md`
+* create `../user_guide/images/user_guide.md`
 * create `doc/user_guide/images/` for screenshots referenced by the guide
 * document plugin installation and typical plugin use cases
 * reuse and expand the current README usage content where it is still accurate
@@ -22,7 +22,7 @@ Out of scope:
 * changing plugin behavior or production code
 * changing automated plugin tests
 * changing `doc/system_requirements.md`
-* changing `doc/design.md` or linked design chapters
+* changing `../design/design.md` or linked design chapters
 * changing the IDE Help-menu action that opens the upstream OpenFastTrace user guide
 * replacing or editing the upstream OpenFastTrace user guide
 * adding dependencies, build plugins, or screenshot tooling
@@ -54,12 +54,12 @@ Because `traceRequirements` scans `doc/`, wrap any illustrative OFT specificatio
 - [x] Confirm GH-43 remains a documentation-only issue and explicitly excludes code, requirement, and design changes
 - [x] Confirm the existing Open OFT User Guide requirements and design items describe the IDE action for the upstream OpenFastTrace guide, not the repository-local plugin user guide requested by GH-43
 - [x] Keep `doc/system_requirements.md` unchanged unless guide work reveals a real mismatch
-- [x] Keep `doc/design.md` and linked design chapters unchanged unless guide work reveals a real mismatch
+- [x] Keep `../design/design.md` and linked design chapters unchanged unless guide work reveals a real mismatch
 - [x] Record any discovered requirement or design mismatch before changing traced artifacts
 
 ### User Guide
 
-- [x] Create `doc/user_guide.md`
+- [x] Create `../user_guide/images/user_guide.md`
 - [x] Create `doc/user_guide/images/`
 - [x] Add an installation section for installing or running the plugin from the available project/release workflows
 - [x] Add a quick-start workflow that starts from an opened IntelliJ project containing OFT documents
@@ -86,8 +86,8 @@ Because `traceRequirements` scans `doc/`, wrap any illustrative OFT specificatio
 - [x] Add `doc/user_guide/images/run-configurations.png` showing an `OpenFastTrace` run configuration
 - [x] Add `doc/user_guide/images/test-runner-results.png` showing trace output in the IntelliJ Test Runner UI
 - [x] Add `doc/user_guide/images/help-user-guide.png` showing the Help-menu user-guide action or the opened guide tab
-- [x] Reference the screenshots from the relevant sections in `doc/user_guide.md`
-- [x] Verify each screenshot path referenced from `doc/user_guide.md` resolves correctly in GitHub Markdown
+- [x] Reference the screenshots from the relevant sections in `../user_guide/images/user_guide.md`
+- [x] Verify each screenshot path referenced from `../user_guide/images/user_guide.md` resolves correctly in GitHub Markdown
 - [x] Keep screenshots focused on plugin UI and avoid unrelated IDE state or local user data
 
 ### README Update
@@ -100,7 +100,7 @@ Because `traceRequirements` scans `doc/`, wrap any illustrative OFT specificatio
 ### Verification
 
 - [x] Run `./gradlew traceRequirements` and keep the repository OpenFastTrace trace clean
-- [x] Verify examples in `doc/user_guide.md` do not create imported trace artifacts unless intentionally excluded from tracing
+- [x] Verify examples in `../user_guide/images/user_guide.md` do not create imported trace artifacts unless intentionally excluded from tracing
 - [x] Verify all new README and user-guide links resolve locally
 - [x] Verify all referenced images exist under `doc/user_guide/images/`
 - [x] Confirm no dependency-policy review is needed because the change adds no third-party libraries

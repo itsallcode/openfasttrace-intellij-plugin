@@ -50,7 +50,7 @@ Because `traceRequirements` scans `doc/`, the committed demo files must not leav
 
 - [x] Confirm GH-26 remains a documentation-only issue and is fully covered by existing product requirements for live templates, navigation, tracing, coverage tags, and user-guide access
 - [x] Confirm no change is needed in `doc/system_requirements.md`
-- [x] Confirm no change is needed in `doc/design.md` or linked design chapters
+- [x] Confirm no change is needed in `../design/design.md` or linked design chapters
 - [x] Confirm implementation findings did not contradict those requirements and design decisions
 
 ### Demo Project

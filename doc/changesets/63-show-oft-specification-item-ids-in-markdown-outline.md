@@ -83,7 +83,7 @@ Extend the Markdown-specific editor support rather than the project declaration 
 
 ### Update User Documentation
 
-- [ ] Update `README.md` and `doc/user_guide.md` to explain the Markdown Structure / File Structure outline, header placement, declaration-only scope, and navigation behavior.
+- [ ] Update `README.md` and `../user_guide/images/user_guide.md` to explain the Markdown Structure / File Structure outline, header placement, declaration-only scope, and navigation behavior.
 
 ## Version And Changelog Update
 
