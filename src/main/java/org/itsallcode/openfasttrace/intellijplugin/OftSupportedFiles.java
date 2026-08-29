@@ -29,6 +29,7 @@ public final class OftSupportedFiles {
             "robot",
             "r",
             "rs",
+            "dox",
             "sv", "v", "inc",
             "sh", "bash", "zsh",
             "swift",
@@ -52,6 +53,11 @@ public final class OftSupportedFiles {
 
     public static boolean isSpecificationFileName(final String fileName) {
         return SPECIFICATION_EXTENSIONS.contains(extensionOf(fileName));
+    }
+
+    public static boolean isMarkdownSpecificationFileName(final String fileName) {
+        final String extension = extensionOf(fileName);
+        return "md".equals(extension) || "markdown".equals(extension);
     }
 
     public static boolean isCoverageTagFile(final VirtualFile file) {

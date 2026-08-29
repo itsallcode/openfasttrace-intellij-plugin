@@ -103,7 +103,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.itsallcode.openfasttrace:openfasttrace:4.5.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace:4.9.0")
 
     intellijPlatform {
         intellijIdea("2026.1.3")

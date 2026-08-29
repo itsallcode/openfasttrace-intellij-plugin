@@ -3,8 +3,8 @@ package org.itsallcode.openfasttrace.intellijplugin.trace.runconfig;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.execution.configurations.RunConfigurationSingletonPolicy;
 import com.intellij.openapi.project.Project;
-import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceSettingsSnapshot;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -33,6 +33,11 @@ public final class OftRunConfigurationFactory extends ConfigurationFactory {
         final OftRunConfiguration configuration = new OftRunConfiguration(project, this, getName());
         this.initializer.accept(configuration);
         return configuration;
+    }
+
+    @Override
+    public @NotNull RunConfigurationSingletonPolicy getSingletonPolicy() {
+        return RunConfigurationSingletonPolicy.SINGLE_INSTANCE_ONLY;
     }
 
     @Override

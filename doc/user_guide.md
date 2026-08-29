@@ -4,7 +4,7 @@ This guide explains how to install and use the OpenFastTrace IntelliJ plugin in 
 
 The plugin helps you author OpenFastTrace (OFT) documents, navigate between specification items and coverage links, and run OFT traces without leaving the IDE.
 
-For the OFT syntax and tracing concepts themselves, see the [OpenFastTrace User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md).
+For the OFT syntax and tracing concepts themselves, see the [OpenFastTrace User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide/user_guide.md).
 
 ## Install The Plugin
 
@@ -100,7 +100,7 @@ The `scn` template inserts a Given-When-Then scenario skeleton. Templates with a
 
 ## Complete OFT References
 
-Use basic completion while editing a `Covers:` entry to select an existing specification item ID from the project index.
+Use basic completion while editing a Markdown declaration ID field or the OFT item text inside a `Covers:` entry to select an existing specification item ID from the project index. Markdown link destinations nested inside `Covers:` entries stay available for Markdown anchor completion instead.
 
 ![OpenFastTrace reference completion in a Covers entry](user_guide/images/reference-completion.png)
 
@@ -136,7 +136,7 @@ Use OpenFastTrace run configurations when you need multiple repeatable trace set
 1. Open the run/debug configuration menu.
 2. Choose `Edit Configurations...`.
 3. Add a new `OpenFastTrace` configuration.
-4. Configure the trace scope, artifact types, tags, and result view.
+4. Configure the trace scope, artifact types, tags, whether to include untagged items, and the result view.
 5. Save and run the configuration from the IDE toolbar.
 
 Run configurations provide the same trace-scope controls in the configuration editor.
@@ -147,6 +147,8 @@ They also let you choose the result view:
 * `Plain text output` shows the rendered OFT report in an IDE output tab with ANSI colors preserved.
 
 Use run configurations for recurring workflows such as tracing only a subsystem, tracing only requirement and design layers, or tracing a document set with a specific tag.
+
+To include specification items without tags, select `Include untagged items` directly below the Tags field.
 
 ![OpenFastTrace run configuration editor](user_guide/images/run-configurations.png)
 
@@ -163,6 +165,8 @@ Use it to:
 * navigate from result nodes back to source files, specification declarations, and source-side coverage tags
 
 Clean items are shown as passed tests. Trace defects are shown as failed tests. The top-level trace result is marked failed when OFT reports trace defects.
+
+Transitive defects in the tree are prefixed with `↳` so they are easy to distinguish from direct defects.
 
 Plain text output is useful when you want the raw OFT report. Specification item IDs in the plain text output are clickable when the plugin can resolve them to project files.
 

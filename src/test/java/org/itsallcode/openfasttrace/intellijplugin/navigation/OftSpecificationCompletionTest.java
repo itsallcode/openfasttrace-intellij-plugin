@@ -8,9 +8,73 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 
 public class OftSpecificationCompletionTest extends AbstractOftPlatformTestCase {
+    // [itest->dsn~complete-markdown-specification-item-id-in-declaration-id-field~1]
+    public void testGivenMarkdownDeclarationIdFieldWhenBasicCompletionInvokesThenItSuggestsDeclaredSpecificationIds() {
+        myFixture.addFileToProject("doc/markdown-completion.md", """
+                req~markdown-completion-target.feature~1
+                Needs: scn
+                """);
+        myFixture.configureByText("current.md", """
+                ### Markdown Completion
+                req~markdown-completion-<caret>source.feature~1
+
+                Body text.
+                """);
+
+        final LookupElement[] elements = myFixture.completeBasic();
+
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> assertThat(elements.length, is(2)),
+                () -> assertThat(
+                        myFixture.getLookupElementStrings(),
+                        hasItems(
+                                "req~markdown-completion-source.feature~1",
+                                "req~markdown-completion-target.feature~1"
+                        )
+                )
+        );
+    }
+
+    // [itest->dsn~complete-markdown-specification-item-id-in-declaration-id-field~1]
+    public void testGivenMarkdownTitleFieldWhenBasicCompletionInvokesThenItDoesNotSuggestSpecificationIds() {
+        myFixture.addFileToProject("doc/markdown-completion.md", """
+                req~markdown-completion-target.feature~1
+                Needs: scn
+                """);
+        myFixture.configureByText("current.md", """
+                ### Markdown Completio<caret>n
+                req~markdown-completion-target.feature~1
+
+                Body text.
+                """);
+
+        myFixture.completeBasic();
+
+        assertThat(lookupStrings(), is(empty()));
+    }
+
+    // [itest->dsn~complete-markdown-specification-item-id-in-declaration-id-field~1]
+    public void testGivenMarkdownBodyTextWhenBasicCompletionInvokesThenItDoesNotSuggestSpecificationIds() {
+        myFixture.addFileToProject("doc/markdown-completion.md", """
+                req~markdown-completion-target.feature~1
+                Needs: scn
+                """);
+        myFixture.configureByText("current.md", """
+                ### Markdown Completion
+                req~markdown-completion-target.feature~1
+
+                Body text <caret>outside the declaration ID field.
+                """);
+
+        myFixture.completeBasic();
+
+        assertThat(lookupStrings(), is(empty()));
+    }
+
     // [itest->dsn~complete-specification-item-id-in-covers-section~1]
     public void testGivenCoversSectionWhenBasicCompletionInvokesThenItSuggestsDeclaredSpecificationIds() {
         myFixture.addFileToProject("doc/spec.md", """

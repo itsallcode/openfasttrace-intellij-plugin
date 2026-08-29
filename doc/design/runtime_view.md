@@ -251,24 +251,52 @@ Needs: impl, itest
 
 ## Completion
 
+### Complete Markdown Specification Item ID in Declaration ID Field
+`dsn~complete-markdown-specification-item-id-in-declaration-id-field~1`
+
+**Given** a supported Markdown specification document contains a specification-item declaration and the caret is in the actual declaration ID field
+**When** a user invokes IntelliJ basic completion while editing that declaration ID
+**Then** the completion component confirms the Markdown declaration-ID context, loads declared specification item IDs from the declaration index, and shows the ordered suggestions in the standard IDE completion popup
+**And** the same Markdown context detector rejects the title field, other non-ID text, and a still-active live-template title placeholder until the caret reaches the actual declaration ID field.
+
+Covers:
+- `scn~complete-markdown-specification-item-id-in-declaration-id-field~1`
+
+Needs: impl, itest
+
 ### Complete Specification Item ID in Covers Section
 `dsn~complete-specification-item-id-in-covers-section~1`
 
 **Given** a supported specification document contains a `Covers:` entry and the opened project already indexes declared OpenFastTrace specification items
 **When** a user invokes IntelliJ basic completion while editing an OFT item ID in that `Covers:` entry
-**Then** the completion component confirms that the caret is inside a `Covers:` reference, loads declared specification item IDs from the declaration index, ranks them by full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches, and shows the ordered suggestions in the standard IDE completion popup.
+**Then** the completion component confirms that the caret is inside a `Covers:` reference, loads declared specification item IDs from the declaration index
+**And** ranks them by full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches
+**And** shows the ordered suggestions in the standard IDE completion popup.
 
 Covers:
 - `scn~complete-specification-item-id-in-covers-section~1`
 
 Needs: impl, itest
 
+### Suppress Specification Item ID Completion in Markdown Link Targets Inside Covers Entries
+`dsn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+**Given** a supported specification document contains a `Covers:` entry with a Markdown link and the caret is inside the link destination
+**When** a user invokes IntelliJ basic completion there
+**Then** the completion component does not add OpenFastTrace specification item ID suggestions inside that Markdown link destination so anchor completion can remain in control.
+
+Covers:
+- `scn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+Needs: impl, itest, utest
+
 ### Complete Specification Item ID in Active Live Template Covers Field
 `dsn~complete-specification-item-id-in-active-live-template-covers-field~1`
 
 **Given** a bundled OFT live template is active at a `COVERED` placeholder under `Covers:` and the opened project already indexes declared OpenFastTrace specification items
 **When** a user invokes IntelliJ basic completion in that placeholder before the live-template session ends
-**Then** the completion component reads the active editor document, handles the request like any other `Covers:` reference by reading declared specification item IDs from the declaration index, and shows the matching suggestions in the standard IDE completion popup without ending the live-template session.
+**Then** the completion component reads the active editor document, handles the request like any other `Covers:` reference by reading declared specification item IDs from the declaration index
+**And** shows the matching suggestions in the standard IDE completion popup without ending the live-template session.
 
 Covers:
 - `scn~complete-specification-item-id-in-active-live-template-covers-field~1`
@@ -401,6 +429,42 @@ Covers:
 
 Needs: impl, itest
 
+### Show Transitive Defects by Default in Run Configuration Templates
+`dsn~show-transitive-defects-by-default-in-run-configuration-templates~1`
+
+**Given** the run-configuration templates initialize a new OpenFastTrace run configuration
+**When** the configuration editor opens for one of those templates
+**Then** the `Show transitive defects` checkbox is selected so the default template behavior keeps transitive defects visible.
+
+Covers:
+- `scn~show-transitive-defects-by-default-in-run-configuration-templates~1`
+
+Needs: impl, itest
+
+### Hide Transitive Defects in Test Runner UI
+`dsn~hide-transitive-defects-in-test-runner-ui~1`
+
+**Given** the trace test-runner presentation receives a structured OpenFastTrace trace result and the saved run-configuration setting disables transitive defects
+**When** it maps the trace result to SM test runner nodes
+**Then** it omits specification-item nodes that are identified as transitive defects while still creating nodes for direct defects and their trace links.
+
+Covers:
+- `scn~hide-transitive-defects-in-test-runner-ui~1`
+
+Needs: impl, itest
+
+### Hide Transitive Defects in Plain Text Output
+`dsn~hide-transitive-defects-in-plain-text-output~1`
+
+**Given** the plain-text trace presentation receives a structured OpenFastTrace trace result and the saved run-configuration setting disables transitive defects
+**When** it prepares the OFT report settings for the plain-text renderer
+**Then** it passes the saved setting to the OpenFastTrace base library's report filter option so the rendered report omits transitive defects while still preserving direct-defect information and the existing summary for the remaining trace.
+
+Covers:
+- `scn~hide-transitive-defects-in-plain-text-output~1`
+
+Needs: impl, itest
+
 ### Trace Selected Project Resources
 `dsn~trace-selected-project-resources~2`
 
@@ -476,7 +540,7 @@ Needs: impl, itest
 `dsn~openfasttrace-run-configuration~2`
 
 **When** a user creates or edits an OpenFastTrace run configuration
-**Then** the plugin uses the IntelliJ Run Configuration API (type, factory, configuration) to persist the name, scope, additional paths, artifact type filters, and tag filters. The plugin registers multiple factories to provide pre-configured templates for common scanning scenarios.
+**Then** the plugin uses the IntelliJ Run Configuration API (type, factory, configuration) to persist the name, scope, additional paths, artifact type filters, tag filters, and the `Include untagged items` checkbox. The plugin registers multiple factories to provide pre-configured templates for common scanning scenarios.
 
 Covers:
 - `scn~create-and-run-openfasttrace-run-configuration~1`
@@ -499,11 +563,12 @@ Needs: impl, itest
 `dsn~filter-trace-by-artifact-types-and-tags~1`
 
 **When** the trace-execution service invokes the OpenFastTrace library
-**Then** it passes the configured artifact type and tag filters from the run configuration to the OpenFastTrace engine to restrict the trace result.
+**Then** it passes the configured artifact type and tag filters, together with the `Include untagged items` setting, from the run configuration to the OpenFastTrace engine to restrict the trace result.
 
 Covers:
 - `scn~filter-run-configuration-by-artifact-types~1`
 - `scn~filter-run-configuration-by-tags~1`
+- `scn~filter-run-configuration-by-untagged-items~1`
 
 Needs: impl, itest
 
@@ -544,26 +609,26 @@ Covers:
 Needs: impl, itest
 
 ### Show Trace Source Files as Test Runner Suites
-`dsn~show-trace-source-files-as-test-runner-suites~1`
+`dsn~show-trace-source-files-as-test-runner-suites~2`
 
 **Given** the trace test-runner presentation receives a structured OpenFastTrace trace result
 **When** it builds the SM test tree
-**Then** it groups traced specification items by source file and creates one SM test suite node for each source file, using a project-local suite label for source paths below the opened project directory.
+**Then** it groups traced specification items by source file and creates one SM test suite node for each source file, using a project-local suite label for source paths below the opened project directory, without reporting source-file suites as logical results or progress events.
 
 Covers:
-- `scn~show-trace-source-files-as-test-runner-suites~1`
+- `scn~show-trace-source-files-as-test-runner-suites~2`
 
 Needs: impl, itest
 
 ### Show Trace Specification Items as Test Runner Tests
-`dsn~show-trace-specification-items-as-test-runner-tests~1`
+`dsn~show-trace-specification-items-as-test-runner-tests~2`
 
 **Given** the trace test-runner presentation has created a source-file suite
 **When** it maps traced specification items from that source file
-**Then** it creates one SM test node for each specification item below that source-file suite.
+**Then** it creates one SM test node and one logical result for each visible specification item below that source-file suite.
 
 Covers:
-- `scn~show-trace-specification-items-as-test-runner-tests~1`
+- `scn~show-trace-specification-items-as-test-runner-tests~2`
 
 Needs: impl, itest
 
@@ -604,14 +669,14 @@ Covers:
 Needs: impl, itest
 
 ### Show Trace Links as Test Runner Sub-Tests
-`dsn~show-trace-links-as-test-runner-sub-tests~1`
+`dsn~show-trace-links-as-test-runner-sub-tests~2`
 
 **Given** the trace test-runner presentation has created a specification-item test node
 **When** it maps incoming and outgoing trace links connected to that item from the structured trace
-**Then** it creates one SM sub-test node for each trace link below the specification-item test node.
+**Then** it creates one SM detail child node for each trace link below the specification-item test node without adding a logical result or progress event.
 
 Covers:
-- `scn~show-trace-links-as-test-runner-sub-tests~1`
+- `scn~show-trace-links-as-test-runner-sub-tests~2`
 
 Needs: impl, itest
 
@@ -624,6 +689,18 @@ Needs: impl, itest
 
 Covers:
 - `scn~show-specification-item-status-in-test-runner-ui~2`
+
+Needs: impl, itest
+
+### Mark Transitive Defects in Test Runner UI
+`dsn~mark-transitive-defects-in-test-runner~1`
+
+**Given** the trace test-runner presentation creates a specification-item test node for a defective item that is identified as a transitive defect
+**When** it derives the node name from the OpenFastTrace trace result
+**Then** it prefixes the visible node name with `↳` so transitive defects are visually distinct in the tree.
+
+Covers:
+- `scn~mark-transitive-defects-in-test-runner~1`
 
 Needs: impl, itest
 
@@ -664,14 +741,26 @@ Covers:
 Needs: impl, itest
 
 ### Map Specification Item Trace Status to Test Runner Status
-`dsn~map-specification-item-trace-status-to-test-runner-status~1`
+`dsn~map-specification-item-trace-status-to-test-runner-status~2`
 
 **Given** the trace test-runner presentation has created a specification-item test node
-**When** the OpenFastTrace trace result marks that specification item as clean or defective
-**Then** it reports the SM test node as passed for a clean item and failed for a defective item.
+**When** the OpenFastTrace trace result marks that specification item or one of its visible trace links as defective
+**Then** it reports one logical result for the item as passed when both the item and its visible links are clean, or failed otherwise, while preserving the status of each visible trace-link detail node.
 
 Covers:
-- `scn~map-specification-item-trace-status-to-test-runner-status~1`
+- `scn~map-specification-item-trace-status-to-test-runner-status~2`
+
+Needs: impl, itest
+
+### Count Only Specification Items in Test Runner Results
+`dsn~count-only-specification-items-in-test-runner-results~1`
+
+**Given** the trace test-runner presentation receives a clean structured OpenFastTrace trace result with source-file suites, visible specification-item nodes, and visible trace-link detail nodes
+**When** it reports the trace result to the IntelliJ Test Runner
+**Then** it starts a custom progress category whose total and completed events are emitted only for visible specification-item nodes, so the displayed total matches those items and reaches 100% when all are clean.
+
+Covers:
+- `scn~count-only-specification-items-in-test-runner-results~1`
 
 Needs: impl, itest
 

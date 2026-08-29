@@ -11,7 +11,11 @@ import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestTree.OftTra
 import org.itsallcode.openfasttrace.intellijplugin.trace.OftTraceTestTree.OftTraceSuiteNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,12 +24,13 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 
 class OftTraceTestTreeMapperTest {
     private static final String PROJECT_BASE = "/workspace/openfasttrace-intellij-plugin";
 
-    // [itest->dsn~trace-test-runner-presentation~1]
-    // [itest->dsn~show-trace-source-files-as-test-runner-suites~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
+    // [itest->dsn~show-trace-source-files-as-test-runner-suites~2]
     // [itest->dsn~roll-up-source-file-suite-trace-status~1]
     // [itest->dsn~roll-up-top-level-trace-status~1]
     @Test
@@ -51,8 +56,8 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
-    // [itest->dsn~show-trace-source-files-as-test-runner-suites~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
+    // [itest->dsn~show-trace-source-files-as-test-runner-suites~2]
     // [itest->dsn~navigate-from-test-runner-source-files~1]
     @Test
     void testGivenAbsoluteTraceItemPathsBelowProjectWhenMappingThenItCreatesSuitesWithProjectLocalPaths() {
@@ -95,16 +100,16 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
-    // [itest->dsn~show-trace-specification-items-as-test-runner-tests~1]
-    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
+    // [itest->dsn~show-trace-specification-items-as-test-runner-tests~2]
+    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~2]
     // [itest->dsn~show-specification-item-title-in-test-runner-ui~2]
     // [itest->dsn~show-specification-item-id-in-test-runner-details~1]
     // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
     // [itest->dsn~show-trace-link-status-in-test-runner-ui~2]
     // [itest->dsn~show-trace-link-direction-in-test-runner-ui~1]
     // [itest->dsn~show-unicode-trace-link-direction-in-test-runner-ui~1]
-    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
+    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~2]
     // [itest->dsn~map-trace-link-status-to-test-runner-status~1]
     // [itest->dsn~show-trace-link-id-details-in-test-runner-ui~1]
     @Test
@@ -135,7 +140,6 @@ class OftTraceTestTreeMapperTest {
                 () -> assertThat(requirementNode.details().detailText(),
                         containsString("Specification item ID: req~covered_requirement~1")),
                 () -> assertThat(requirementNode.details().detailText(), containsString("Trace status: covered")),
-                () -> assertThat(requirementNode.testCount(), is(2)),
                 () -> assertThat(requirementNode.links(), hasSize(1)),
                 () -> assertThat(requirementNode.links().getFirst().name(),
                         is("⊙← Covered requirement test")),
@@ -153,8 +157,8 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
-    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
+    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~2]
     // [itest->dsn~show-trace-link-direction-in-test-runner-ui~1]
     // [itest->dsn~show-unicode-trace-link-direction-in-test-runner-ui~1]
     @Test
@@ -211,7 +215,7 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
     // [itest->dsn~sort-specification-items-in-test-runner-ui~1]
     @Test
     void testGivenUnsortedSpecificationItemsInOneSourceFileWhenMappingThenItSortsItemsByIdParts() {
@@ -237,12 +241,12 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
-    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
+    // [itest->dsn~show-trace-links-as-test-runner-sub-tests~2]
     // [itest->dsn~show-trace-link-status-in-test-runner-ui~2]
     // [itest->dsn~show-trace-link-direction-in-test-runner-ui~1]
     // [itest->dsn~show-unicode-trace-link-direction-in-test-runner-ui~1]
-    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
+    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~2]
     // [itest->dsn~map-trace-link-status-to-test-runner-status~1]
     // [itest->dsn~roll-up-source-file-suite-trace-status~1]
     // [itest->dsn~roll-up-top-level-trace-status~1]
@@ -275,9 +279,68 @@ class OftTraceTestTreeMapperTest {
         );
     }
 
-    // [itest->dsn~trace-test-runner-presentation~1]
+    // [itest->dsn~mark-transitive-defects-in-test-runner~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
+    // [itest->dsn~mark-transitive-defects-in-test-runner~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
     // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
-    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~1]
+    // [itest->dsn~show-specification-item-defect-details-in-test-runner-ui~1]
+    // [itest->dsn~roll-up-source-file-suite-trace-status~1]
+    // [itest->dsn~roll-up-top-level-trace-status~1]
+    @Test
+    void testGivenTransitiveDefectsWhenMappingThenItPrefixesTheirNodeNames(@TempDir final Path temporaryDirectory)
+            throws IOException {
+        writeUncleanTraceChainProject(temporaryDirectory);
+
+        final Trace trace = new OftTraceService().traceProject(
+                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
+                OftTraceProgress.NONE
+        ).trace().orElseThrow();
+        final OftTraceTestTree tree = OftTraceTestTreeMapper.map(trace);
+        final OftTraceSuiteNode suite = tree.suites().getFirst();
+
+        Assertions.assertAll(
+                () -> assertThat(
+                        suite.items().stream()
+                                .map(OftTraceItemNode::name)
+                                .toList(),
+                        hasSize(3)
+                ),
+                () -> assertThat(suite.items().get(0).name(), is("Design (uncovered)")),
+                () -> assertThat(suite.items().get(1).name(), startsWith("↳ Feature")),
+                () -> assertThat(suite.items().get(2).name(), startsWith("↳ Requirement")),
+                () -> assertThat(itemNamedStartingWith(suite, "↳ Requirement").details().failureMessage(),
+                        is("Transitive trace defect. The problem is not in this item but in one it depends on.")),
+                () -> assertThat(itemNamedStartingWith(suite, "↳ Requirement").details().detailText(),
+                        containsString("Fix the specification items this one depends on.")),
+                () -> assertThat(tree.failed(), is(true))
+        );
+    }
+
+    // [itest->dsn~hide-transitive-defects-in-test-runner-ui~1]
+    // [itest->dsn~trace-test-runner-presentation~2]
+    @Test
+    void testGivenTransitiveDefectsWhenMappingWithHiddenTransitivesThenItOmitsThem(@TempDir final Path temporaryDirectory)
+            throws IOException {
+        writeUncleanTraceChainProject(temporaryDirectory);
+
+        final Trace trace = new OftTraceService().traceProject(
+                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
+                OftTraceProgress.NONE
+        ).trace().orElseThrow();
+        final OftTraceTestTree tree = OftTraceTestTreeMapper.map(trace, null, false);
+        final OftTraceSuiteNode suite = tree.suites().getFirst();
+
+        Assertions.assertAll(
+                () -> assertThat(suite.items(), hasSize(1)),
+                () -> assertThat(suite.items().getFirst().name(), is("Design (uncovered)")),
+                () -> assertThat(tree.failed(), is(true))
+        );
+    }
+
+    // [itest->dsn~trace-test-runner-presentation~2]
+    // [itest->dsn~show-specification-item-status-in-test-runner-ui~2]
+    // [itest->dsn~map-specification-item-trace-status-to-test-runner-status~2]
     // [itest->dsn~show-specification-item-defect-details-in-test-runner-ui~1]
     @Test
     void testGivenUncoveredRequirementWhenMappingThenItCreatesFailedItemNodeWithUncoveredStatus() {
@@ -315,6 +378,13 @@ class OftTraceTestTreeMapperTest {
         return items.getFirst();
     }
 
+    private static OftTraceItemNode itemNamedStartingWith(final OftTraceSuiteNode suite, final String itemNamePrefix) {
+        return suite.items().stream()
+                .filter(item -> item.name().startsWith(itemNamePrefix))
+                .findFirst()
+                .orElseThrow();
+    }
+
     private static Trace trace(final LinkedSpecificationItem... items) {
         final List<LinkedSpecificationItem> traceItems = Arrays.asList(items);
         return Trace.builder()
@@ -323,6 +393,35 @@ class OftTraceTestTreeMapperTest {
                         .filter(LinkedSpecificationItem::isDefect)
                         .toList())
                 .build();
+    }
+
+    private static void writeUncleanTraceChainProject(final Path projectRoot) throws IOException {
+        final Path docDirectory = Files.createDirectories(projectRoot.resolve("doc"));
+        Files.writeString(
+                docDirectory.resolve("trace.md"),
+                """
+                ### Feature
+                `feat~chain_feature~1`
+
+                Needs: req
+
+                ### Requirement
+                `req~chain_requirement~1`
+
+                Covers:
+                - `feat~chain_feature~1`
+
+                Needs: dsn
+
+                ### Design
+                `dsn~chain_design~1`
+
+                Covers:
+                - `req~chain_requirement~1`
+
+                Needs: impl
+                """
+        );
     }
 
     private static LinkedSpecificationItem item(

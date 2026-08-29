@@ -52,7 +52,7 @@ The plugin should package one repository-owned OFT live-template definition file
 
 - [x] Copy the existing OFT live-template XML from `openfasttrace-ide-templates` into a plugin-owned resource location under `src/main/resources`
 - [x] Add the missing OFT scenario live template to the bundled XML and keep the naming, placeholders, and OFT notation aligned with the existing template set
-- [x] Register the bundled live-template resource in [plugin.xml](/home/seb/git/openfasttrace-intellij-plugin/src/main/resources/META-INF/plugin.xml)
+- [x] Register the bundled live-template resource in `plugin`.
 - [x] Confirm the Gradle plugin packaging includes the live-template resource in the built plugin artifact without introducing new dependencies
 
 ### Automated Verification

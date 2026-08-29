@@ -30,7 +30,7 @@ SonarCloud status:
 
 **User Guides**
 * [OpenFastTrace IntelliJ Plugin User Guide](doc/user_guide.md)
-* [OpenFastTrace User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md)
+* [OpenFastTrace User Guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide/user_guide.md)
 * [OpenFastTrace in IDE Help Action](src/main/java/org/itsallcode/openfasttrace/intellijplugin/help/OpenFastTraceUserGuide.java)
 * [OpenFastTrace IntelliJ Plugin Demo](doc/demo/plugin-demo.md)
 
@@ -52,7 +52,7 @@ For installation and workflow instructions, see the [OpenFastTrace IntelliJ Plug
 The plugin currently focuses on:
 * syntax highlighting for OFT items in supported files
 * navigation support (`Go To Declaration`, symbol search, and related navigation paths)
-* completion for existing specification item IDs while editing `Covers:` entries in supported specification documents and coverage-tag targets in files supported by the OpenFastTrace Tag Importer
+* completion for existing specification item IDs while editing Markdown declaration ID fields, `Covers:` entries in supported specification documents, and coverage-tag targets in files supported by the OpenFastTrace Tag Importer
 * bundled OFT live templates for common specification items, including a scenario template
 * project-wide or selected-resource OFT tracing through custom OpenFastTrace run configurations, including pre-configured templates
 * clickable specification item IDs directly from the trace output window, including generated IDs created from coverage tags
@@ -84,13 +84,13 @@ After the sandbox IDE opens a project, configure trace scope under `Settings | T
 
 ## Run Configurations
 
-You can create and run a dedicated `OpenFastTrace` run configuration from the IDE's run/debug toolbar. The plugin provides pre-configured templates (e.g., "User requirements", "Design and above", "Typical project", "Unfiltered") to quickly set up common scanning scenarios. The plugin traces the configured inputs in the background and shows the result in IntelliJ's Test Runner UI by default. The result tree groups source files, specification items, and trace links with pass/fail status and navigation back to source.
+You can create and run a dedicated `OpenFastTrace` run configuration from the IDE's run/debug toolbar. The plugin provides pre-configured templates (e.g., "User requirements", "Design and above", "Typical project", "Unfiltered") to quickly set up common scanning scenarios. The plugin traces the configured inputs in the background and shows the result in IntelliJ's Test Runner UI by default. The result tree groups source files, specification items, and trace links with pass/fail status and navigation back to source. Its total and progress count specification items only; source files and trace links remain structural and detail nodes.
 
 Run configurations can select plain text output instead. In that mode, the plugin shows the text report in an IDE output tab with ANSI colors preserved. You can click specification item IDs in the report to jump to their declarations, including source-side items generated from coverage tags.
 
 ## Live-Templates Bundled With the Plugin
 
-The plugin also bundles an `OpenFastTrace` live-template group under `Settings | Editor | Live Templates`. Use abbreviations such as `feat`, `req`, `dsn`, and `scn` in a supported editing context, then press `Tab` to insert an OFT item skeleton. The `scn` template inserts a scenario stub with placeholders for `Given`, `When`, `Then`, and the covered requirement. While the caret is still in a template's covered-item field, use basic completion to select an existing specification item ID from the project index.
+The plugin also bundles an `OpenFastTrace` live-template group under `Settings | Editor | Live Templates`. Use abbreviations such as `feat`, `req`, `dsn`, and `scn` in a supported editing context, then press `Tab` to insert an OFT item skeleton. The `scn` template inserts a scenario stub with placeholders for `Given`, `When`, `Then`, and the covered requirement. While the caret is still in a template's covered-item field, use basic completion to select an existing specification item ID from the project index. In Markdown specification documents, basic completion also works while editing the declaration ID field of an OFT item, and it stays off Markdown link destinations nested inside `Covers:` entries.
 
 ## Installation
 ### Runtime Dependencies

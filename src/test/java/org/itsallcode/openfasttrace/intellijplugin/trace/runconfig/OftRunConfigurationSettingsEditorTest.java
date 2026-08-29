@@ -39,6 +39,8 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 "additional",
                 "dsn",
                 "mvp",
+                true,
+                false,
                 OftTraceResultView.TEST_RUNNER
         );
         configuration.updateFrom(snapshot);
@@ -54,6 +56,8 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 () -> assertThat(uiSettings.additionalPathsText(), is(snapshot.additionalPathsText())),
                 () -> assertThat(uiSettings.artifactTypesText(), is(snapshot.artifactTypesText())),
                 () -> assertThat(uiSettings.tagsText(), is(snapshot.tagsText())),
+                () -> assertThat(uiSettings.includeUntagged(), is(snapshot.includeUntagged())),
+                () -> assertThat(uiSettings.showTransitiveDefects(), is(snapshot.showTransitiveDefects())),
                 () -> assertThat(uiSettings.resultView(), is(snapshot.resultView()))
         );
     }
@@ -69,6 +73,8 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 "more paths",
                 "req",
                 "tag",
+                true,
+                false,
                 OftTraceResultView.TEST_RUNNER
         );
         editor.component.setSettings(snapshot);
@@ -84,6 +90,8 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 () -> assertThat(stored.additionalPathsText(), is(snapshot.additionalPathsText())),
                 () -> assertThat(stored.artifactTypesText(), is(snapshot.artifactTypesText())),
                 () -> assertThat(stored.tagsText(), is(snapshot.tagsText())),
+                () -> assertThat(stored.includeUntagged(), is(snapshot.includeUntagged())),
+                () -> assertThat(stored.showTransitiveDefects(), is(snapshot.showTransitiveDefects())),
                 () -> assertThat(stored.resultView(), is(snapshot.resultView()))
         );
     }
@@ -98,6 +106,8 @@ public class OftRunConfigurationSettingsEditorTest extends AbstractOftPlatformTe
                 "missing",
                 "",
                 "",
+                false,
+                true,
                 OftTraceResultView.TEST_RUNNER
         ));
 

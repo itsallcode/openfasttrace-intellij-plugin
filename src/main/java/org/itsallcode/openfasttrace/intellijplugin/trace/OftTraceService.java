@@ -22,21 +22,36 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public final class OftTraceService {
+    private static final String UNTAGGED_ITEMS_FILTER_MARKER = "__oft-include-untagged__!";
     @SuppressWarnings("java:S3032")
     // OFT ServiceLoader discovery must use the plugin class loader, not an arbitrary caller context loader.
     private static final ClassLoader PLUGIN_CLASS_LOADER = OftTraceService.class.getClassLoader();
 
     private final Oft oft;
     private final OftTraceReportRenderer reportRenderer;
+    private final boolean showTransitiveDefects;
 
     // [impl->dsn~trace-execution-service~1]
     public OftTraceService() {
-        this(Oft.create(), new OftPlainTextTraceReportRenderer());
+        this(Oft.create(), new OftPlainTextTraceReportRenderer(), true);
+    }
+
+    public OftTraceService(final boolean showTransitiveDefects) {
+        this(Oft.create(), new OftPlainTextTraceReportRenderer(), showTransitiveDefects);
     }
 
     OftTraceService(final Oft oft, final OftTraceReportRenderer reportRenderer) {
+        this(oft, reportRenderer, true);
+    }
+
+    OftTraceService(
+            final Oft oft,
+            final OftTraceReportRenderer reportRenderer,
+            final boolean showTransitiveDefects
+    ) {
         this.oft = oft;
         this.reportRenderer = reportRenderer;
+        this.showTransitiveDefects = showTransitiveDefects;
     }
 
     // [impl->dsn~show-successful-trace-output-in-ide-output-window~2]
@@ -48,10 +63,16 @@ public final class OftTraceService {
         try {
             progress.phase("Importing OpenFastTrace items...", 0.15D);
             progress.checkCanceled();
-            final FilterSettings filterSettings = FilterSettings.builder()
-                    .artifactTypes(Set.copyOf(inputs.artifactTypes()))
-                    .tags(Set.copyOf(inputs.tags()))
-                    .build();
+            final FilterSettings.Builder filterSettings = FilterSettings.builder();
+            if (!inputs.artifactTypes().isEmpty()) {
+                filterSettings.artifactTypes(Set.copyOf(inputs.artifactTypes()));
+            }
+            final Set<String> tags = createTagFilter(inputs);
+            if (!tags.isEmpty()) {
+                filterSettings.tags(tags);
+                // OFT defaults to "without tags" mode unless this is explicitly disabled.
+                filterSettings.withoutTags(inputs.includeUntagged());
+            }
             final List<SpecificationItem> items = importItems(inputs.inputPaths(), filterSettings);
 
             progress.phase("Linking OpenFastTrace items...", 0.4D);
@@ -75,10 +96,10 @@ public final class OftTraceService {
     }
 
 
-    private List<SpecificationItem> importItems(final List<Path> inputs, final FilterSettings filterSettings) {
+    private List<SpecificationItem> importItems(final List<Path> inputs, final FilterSettings.Builder filterSettings) {
         final ImportSettings settings = ImportSettings.builder()
                 .addInputs(inputs)
-                .filter(filterSettings)
+                .filter(filterSettings.build())
                 .build();
         return runWithPluginClassLoader(() -> oft.importItems(settings));
     }
@@ -108,13 +129,28 @@ public final class OftTraceService {
         return runWithPluginClassLoader(() -> reportRenderer.render(trace, createReportSettings()));
     }
 
-    private static ReportSettings createReportSettings() {
+    // [impl->dsn~hide-transitive-defects-in-plain-text-output~1]
+    // [impl->dsn~transitive-defect-visibility-is-controlled-by-the-run-configuration~1]
+    private ReportSettings createReportSettings() {
         return ReportSettings.builder()
                 .outputFormat(ReportConstants.DEFAULT_REPORT_FORMAT)
-                .verbosity(ReportVerbosity.FAILURE_DETAILS)
+                .verbosity(showTransitiveDefects
+                        ? ReportVerbosity.FAILURE_DETAILS
+                        : ReportVerbosity.DIRECT_FAILURE_DETAILS)
                 .colorScheme(ColorScheme.COLOR)
                 .detailsSectionDisplay(DetailsSectionDisplay.COLLAPSE)
                 .build();
+    }
+
+    private static Set<String> createTagFilter(final OftTraceInputs inputs) {
+        if (!inputs.includeUntagged() && inputs.tags().isEmpty()) {
+            return Set.of();
+        }
+        final Set<String> tags = new java.util.LinkedHashSet<>(inputs.tags());
+        if (inputs.includeUntagged()) {
+            tags.add(UNTAGGED_ITEMS_FILTER_MARKER);
+        }
+        return tags;
     }
 
     private static <T> T runWithPluginClassLoader(final Callable<T> action) {

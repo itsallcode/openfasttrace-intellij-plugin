@@ -25,6 +25,8 @@ Covers:
 
 Needs: scn
 
+Tags: work
+
 ## Scenarios
 
 ### Pick a Late-Work Excuse
@@ -38,6 +40,8 @@ Covers:
 - `req~tell-late-work-excuse~1`
 
 Needs: dsn
+
+Tags: work
 
 ## Design
 

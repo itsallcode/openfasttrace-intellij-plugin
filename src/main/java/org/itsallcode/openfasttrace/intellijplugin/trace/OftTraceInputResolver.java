@@ -106,7 +106,8 @@ public final class OftTraceInputResolver {
         return OftTraceInputResolution.valid(OftTraceInputs.wholeProject(
                 inputPath,
                 settings.artifactTypes(),
-                settings.tags()
+                settings.tags(),
+                settings.includeUntagged()
         ));
     }
 
@@ -123,7 +124,8 @@ public final class OftTraceInputResolver {
             return OftTraceInputResolution.valid(OftTraceInputs.wholeProject(
                     projectRoot,
                     settings.artifactTypes(),
-                    settings.tags()
+                    settings.tags(),
+                    settings.includeUntagged()
             ));
         }
         final LinkedHashSet<Path> inputs = new LinkedHashSet<>();
@@ -152,7 +154,8 @@ public final class OftTraceInputResolver {
         return OftTraceInputResolution.valid(OftTraceInputs.selectedResources(
                 List.copyOf(inputs),
                 settings.artifactTypes(),
-                settings.tags()
+                settings.tags(),
+                settings.includeUntagged()
         ));
     }
 
@@ -218,7 +221,8 @@ public final class OftTraceInputResolver {
         return OftTraceInputResolution.valid(OftTraceInputs.selectedResources(
                 List.of(resolvedPath),
                 settings.artifactTypes(),
-                settings.tags()
+                settings.tags(),
+                settings.includeUntagged()
         ));
     }
 

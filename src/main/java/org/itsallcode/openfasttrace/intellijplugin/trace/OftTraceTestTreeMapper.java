@@ -35,18 +35,18 @@ final class OftTraceTestTreeMapper {
     private OftTraceTestTreeMapper() {
     }
 
-    // [impl->dsn~trace-test-runner-presentation~1]
-    // [impl->dsn~show-trace-source-files-as-test-runner-suites~1]
-    // [impl->dsn~show-trace-specification-items-as-test-runner-tests~1]
+    // [impl->dsn~trace-test-runner-presentation~2]
+    // [impl->dsn~show-trace-source-files-as-test-runner-suites~2]
+    // [impl->dsn~show-trace-specification-items-as-test-runner-tests~2]
     // [impl->dsn~show-specification-item-title-in-test-runner-ui~2]
     // [impl->dsn~show-specification-item-id-in-test-runner-details~1]
     // [impl->dsn~sort-specification-items-in-test-runner-ui~1]
-    // [impl->dsn~show-trace-links-as-test-runner-sub-tests~1]
+    // [impl->dsn~show-trace-links-as-test-runner-sub-tests~2]
     // [impl->dsn~show-specification-item-status-in-test-runner-ui~2]
     // [impl->dsn~show-trace-link-status-in-test-runner-ui~2]
     // [impl->dsn~show-trace-link-direction-in-test-runner-ui~1]
     // [impl->dsn~show-unicode-trace-link-direction-in-test-runner-ui~1]
-    // [impl->dsn~map-specification-item-trace-status-to-test-runner-status~1]
+    // [impl->dsn~map-specification-item-trace-status-to-test-runner-status~2]
     // [impl->dsn~map-trace-link-status-to-test-runner-status~1]
     // [impl->dsn~show-specification-item-defect-details-in-test-runner-ui~1]
     // [impl->dsn~show-trace-link-defect-details-in-test-runner-ui~1]
@@ -59,7 +59,22 @@ final class OftTraceTestTreeMapper {
     }
 
     static OftTraceTestTree map(final Trace trace, final String projectBasePath) {
-        final List<TraceItemLinks> visibleLinksByItem = visibleLinksByItem(trace.getItems());
+        return map(trace, projectBasePath, true);
+    }
+
+    static OftTraceTestTree map(
+            final Trace trace,
+            final String projectBasePath,
+            final boolean showTransitiveDefects
+    ) {
+        // [impl->dsn~hide-transitive-defects-in-test-runner-ui~1]
+        // [impl->dsn~transitive-defect-visibility-is-controlled-by-the-run-configuration~1]
+        final List<LinkedSpecificationItem> items = showTransitiveDefects
+                ? trace.getItems()
+                : trace.getItems().stream()
+                        .filter(item -> !item.isTransitiveDefect())
+                        .toList();
+        final List<TraceItemLinks> visibleLinksByItem = visibleLinksByItem(items);
         final Map<String, SourceFileItems> itemsBySource = new LinkedHashMap<>();
         for (final TraceItemLinks itemLinks : visibleLinksByItem) {
             final SourceFileSuite sourceFileSuite = sourceFileSuite(itemLinks.item(), projectBasePath);
@@ -91,8 +106,10 @@ final class OftTraceTestTreeMapper {
     ) {
         final String itemStatus = itemStatus(item);
         final String itemId = item.getId().toString();
+        final String itemName = itemName(item);
+        final String visibleItemName = getVisibleItemName(item, itemName);
         return new OftTraceItemNode(
-                nodeName(itemName(item), itemStatus, !item.isDefect()),
+                nodeName(visibleItemName, itemStatus, !item.isDefect()),
                 itemId,
                 item.isDefect(),
                 item.isDefect()
@@ -102,6 +119,11 @@ final class OftTraceTestTreeMapper {
                         .map(link -> mapLink(item, link))
                         .toList()
         );
+    }
+
+    // [impl -> dsn~mark-transitive-defects-in-test-runner~1]
+    private static String getVisibleItemName(final LinkedSpecificationItem item, final String itemName) {
+        return item.isTransitiveDefect() ? "↳ " + itemName : itemName;
     }
 
     private static List<TraceItemLinks> visibleLinksByItem(

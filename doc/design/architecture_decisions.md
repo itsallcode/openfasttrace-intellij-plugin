@@ -174,6 +174,49 @@ We add no "needs" here, since we cannot trace into dependabot.
 
 Tags: Build, Security, Dependabot
 
+## Trace Presentation Decisions
+
+### How Does The Plugin Handle Transitive Defects In Trace Result Views?
+
+The plugin needs a way to reduce trace-result noise when users debug broken dependency chains. This decision is architecture-relevant because it affects:
+
+* how much noise every trace run exposes to the user while debugging a broken chain
+* whether the same setting can drive both the Test Runner UI and plain-text trace output
+* whether the project can keep transitive-defect detection in OpenFastTrace while changing only presentation
+
+Picking the wrong option here would be expensive to undo. A local-only workaround would leave the result views inconsistent and force users to learn two different behaviors. Burying the filter in the trace engine or result model would be harder still because that choice would spread into tracing, rendering, settings persistence, and tests, so correcting it later would require broad refactoring instead of a narrow presentation-layer change.
+
+We considered the following alternatives:
+
+1. No filter.
+
+   This produces too much noise. Debugging broken chains stays unnecessarily hard because direct defects are mixed with transitive defects that are only symptoms.
+
+1. Only an optical distinction without a filter.
+
+   This looks better, but it still leaves the noise problem unsolved because transitive defects remain present in the result tree and report.
+
+1. Use the `ignored` status in the Test Runner UI.
+
+   This looked visually good, but it did not work as a filter because the items below a transitive defect were still counted as successful. The instant filter could not hide the transitive item without also changing the status accounting under it.
+
+#### Transitive Defect Visibility Is Controlled By The Run Configuration
+`dsn~transitive-defect-visibility-is-controlled-by-the-run-configuration~1`
+
+The trace result presentations read the saved `Show transitive defects` setting from the OpenFastTrace run configuration and use it to include or omit transitive defects before rendering the Test Runner UI or the plain-text report.
+
+Rationale:
+
+This keeps the transitive-defect filter in the presentation layer instead of changing trace evaluation, and it works consistently across both result views. The bundled run configuration templates initialize the setting to shown so the existing defect-oriented view remains the default.
+
+Comment:
+
+This decision does not change how OpenFastTrace detects transitive defects. It only changes whether the trace presenters render them.
+
+Needs: impl
+
+Tags: Trace, Run Configuration, UI
+
 ## Test Framework Decisions
 
 ### Which JUnit Baseline Does the Plugin Use?

@@ -3,9 +3,11 @@ package org.itsallcode.openfasttrace.intellijplugin.trace;
 import org.itsallcode.openfasttrace.core.Oft;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.lang.reflect.Proxy;
@@ -13,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.net.URLClassLoader;
 import java.util.List;
+import java.util.stream.Stream;
 import java.util.regex.Pattern;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -45,7 +48,7 @@ class OftTraceServiceTest {
                 () -> assertThat(result.output(), Matchers.containsString("\u001B[")),
                 () -> assertThat(renderedOutput, Matchers.containsString("ok -")),
                 () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("not ok"))),
-                // [itest->dsn~trace-test-runner-presentation~1]
+                // [itest->dsn~trace-test-runner-presentation~2]
                 () -> assertThat(result.trace().isPresent(), is(true))
         );
     }
@@ -102,7 +105,7 @@ class OftTraceServiceTest {
                 () -> assertThat(renderedOutput, Matchers.containsString("not ok")),
                 () -> assertThat(renderedOutput, Matchers.containsString("req~trace_output_requirement~1")),
                 () -> assertThat(result.output(), Matchers.containsString("\u001B[")),
-                // [itest->dsn~trace-test-runner-presentation~1]
+                // [itest->dsn~trace-test-runner-presentation~2]
                 () -> assertThat(result.trace().isPresent(), is(true))
         );
     }
@@ -151,10 +154,32 @@ class OftTraceServiceTest {
         Assertions.assertAll(
                 () -> assertThat(result.isSuccessful(), is(false)),
                 () -> assertThat(result.output(), Matchers.containsString("\u001B[")),
-                () -> assertThat(renderedOutput, Matchers.containsString("not ok - 3 total, 3 defect")),
+                () -> assertThat(renderedOutput, Matchers.containsString("not ok - 3 total, 1 direct, 2 transitive defects")),
                 () -> assertThat(renderedOutput, Matchers.containsString("dsn~chain_design~1")),
                 () -> assertThat(renderedOutput, Matchers.containsString("feat~chain_feature~1")),
                 () -> assertThat(renderedOutput, Matchers.containsString("req~chain_requirement~1"))
+        );
+    }
+
+    // [itest->dsn~hide-transitive-defects-in-plain-text-output~1]
+    @Test
+    void testGivenUncleanTraceChainWhenTracingWithoutTransitiveDefectsThenItOmitsTransitiveItemDetails(
+            @TempDir final Path temporaryDirectory
+    )
+            throws IOException {
+        writeUncleanTraceChainProject(temporaryDirectory);
+
+        final OftTraceResult result = new OftTraceService(false).traceProject(
+                OftTraceInputs.wholeProject(temporaryDirectory, List.of(), List.of()),
+                OftTraceProgress.NONE
+        );
+        final String renderedOutput = stripAnsi(result.output());
+
+        Assertions.assertAll(
+                () -> assertThat(result.isSuccessful(), is(false)),
+                () -> assertThat(renderedOutput, Matchers.containsString("dsn~chain_design~1")),
+                () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("↳ Feature"))),
+                () -> assertThat(renderedOutput, Matchers.not(Matchers.containsString("Feature (uncovered)")))
         );
     }
 
@@ -185,7 +210,7 @@ class OftTraceServiceTest {
                 () -> assertThat(result.statusMessage(), is("OpenFastTrace trace failed unexpectedly.")),
                 () -> assertThat(result.output(), Matchers.containsString("OpenFastTrace trace failed for input path")),
                 () -> assertThat(result.output(), Matchers.containsString("IllegalStateException: boom")),
-                // [itest->dsn~trace-test-runner-presentation~1]
+                // [itest->dsn~trace-test-runner-presentation~2]
                 () -> assertThat(result.trace().isEmpty(), is(true))
         );
     }
@@ -206,55 +231,51 @@ class OftTraceServiceTest {
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
-        System.out.println(renderedOutput);
         Assertions.assertAll(
                 () -> assertThat(result.isSuccessful(), is(true)),
                 () -> assertThat(renderedOutput, Matchers.containsString("ok - 2 total"))
         );
     }
 
-    @Disabled("Reanable after https://github.com/itsallcode/openfasttrace/issues/505 is fixed")
-    @Test
-    void testGivenTagFilterMatchingArtifactWhenTracingThenItIncludesTheArtifact(
+
+    private static Stream<Arguments> tagFilterScenarios() {
+        return Stream.of(
+                Arguments.of("work", false, "ok - 2 total"),
+                Arguments.of("work, home", false, "ok - 3 total"),
+                Arguments.of("", false, "ok - 4 total"),
+                Arguments.of("", true, "ok - 1 total")
+        );
+    }
+
+    // [itest->dsn~filter-trace-by-artifact-types-and-tags~1]
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("tagFilterScenarios")
+    void testGivenTagFilterWhenTracingThenItIncludesOnlyMatchingItems(
+            final String tagsText,
+            final boolean includeUntagged,
+            final String expectedSummaryLine,
             @TempDir final Path temporaryDirectory
     ) throws IOException {
-        final Path docDirectory = Files.createDirectories(temporaryDirectory.resolve("doc"));
-        Files.writeString(
-                docDirectory.resolve("tags.md"),
-                """
-                ### Tagged Requirement
-                `req~tagged_requirement~1`
-                
-                Tags: tagged
-                
-                Needs: impl
-                
-                ### Untagged Requirement
-                `req~untagged_requirement~1`
-                
-                Needs: impl
-                
-                ### Tagged Coverage
-                `impl~tagged_coverage~1`
-                
-                Covers:
-                - `req~tagged_requirement~1`
-                
-                Tags: tagged
-                """
-        );
+        writeTagFilterProject(temporaryDirectory);
 
         final OftTraceResult result = new OftTraceService().traceProject(
                 OftTraceInputs.selectedResources(
                         java.util.List.of(temporaryDirectory),
                         java.util.List.of(),
-                        java.util.List.of("tagged")
+                        tagsText.isEmpty() ? java.util.List.of() : java.util.Arrays.stream(tagsText.split(","))
+                                .map(String::trim)
+                                .filter(tag -> !tag.isEmpty())
+                                .toList(),
+                        includeUntagged
                 ),
                 OftTraceProgress.NONE
         );
         final String renderedOutput = stripAnsi(result.output());
 
-        assertThat(renderedOutput, Matchers.containsString("ok - 2 total"));
+        Assertions.assertAll(
+                () -> assertThat(result.isSuccessful(), is(true)),
+                () -> assertThat(renderedOutput, Matchers.containsString(expectedSummaryLine))
+        );
     }
 
     private String stripAnsi(final String output) {
@@ -363,6 +384,29 @@ class OftTraceServiceTest {
                 `req~unwanted_requirement~1`
 
                 Needs: impl
+                """
+        );
+    }
+
+    private void writeTagFilterProject(final Path projectRoot) throws IOException {
+        final Path docDirectory = Files.createDirectories(projectRoot.resolve("doc"));
+        Files.writeString(
+                docDirectory.resolve("tags.md"),
+                """
+                ### Work Requirement
+                `req~tagged_work_requirement~1`
+                Tags: work
+
+                ### Work and Home Requirement
+                `req~tagged_work_home_requirement~1`
+                Tags: work, home
+
+                ### Home Requirement
+                `req~tagged_home_requirement~1`
+                Tags: home
+
+                ### Untagged Requirement
+                `req~untagged_requirement~1`
                 """
         );
     }

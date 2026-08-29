@@ -2,31 +2,24 @@
 
 This chapter describes the static decomposition of the plugin into building blocks and their responsibilities.
 
-The following diagram drafts the current product-level components of the plugin. It shows components, not classes.
+The following feature-focused views show the current product-level components of the plugin. A component may occur in more than one view where it participates in multiple features. The views show components, not classes, and contain at most seven modules each.
+
+## Syntax Highlighting
 
 ```plantuml
 @startuml
 skinparam componentStyle rectangle
+top to bottom direction
 
 package "JetBrains IDE / IntelliJ Platform" {
   component "Editor and PSI\nInfrastructure" as IdeEditor
-  component "Symbol Search and\nNavigation Infrastructure" as IdeNavigation
-  component "Live Template\nInfrastructure" as IdeLiveTemplates
-  component "Action System" as IdeActions
-  component "Background Task and\nProgress Infrastructure" as IdeTasks
-  component "Output View and\nRun Content Infrastructure" as IdeOutput
-  component "SM Test Runner\nInfrastructure" as IdeTestRunner
-  component "Help Menu and\nWeb View Infrastructure" as IdeHelp
 }
 
 package "Opened Project" {
-  artifact "Project Content Root" as ProjectRoot
   artifact "Markdown and RST\nSpecification Documents" as ProjectSpecs
   artifact "Source Files with\nCoverage Tags" as ProjectSources
-}
-
-package "OpenFastTrace Library" {
-  component "Trace Engine and\nText Reporter" as OftTraceLibrary
+  
+  ProjectSources -[hidden]u- ProjectSpecs
 }
 
 package "OpenFastTrace Plugin" {
@@ -34,33 +27,67 @@ package "OpenFastTrace Plugin" {
   component "Markdown Specification\nSupport" as MarkdownSupport
   component "RST Specification\nSupport" as RstSupport
   component "Coverage Tag\nSupport" as CoverageSupport
-  component "Specification Item\nIndex" as SpecIndex
-  component "Specification Item\nNavigation" as NavigationSupport
-  component "Specification Item\nCompletion" as CompletionSupport
-  component "Specification Item\nRename" as RenameSupport
-  component "Live Template\nIntegration" as LiveTemplateSupport
-  component "Trace Configuration\nIntegration" as TraceConfigurationSupport
-  component "Trace Action\nIntegration" as TraceActionSupport
-  component "Trace Execution\nService" as TraceExecutionSupport
-  component "Trace Output\nPresentation" as TraceOutputSupport
-  component "Trace Test Runner\nPresentation" as TraceTestRunnerSupport
-  component "User Guide\nIntegration" as UserGuideSupport
 }
 
-MarkdownSupport --> OftSyntax
-RstSupport --> OftSyntax
-CoverageSupport --> OftSyntax
+ProjectSpecs -l-> MarkdownSupport : reads
+ProjectSpecs --> RstSupport : reads
+ProjectSources --> CoverageSupport : reads
+MarkdownSupport -u-> OftSyntax
+RstSupport -u-> OftSyntax
+CoverageSupport -u-> OftSyntax
+MarkdownSupport -d-> IdeEditor
+RstSupport -d-> IdeEditor
+CoverageSupport -d-> IdeEditor
+@enduml
+```
+
+## Specification-Item Navigation and Refactoring
+
+```plantuml
+@startuml
+skinparam componentStyle rectangle
+
+package "JetBrains IDE / IntelliJ Platform" {
+  component "Symbol Search and\nNavigation Infrastructure" as IdeNavigation
+  component "Refactoring and\nUsage Search Infrastructure" as IdeRefactoring
+  
+  IdeNavigation -[hidden]u- IdeRefactoring
+}
+
+package "OpenFastTrace Plugin" {
+  component "OFT Syntax Core" as OftSyntax
+  component "Specification Item\nIndex" as SpecIndex
+  component "Specification Item\nNavigation" as NavigationSupport
+  component "Specification Item\nRefactoring" as RefactoringSupport
+}
+
 SpecIndex --> OftSyntax
 NavigationSupport --> SpecIndex
-TraceActionSupport --> TraceExecutionSupport
-TraceExecutionSupport --> TraceOutputSupport
-TraceExecutionSupport --> TraceTestRunnerSupport
+NavigationSupport -l-> IdeNavigation
+RefactoringSupport --> OftSyntax
+RefactoringSupport --> SpecIndex
+RefactoringSupport --> NavigationSupport
+RefactoringSupport -l-> IdeRefactoring
+@enduml
+```
 
-MarkdownSupport --> IdeEditor
-RstSupport --> IdeEditor
-CoverageSupport --> IdeEditor
-SpecIndex --> IdeEditor
-NavigationSupport --> IdeNavigation
+## Reference Authoring
+
+```plantuml
+@startuml
+skinparam componentStyle rectangle
+
+package "JetBrains IDE / IntelliJ Platform" {
+  component "Editor and PSI\nInfrastructure" as IdeEditor
+  component "Live Template\nInfrastructure" as IdeLiveTemplates
+}
+
+package "OpenFastTrace Plugin" {
+  component "Specification Item\nIndex" as SpecIndex
+  component "Specification Item\nCompletion" as CompletionSupport
+  component "Live Template\nIntegration" as LiveTemplateSupport
+}
+
 CompletionSupport --> SpecIndex
 CompletionSupport --> IdeEditor
 RenameSupport --> SpecIndex
@@ -68,23 +95,82 @@ RenameSupport --> IdeEditor
 RenameSupport --> IdeActions
 LiveTemplateSupport --> IdeLiveTemplates
 LiveTemplateSupport --> IdeEditor
+@enduml
+```
+
+## Trace Setup
+
+```plantuml
+@startuml
+skinparam componentStyle rectangle
+
+package "JetBrains IDE / IntelliJ Platform" {
+  component "Action System" as IdeActions
+}
+
+package "Opened Project" {
+  artifact "Project Content Root" as ProjectRoot
+}
+
+package "OpenFastTrace Plugin" {
+  component "Trace Configuration\nIntegration" as TraceConfigurationSupport
+  component "Trace Action\nIntegration" as TraceActionSupport
+}
+
 TraceConfigurationSupport --> IdeActions
 TraceActionSupport --> IdeActions
-TraceExecutionSupport --> IdeTasks
-TraceOutputSupport --> IdeOutput
-TraceTestRunnerSupport --> IdeTestRunner
-TraceTestRunnerSupport --> NavigationSupport
-UserGuideSupport --> IdeHelp
-
 TraceActionSupport --> TraceConfigurationSupport
 TraceActionSupport --> ProjectRoot : reads path
 TraceConfigurationSupport --> ProjectRoot : reads settings roots
-TraceExecutionSupport --> ProjectRoot : traces
+@enduml
+```
+
+## Trace Execution and Results
+
+```plantuml
+@startuml
+skinparam componentStyle rectangle
+
+package "JetBrains IDE / IntelliJ Platform" {
+  component "Background Task and\nProgress Infrastructure" as IdeTasks
+  component "Output View and\nRun Content Infrastructure" as IdeOutput
+  component "SM Test Runner\nInfrastructure" as IdeTestRunner
+}
+
+package "OpenFastTrace Library" {
+  component "Trace Engine and\nText Reporter" as OftTraceLibrary
+}
+
+package "OpenFastTrace Plugin" {
+  component "Trace Execution\nService" as TraceExecutionSupport
+  component "Trace Output\nPresentation" as TraceOutputSupport
+  component "Trace Test Runner\nPresentation" as TraceTestRunnerSupport
+}
+
+TraceExecutionSupport --> IdeTasks
 TraceExecutionSupport --> OftTraceLibrary
-MarkdownSupport --> ProjectSpecs : reads
-RstSupport --> ProjectSpecs : reads
-CoverageSupport --> "1..n" ProjectSources : reads
-SpecIndex --> "1..n" ProjectSpecs : indexes
+TraceExecutionSupport --> TraceOutputSupport
+TraceExecutionSupport --> TraceTestRunnerSupport
+TraceOutputSupport --> IdeOutput
+TraceTestRunnerSupport --> IdeTestRunner
+@enduml
+```
+
+## User Guide
+
+```plantuml
+@startuml
+skinparam componentStyle rectangle
+
+package "JetBrains IDE / IntelliJ Platform" {
+  component "Help Menu and\nWeb View Infrastructure" as IdeHelp
+}
+
+package "OpenFastTrace Plugin" {
+  component "User Guide\nIntegration" as UserGuideSupport
+}
+
+UserGuideSupport --> IdeHelp
 @enduml
 ```
 
@@ -186,11 +272,13 @@ Needs: impl
 ### Specification Item Completion
 `dsn~specification-item-completion~1`
 
-The plugin provides a specification-item completion component that activates IntelliJ basic completion for supported OFT reference authoring contexts, reads declared specification item IDs from the project-local declaration index, and presents those IDs in a deterministic order based on full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches. Supported contexts include OFT item references under `Covers:` in supported specification documents, completion requests started from an active live-template placeholder when the placeholder expands inside a `Covers:` entry, and the target side of likely OFT coverage tags in source-code comments for the default file extensions supported by the upstream OpenFastTrace Tag Importer after a left-hand artifact type and arrow.
+The plugin provides a specification-item completion component that activates IntelliJ basic completion for supported OFT reference authoring contexts, reads declared specification item IDs from the project-local declaration index, and presents those IDs in a deterministic order based on full-ID prefix, name-prefix, name-substring, and artifact-type prefix matches. Supported contexts include the actual Markdown specification-item ID field, OFT item references under `Covers:` in supported specification documents, completion requests started from an active live-template placeholder when the placeholder expands inside a `Covers:` entry, and the target side of likely OFT coverage tags in source-code comments for the default file extensions supported by the upstream OpenFastTrace Tag Importer after a left-hand artifact type and arrow. The component excludes the Markdown title field and other non-ID text by using a context detector that identifies the declaration anchor explicitly rather than relying only on document structure, keeps the active live-template session in place while ignoring the title placeholder until the caret reaches the actual declaration ID field, and skips Markdown link destinations nested inside `Covers:` entries so link-target anchor completion stays available there.
 
 Covers:
+- `scn~complete-markdown-specification-item-id-in-declaration-id-field~1`
 - `scn~complete-specification-item-id-in-covers-section~1`
 - `scn~complete-specification-item-id-in-active-live-template-covers-field~1`
+- `scn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
 - `scn~complete-specification-item-id-in-coverage-tag-target~1`
 - `scn~complete-specification-item-id-in-spaced-coverage-tag-target~1`
 - `scn~complete-specification-item-id-in-incomplete-coverage-tag-target~1`
@@ -309,22 +397,24 @@ Covers:
 Needs: impl, itest
 
 ### Trace Test Runner Presentation
-`dsn~trace-test-runner-presentation~1`
+`dsn~trace-test-runner-presentation~2`
 
-The plugin provides a trace test-runner presentation component that maps the structured OpenFastTrace trace result to IntelliJ SM test runner nodes. It creates project-local source-file suites, sorted specification-item tests, and incoming or outgoing trace-link sub-tests; derives compact title-aware labels, Unicode direction markers, pass/fail status, status roll-up, and item/link details from the OpenFastTrace trace status; and connects source-file, item, and link node navigation to the existing OpenFastTrace trace navigation support.
+The plugin provides a trace test-runner presentation component that maps the structured OpenFastTrace trace result to IntelliJ SM test runner nodes. It creates project-local source-file suites, sorted specification-item tests, and incoming or outgoing trace-link detail children; derives compact title-aware labels, Unicode direction markers, transitive-defect markers, pass/fail status, status roll-up, and item/link details from the OpenFastTrace trace status; and connects source-file, item, and link node navigation to the existing OpenFastTrace trace navigation support. It separately reports custom logical-result progress for visible specification items only, excluding suites and trace-link detail children from totals and progress while rolling a defective visible link into its owning item's one logical failure.
 
 Covers:
-- `scn~show-trace-source-files-as-test-runner-suites~1`
-- `scn~show-trace-specification-items-as-test-runner-tests~1`
+- `scn~show-trace-source-files-as-test-runner-suites~2`
+- `scn~show-trace-specification-items-as-test-runner-tests~2`
 - `scn~show-specification-item-title-in-test-runner-ui~2`
 - `scn~show-specification-item-id-in-test-runner-details~1`
 - `scn~sort-specification-items-in-test-runner-ui~1`
-- `scn~show-trace-links-as-test-runner-sub-tests~1`
+- `scn~show-trace-links-as-test-runner-sub-tests~2`
 - `scn~show-specification-item-status-in-test-runner-ui~2`
+- `scn~mark-transitive-defects-in-test-runner~1`
 - `scn~show-trace-link-status-in-test-runner-ui~2`
 - `scn~show-trace-link-direction-in-test-runner-ui~1`
 - `scn~show-unicode-trace-link-direction-in-test-runner-ui~1`
-- `scn~map-specification-item-trace-status-to-test-runner-status~1`
+- `scn~map-specification-item-trace-status-to-test-runner-status~2`
+- `scn~count-only-specification-items-in-test-runner-results~1`
 - `scn~map-trace-link-status-to-test-runner-status~1`
 - `scn~roll-up-source-file-suite-trace-status~1`
 - `scn~roll-up-top-level-trace-status~1`
@@ -385,6 +475,12 @@ scale 2
         .               | .
         Tags:           | "mvp                       "
         .               | <i>(comma-separated, empty = all)
+        .               |  [ ] Include untagged items
+        .               | .
+        Defects         |  [X] Include transitive defects
+     }
+     ---
+     {
         .               | .
         Result view:    | ()  Plain text output
         .               | (X) IntelliJ Test Runner UI
@@ -398,3 +494,5 @@ scale 2
 }
 @endsalt
 ```
+
+The filter area uses a hierarchical layout: section headers introduce the group, each filter row keeps its label in the first column and its input in the second column, and the helper text or checkbox rows align underneath the corresponding input. If that arrangement needs another adjustment later, the next iteration should refine the existing hierarchy and row constraints instead of restarting the dialog layout from zero.

@@ -143,7 +143,7 @@ Needs: req
 
 The following requirements refine the syntax-highlighting feature into user-visible capabilities.
 
-### Markdown Syntax Highlighting
+#### Markdown Syntax Highlighting
 `req~markdown-syntax-highlighting~1`
 
 The plugin highlights OpenFastTrace specification items in Markdown documents. Users distinguish OpenFastTrace syntax from surrounding Markdown text while reading or editing a specification.
@@ -153,7 +153,7 @@ Covers:
 
 Needs: scn
 
-### RST Syntax Highlighting
+#### RST Syntax Highlighting
 `req~rst-syntax-highlighting~1`
 
 The plugin highlights OpenFastTrace specification items in RST documents. Users distinguish OpenFastTrace syntax from surrounding RST text while reading or editing a specification.
@@ -163,7 +163,7 @@ Covers:
 
 Needs: scn
 
-### Coverage Tag Syntax Highlighting
+#### Coverage Tag Syntax Highlighting
 `req~coverage-tag-syntax-highlighting~1`
 
 The plugin highlights OpenFastTrace coverage tags in supported source code comments. Users distinguish OFT coverage tags from ordinary comment text while reading or editing source files.
@@ -177,7 +177,7 @@ Needs: scn
 
 The following requirements refine the 'Go to Specification' Item feature into user-visible capabilities.
 
-### Go to Symbol for Specification Items
+#### Go to Symbol for Specification Items
 `req~go-to-symbol-for-specification-items~1`
 
 The plugin contributes OpenFastTrace specification item declarations to `Go to Symbol`.
@@ -191,7 +191,7 @@ Covers:
 
 Needs: scn
 
-### Recognize Markdown Specification Item Declaration Variants
+#### Recognize Markdown Specification Item Declaration Variants
 `req~recognize-markdown-specification-item-declaration-variants~1`
 
 The plugin recognizes an OpenFastTrace specification item declaration in a Markdown document both when the full OFT item ID appears as the plain declaration line and when the full OFT item ID is enclosed in single backticks on that declaration line.
@@ -205,7 +205,7 @@ Covers:
 
 Needs: scn
 
-### Open Specification Item from Go to Symbol
+#### Open Specification Item from Go to Symbol
 `req~open-specification-item-from-go-to-symbol~1`
 
 The plugin opens the selected OpenFastTrace specification item from the `Go to Symbol` result list in the editor at the declaration of that item. Users can jump from the result list to the defining item ID of the selected specification item.
@@ -215,7 +215,7 @@ Covers:
 
 Needs: scn
 
-### Open Specification Item from Coverage Definition
+#### Open Specification Item from Coverage Definition
 `req~open-specification-item-from-coverage-definition~1`
 
 The plugin opens the covered OpenFastTrace specification item when a user invokes `Go To Declaration` on an OFT item ID under `Covers:` in a supported specification document.
@@ -225,7 +225,7 @@ Covers:
 
 Needs: scn
 
-### Stay on Specification Item Declaration on Go To Declaration
+#### Stay on Specification Item Declaration on Go To Declaration
 `req~stay-on-specification-item-declaration-on-go-to-declaration~1`
 
 The plugin keeps the user on the current OpenFastTrace specification item declaration when a user invokes `Go To Declaration` on the declared item ID itself. Users can distinguish the declaration from coverage-providing occurrences of the same item.
@@ -235,7 +235,7 @@ Covers:
 
 Needs: scn
 
-### Show Covering Occurrences from Specification Item Declaration
+#### Show Covering Occurrences from Specification Item Declaration
 `req~show-covering-occurrences-from-specification-item-declaration~1`
 
 The plugin shows the coverage-providing occurrences of an OpenFastTrace specification item when a user invokes `Go To Implementations` on the declared item ID. The result includes supported `Covers:` entries in specification documents and OFT coverage tags in source files.
@@ -245,7 +245,7 @@ Covers:
 
 Needs: scn
 
-### Open Specification Item from Coverage Tag Left Side
+#### Open Specification Item from Coverage Tag Left Side
 `req~open-specification-item-from-coverage-tag-left-side~1`
 
 The plugin resolves the covering OpenFastTrace specification item when a user invokes `Go To Declaration` on the left side of an OFT coverage tag in a supported file and opens that item's declaration in the specification document. If the left side omits the name and revision, the plugin resolves the effective ID by copying the missing parts from the covered ID on the right side of the arrow.
@@ -255,7 +255,7 @@ Covers:
 
 Needs: scn
 
-### Open Specification Item from Coverage Tag Right Side
+#### Open Specification Item from Coverage Tag Right Side
 `req~open-specification-item-from-coverage-tag-right-side~1`
 
 The plugin opens the covered OpenFastTrace specification item when a user invokes Go To on the right side of an OFT coverage tag in a supported file.
@@ -283,7 +283,7 @@ Needs: scn
 
 The following requirements refine the Open OFT User Guide feature into user-visible capabilities.
 
-### Open OFT User Guide in Help Menu
+#### Open OFT User Guide in Help Menu
 `req~open-oft-user-guide-in-help-menu~1`
 
 The plugin adds an action for the OpenFastTrace user guide to the global Help menu. Users can find the user guide entry in the established IDE location for help content.
@@ -293,7 +293,7 @@ Covers:
 
 Needs: scn
 
-### Open OFT User Guide in Integrated Web View
+#### Open OFT User Guide in Integrated Web View
 `req~open-oft-user-guide-in-integrated-web-view~1`
 
 The plugin opens the OpenFastTrace user guide from GitHub in an integrated web view tab. Users can read the guide inside the IDE.
@@ -307,7 +307,7 @@ Needs: scn
 
 The following requirements refine the OFT live-template feature into user-visible capabilities.
 
-### Bundle OFT Live Templates
+#### Bundle OFT Live Templates
 `req~bundle-oft-live-templates~1`
 
 The plugin bundles an OpenFastTrace live-template group into the IDE installation. Users can access OFT live templates without importing template files manually.
@@ -317,7 +317,7 @@ Covers:
 
 Needs: scn
 
-### Provide OFT Scenario Live Template
+#### Provide OFT Scenario Live Template
 `req~provide-oft-scenario-live-template~1`
 
 The bundled OpenFastTrace live-template group includes a scenario template for `scn` items. Users can insert a scenario skeleton with placeholders for the scenario title, item name, given-when-then text, and covered requirement.
@@ -331,7 +331,7 @@ Needs: scn
 
 The following requirements refine the OFT reference-completion feature into user-visible capabilities.
 
-### Complete Specification Item IDs in Covers Section
+#### Complete Specification Item IDs in Covers Section
 `req~complete-specification-item-ids-in-covers-section~1`
 
 The plugin suggests existing OpenFastTrace specification item IDs when a user invokes completion while editing an OFT item ID under `Covers:` in a supported specification document. The suggestion list is ranked first by exact prefix match against the full ID, then by prefix match against the item name, then by substring match against the item name, and finally by prefix match against the artifact type.
@@ -341,7 +341,29 @@ Covers:
 
 Needs: scn
 
-### Complete Specification Item IDs in Coverage Tag Target
+#### Suppress Specification Item ID Completion in Markdown Link Targets Inside Covers Entries
+`req~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+The plugin does not suggest existing OpenFastTrace specification item IDs when a user invokes completion inside the destination part of a Markdown link nested in a `Covers:` entry. Users can keep the link destination available for Markdown anchor completion without OFT IDs taking over the popup.
+
+Covers:
+- `feat~oft-reference-completion~1`
+
+Needs: scn
+
+### Suppress Specification Item ID Completion in Markdown Link Targets Inside Covers Entries
+`scn~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+**Given** a supported specification document contains a `Covers:` entry with a Markdown link and the caret is inside the link destination
+**When** a user invokes completion there
+**Then** the plugin does not suggest OpenFastTrace specification item IDs inside that Markdown link destination
+
+Covers:
+- `req~suppress-specification-item-id-completion-in-markdown-link-targets-inside-covers-entries~1`
+
+Needs: dsn
+
+#### Complete Specification Item IDs in Coverage Tag Target
 `req~complete-specification-item-ids-in-coverage-tag-target~1`
 
 The plugin suggests existing OpenFastTrace specification item IDs when a user invokes completion while editing the target side of a likely OFT coverage tag in a supported source-code comment. Coverage-tag target completion is available for the default file extensions supported by the upstream OpenFastTrace Tag Importer. The completion context requires a left-hand artifact type and an arrow before the caret so suggestions appear for coverage-tag targets instead of ordinary comment text. The suggestion list is ranked first by exact prefix match against the full ID, then by prefix match against the item name, then by substring match against the item name, and finally by prefix match against the artifact type.
@@ -355,7 +377,7 @@ Needs: scn
 
 The following requirements refine the Run OFT Trace feature into user-visible capabilities.
 
-### Trace Open Project from Project Root
+#### Trace Open Project from Project Root
 `req~trace-open-project-from-project-root~1`
 
 The plugin can trace an IntelliJ project by using the project directory as the default OpenFastTrace input root.
@@ -365,7 +387,7 @@ Covers:
 
 Needs: scn
 
-### Trace Selected Project Resources
+#### Trace Selected Project Resources
 `req~trace-selected-project-resources~1`
 
 The plugin can trace selected project resources instead of the whole opened project directory. Users can restrict the OpenFastTrace scan to the resources they intend to include in the trace.
@@ -375,7 +397,7 @@ Covers:
 
 Needs: scn
 
-### Include IntelliJ Source Directories in Selected-Resource Trace
+#### Include IntelliJ Source Directories in Selected-Resource Trace
 `req~include-intellij-source-directories-in-selected-resource-trace~1`
 
 When selected-resource tracing is active, the plugin can include source directories known to IntelliJ in the effective OpenFastTrace input set. Users do not need to discover and configure ordinary source roots by hand.
@@ -385,7 +407,7 @@ Covers:
 
 Needs: scn
 
-### Include IntelliJ Test Directories in Selected-Resource Trace
+#### Include IntelliJ Test Directories in Selected-Resource Trace
 `req~include-intellij-test-directories-in-selected-resource-trace~1`
 
 When selected-resource tracing is active, the plugin can include test directories known to IntelliJ in the effective OpenFastTrace input set. Users do not need to discover and configure ordinary test roots by hand.
@@ -395,7 +417,7 @@ Covers:
 
 Needs: scn
 
-### Add Project-Relative Paths to Selected-Resource Trace
+#### Add Project-Relative Paths to Selected-Resource Trace
 `req~add-project-relative-paths-to-selected-resource-trace~1`
 
 When selected-resource tracing is active, the plugin lets users add additional trace inputs through a multi-line text field in the run configuration editor. Each non-empty line specifies one file or directory path relative to the opened project directory that OpenFastTrace should scan. If the user has not changed that setting, the field contains exactly one default entry: `doc/`.
@@ -405,7 +427,7 @@ Covers:
 
 Needs: scn
 
-### Run Trace Project in Background
+#### Run Trace Project in Background
 `req~run-trace-project-in-background~1`
 
 The plugin runs the OpenFastTrace project trace in a background task with IDE progress reporting. Users can start a trace without blocking the editor UI while the trace is running.
@@ -415,7 +437,7 @@ Covers:
 
 Needs: scn
 
-### Show Trace Result in Test Runner UI by Default
+#### Show Trace Result in Test Runner UI by Default
 `req~show-trace-result-in-test-runner-ui-by-default~2`
 
 The plugin shows the trace result in IntelliJ's Test Runner UI by default. Users can inspect the project trace as structured source-file suites, specification-item tests, and trace-link sub-tests.
@@ -426,7 +448,7 @@ Covers:
 
 Needs: scn
 
-### Show Trace Output in IDE Output Window
+#### Show Trace Output in IDE Output Window
 `req~show-trace-output-in-ide-output-window~2`
 
 The plugin can show the OpenFastTrace text trace output in an IDE output sub-window and keep that output available after the trace finishes. Users who select the plain text result view can inspect the plain text result inside the IDE without looking at log files or an external terminal.
@@ -437,7 +459,7 @@ Covers:
 
 Needs: scn
 
-### Open Specification Item from Trace Output Window
+#### Open Specification Item from Trace Output Window
 `req~open-specification-item-from-trace-output-window~1`
 
 The plugin makes OpenFastTrace specification item IDs in the trace output window navigable to their declarations in the opened project. Users can jump from a reported item in the trace output directly to the defining specification item without searching manually.
@@ -447,7 +469,7 @@ Covers:
 
 Needs: scn
 
-### OpenFastTrace Run Configurations
+### OFT Run Configurations
 `req~openfasttrace-run-configurations~1`
 
 The plugin provides a dedicated run configuration type for OpenFastTrace. Users can create, name, and save multiple trace configurations to switch quickly between different scan scopes and filters.
@@ -457,7 +479,7 @@ Covers:
 
 Needs: scn
 
-### OpenFastTrace Run Configuration Templates
+#### OpenFastTrace Run Configuration Templates
 `req~openfasttrace-run-configuration-templates~1`
 
 The plugin provides pre-configured templates when creating new OpenFastTrace run configurations. These templates allow users to quickly set up common scanning scenarios. The following templates are available:
@@ -471,7 +493,7 @@ Covers:
 
 Needs: scn
 
-### Filter Trace by Artifact Types
+#### Filter Trace by Artifact Types
 `req~filter-trace-by-artifact-types~1`
 
 When using an OpenFastTrace run configuration, the plugin lets users filter the trace results by artifact types. Users can specify a comma-separated list of types (e.g., `req, dsn`) to focus the trace on specific document layers.
@@ -481,17 +503,17 @@ Covers:
 
 Needs: scn
 
-### Filter Trace by Tags
+#### Filter Trace by Tags
 `req~filter-trace-by-tags~1`
 
-When using an OpenFastTrace run configuration, the plugin lets users filter the trace results by tags. Users can specify a comma-separated list of tags to focus the trace on tagged specification items.
+When using an OpenFastTrace run configuration, the plugin lets users filter the trace results by tags. Users can specify a comma-separated list of tags to focus the trace on tagged specification items and can select an `Include untagged items` checkbox below the Tags field to also include specification items without tags.
 
 Covers:
 - `feat~oft-run-configurations~2`
 
 Needs: scn
 
-### Select Trace Result View in Run Configuration
+#### Select Trace Result View in Run Configuration
 `req~select-trace-result-view-in-run-configuration~2`
 
 The OpenFastTrace run configuration includes a result-view option for choosing plain text output or the IntelliJ Test Runner UI.
@@ -506,11 +528,11 @@ Covers:
 
 Needs: scn
 
-### Plugin Distribution
+#### Plugin Distribution
 
 The following requirements refine how the plugin distribution appears in JetBrains plugin management surfaces.
 
-### Plugin Logo for JetBrains Plugin Surfaces
+#### Plugin Logo for JetBrains Plugin Surfaces
 `req~plugin-logo-for-jetbrains-plugin-surfaces~1`
 
 The plugin distribution includes JetBrains-compliant OpenFastTrace plugin logo assets that IntelliJ Platform IDEs and JetBrains Marketplace can display for the plugin. Users can recognize the plugin in plugin-management surfaces.
@@ -521,7 +543,7 @@ JetBrains plugin surfaces use packaged plugin logo resources to distinguish plug
 
 Needs: scn
 
-### Marketplace Metadata for JetBrains Plugin Surfaces
+#### Marketplace Metadata for JetBrains Plugin Surfaces
 `req~marketplace-metadata-for-jetbrains-plugin-surfaces~1`
 
 The plugin distribution includes Marketplace-facing descriptor metadata that IntelliJ Platform IDEs and JetBrains Marketplace can display for the plugin. Developers and other OpenFastTrace users can understand the plugin purpose, maintained project links, vendor identity, compatible IDE baseline, and current release notes before installing or updating the plugin.
@@ -532,11 +554,11 @@ JetBrains plugin surfaces extract key listing information from the packaged plug
 
 Needs: scn
 
-### Run Configuration Presentation
+#### Run Configuration Presentation
 
 The following requirements refine how OpenFastTrace run configurations appear in the IDE run/debug UI.
 
-### OpenFastTrace Run Configuration Icon
+#### OpenFastTrace Run Configuration Icon
 `req~openfasttrace-run-configuration-icon~1`
 
 The plugin shows an OpenFastTrace-specific icon for the `OpenFastTrace` run configuration type. Users can distinguish OpenFastTrace trace configurations from generic run actions in the run/debug UI.
@@ -546,27 +568,31 @@ Covers:
 
 Needs: scn
 
-### Show Trace Source Files as Test Runner Suites
-`req~show-trace-source-files-as-test-runner-suites~1`
+### OFT Test Runner Trace Results
 
-The IntelliJ Test Runner UI result view shows each traced source file as a test runner suite. For traced source files below the opened project directory, the suite label uses the project-local path, for example `doc/system_requirements.md`.
+The following requirements refine the OFT test-runner trace-results feature into user-visible capabilities.
 
-Covers:
-- `feat~oft-test-runner-trace-results~1`
+#### Show Trace Source Files as Test Runner Suites
+`req~show-trace-source-files-as-test-runner-suites~2`
 
-Needs: scn
-
-### Show Trace Specification Items as Test Runner Tests
-`req~show-trace-specification-items-as-test-runner-tests~1`
-
-The IntelliJ Test Runner UI result view shows each traced specification item as a test entry below the suite for the source file that contains that item.
+The IntelliJ Test Runner UI result view shows each traced source file as a test runner suite. For traced source files below the opened project directory, the suite label uses the project-local path, for example `doc/system_requirements.md`. Source-file suites structure the result tree and do not contribute to its logical result total or completion progress.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
 
 Needs: scn
 
-### Show Specification Item Title in Test Runner UI
+#### Show Trace Specification Items as Test Runner Tests
+`req~show-trace-specification-items-as-test-runner-tests~2`
+
+The IntelliJ Test Runner UI result view shows each traced specification item as a test entry below the suite for the source file that contains that item. Each visible specification-item entry contributes exactly one logical result to the displayed total and completion progress.
+
+Covers:
+- `feat~oft-test-runner-trace-results~1`
+
+Needs: scn
+
+#### Show Specification Item Title in Test Runner UI
 `req~show-specification-item-title-in-test-runner-ui~2`
 
 The IntelliJ Test Runner UI result view uses the item's title as the visible specification-item name when the imported OpenFastTrace item provides a non-blank title. Items without a title show the full specification item ID as the visible name.
@@ -576,7 +602,7 @@ Covers:
 
 Needs: scn
 
-### Show Specification Item ID in Test Runner Details
+#### Show Specification Item ID in Test Runner Details
 `req~show-specification-item-id-in-test-runner-details~1`
 
 The IntelliJ Test Runner UI result view shows the full specification item ID and trace status in the details for specification-item entries, even when the entry is passed.
@@ -586,7 +612,7 @@ Covers:
 
 Needs: scn
 
-### Sort Specification Items in Test Runner UI
+#### Sort Specification Items in Test Runner UI
 `req~sort-specification-items-in-test-runner-ui~1`
 
 Within each source-file suite, the IntelliJ Test Runner UI result view sorts specification item entries by artifact type, then by the name part of the specification item ID, then by revision number.
@@ -596,17 +622,17 @@ Covers:
 
 Needs: scn
 
-### Show Trace Links as Test Runner Sub-Tests
-`req~show-trace-links-as-test-runner-sub-tests~1`
+#### Show Trace Links as Test Runner Sub-Tests
+`req~show-trace-links-as-test-runner-sub-tests~2`
 
-The IntelliJ Test Runner UI result view shows each incoming or outgoing trace link as a sub-test below the connected specification item for which the link is shown.
+The IntelliJ Test Runner UI result view shows each incoming or outgoing trace link as a detail child below the connected specification item for which the link is shown. Trace-link detail children do not contribute to the displayed logical result total or completion progress.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
 
 Needs: scn
 
-### Show Specification Item Status in Test Runner UI
+#### Show Specification Item Status in Test Runner UI
 `req~show-specification-item-status-in-test-runner-ui~2`
 
 The IntelliJ Test Runner UI result view includes a specification item's trace status in brackets in the item entry only when the item status is not clean, for example `(uncovered)` or `(defective)`.
@@ -616,7 +642,7 @@ Covers:
 
 Needs: scn
 
-### Show Trace Link Status in Test Runner UI
+#### Show Trace Link Status in Test Runner UI
 `req~show-trace-link-status-in-test-runner-ui~2`
 
 The IntelliJ Test Runner UI result view includes a trace link's status in brackets in the link entry only when the link status is not clean, for example `(orphaned)`.
@@ -626,7 +652,7 @@ Covers:
 
 Needs: scn
 
-### Show Trace Link Direction in Test Runner UI
+#### Show Trace Link Direction in Test Runner UI
 `req~show-trace-link-direction-in-test-runner-ui~1`
 
 The IntelliJ Test Runner UI result view marks each trace link entry as incoming or outgoing. Users can distinguish links that cover the specification item from links that the specification item covers.
@@ -636,7 +662,7 @@ Covers:
 
 Needs: scn
 
-### Show Unicode Trace Link Direction in Test Runner UI
+#### Show Unicode Trace Link Direction in Test Runner UI
 `req~show-unicode-trace-link-direction-in-test-runner-ui~1`
 
 The IntelliJ Test Runner UI result view uses Unicode arrows in trace-link entries. Incoming links use `←`, outgoing links use `→`, and links without a single incoming or outgoing direction use `↔`.
@@ -646,17 +672,27 @@ Covers:
 
 Needs: scn
 
-### Map Specification Item Trace Status to Test Runner Status
-`req~map-specification-item-trace-status-to-test-runner-status~1`
+#### Map Specification Item Trace Status to Test Runner Status
+`req~map-specification-item-trace-status-to-test-runner-status~2`
 
-The IntelliJ Test Runner UI result view treats a clean specification item as a passed test and a defective specification item as a failed test.
+The IntelliJ Test Runner UI result view treats a clean specification item with only clean visible trace links as one passed logical result. It treats a defective specification item, or an item with one or more defective visible trace links, as one failed logical result.
 
 Covers:
 - `feat~oft-test-runner-trace-results~1`
 
 Needs: scn
 
-### Map Trace Link Status to Test Runner Status
+#### Count Only Specification Items in Test Runner Results
+`req~count-only-specification-items-in-test-runner-results~1`
+
+The IntelliJ Test Runner UI result view reports logical result totals and completion progress for visible specification items only. Source-file suites and incoming or outgoing trace-link detail children remain visible in the tree but do not increase the total or independently advance completion progress.
+
+Covers:
+- `feat~oft-test-runner-trace-results~1`
+
+Needs: scn
+
+#### Map Trace Link Status to Test Runner Status
 `req~map-trace-link-status-to-test-runner-status~1`
 
 The IntelliJ Test Runner UI result view treats a clean incoming or outgoing trace link as a passed sub-test and a defective incoming or outgoing trace link as a failed sub-test.
@@ -666,7 +702,7 @@ Covers:
 
 Needs: scn
 
-### Roll Up Source File Suite Trace Status
+#### Roll Up Source File Suite Trace Status
 `req~roll-up-source-file-suite-trace-status~1`
 
 The IntelliJ Test Runner UI result view marks a source-file suite as failed if any specification item or trace-link sub-test below that source file is failed. It marks the source-file suite as passed only if all descendants are clean.
@@ -676,7 +712,7 @@ Covers:
 
 Needs: scn
 
-### Roll Up Top-Level Trace Status
+#### Roll Up Top-Level Trace Status
 `req~roll-up-top-level-trace-status~1`
 
 The IntelliJ Test Runner UI result view marks the top-level trace suite as failed if any source-file suite contains a failed descendant. It marks the top-level trace suite as passed only if all source-file suites are clean.
@@ -686,7 +722,7 @@ Covers:
 
 Needs: scn
 
-### Show Specification Item Defect Details in Test Runner UI
+#### Show Specification Item Defect Details in Test Runner UI
 `req~show-specification-item-defect-details-in-test-runner-ui~1`
 
 The IntelliJ Test Runner UI result view shows a clear details text for failed specification-item entries. The details identify the specification item, its trace status, and the reason the item is defective.
@@ -696,7 +732,7 @@ Covers:
 
 Needs: scn
 
-### Show Trace Link Defect Details in Test Runner UI
+#### Show Trace Link Defect Details in Test Runner UI
 `req~show-trace-link-defect-details-in-test-runner-ui~1`
 
 The IntelliJ Test Runner UI result view shows a clear details text for failed trace-link entries. The details identify the owning specification item, the linked item, the link direction, the trace-link status, and the reason that status is defective.
@@ -706,7 +742,7 @@ Covers:
 
 Needs: scn
 
-### Show Trace Link ID Details in Test Runner UI
+#### Show Trace Link ID Details in Test Runner UI
 `req~show-trace-link-id-details-in-test-runner-ui~1`
 
 The IntelliJ Test Runner UI result view shows the owning specification item ID, linked specification item ID, link direction, and trace-link status in the details for trace-link entries, even when the entry is passed.
@@ -716,7 +752,7 @@ Covers:
 
 Needs: scn
 
-### Navigate from Test Runner Specification Items
+#### Navigate from Test Runner Specification Items
 `req~navigate-from-test-runner-specification-items~1`
 
 Users can navigate from a specification item entry in the IntelliJ Test Runner UI result view to the corresponding specification item declaration in the opened project.
@@ -726,7 +762,7 @@ Covers:
 
 Needs: scn
 
-### Navigate from Test Runner Trace Links
+#### Navigate from Test Runner Trace Links
 `req~navigate-from-test-runner-trace-links~1`
 
 Users can navigate from a trace-link entry in the IntelliJ Test Runner UI result view to the corresponding specification item declaration or source-side coverage tag in the opened project.
@@ -736,7 +772,7 @@ Covers:
 
 Needs: scn
 
-### Navigate from Test Runner Source Files
+#### Navigate from Test Runner Source Files
 `req~navigate-from-test-runner-source-files~1`
 
 Users can navigate from a source-file suite entry in the IntelliJ Test Runner UI result view to the corresponding file in the opened project.
@@ -746,7 +782,7 @@ Covers:
 
 Needs: scn
 
-### Show Scanned Base Directory in Trace Output Window
+#### Show Scanned Base Directory in Trace Output Window
 `req~show-scanned-base-directory-in-trace-output-window~1`
 
 When a plain text project trace starts, the plugin writes the resolved project base directory that OpenFastTrace scans into the IDE output sub-window. Users can confirm the actual trace input root directly from the trace output.
@@ -756,7 +792,7 @@ Covers:
 
 Needs: scn
 
-### Show Resolved Trace Inputs in Trace Output Window
+#### Show Resolved Trace Inputs in Trace Output Window
 `req~show-resolved-trace-inputs-in-trace-output-window~1`
 
 When a plain text project trace starts with selected-resource tracing, the plugin writes the resolved files and directories that it passes to OpenFastTrace into the IDE output sub-window. Users can confirm the actual configured trace scope directly from the trace output.
@@ -766,7 +802,7 @@ Covers:
 
 Needs: scn
 
-### Report Invalid Project Path before Trace Start
+#### Report Invalid Project Path before Trace Start
 `req~report-invalid-project-path-before-trace-start~1`
 
 The plugin reports when the opened project does not resolve to a valid local path before starting the trace. Users can see why the trace cannot start without inspecting plugin logs.
@@ -776,7 +812,7 @@ Covers:
 
 Needs: scn
 
-### Show Failing Trace Result in IDE Output Window
+#### Show Failing Trace Result in IDE Output Window
 `req~show-failing-trace-result-in-ide-output-window~1`
 
 When plain text output is selected, the plugin shows failing OpenFastTrace executions through the same IDE output flow as successful traces, including the text output and the failing result. Users can inspect trace failures without switching to plugin logs or an external terminal.
@@ -786,7 +822,7 @@ Covers:
 
 Needs: scn
 
-### Show Defect Count for Unclean Trace Chain in IDE Output Window
+#### Show Defect Count for Unclean Trace Chain in IDE Output Window
 `req~show-defect-count-for-unclean-trace-chain-in-output-window~1`
 
 The plugin preserves the OpenFastTrace plain-text defect summary for an unclean trace chain in the IDE output window, including the reported total-item count and defect count. Users can verify how many trace issues OpenFastTrace found directly from the text result.
@@ -1061,7 +1097,36 @@ Needs: dsn
 
 ### OFT Reference Completion
 
-The following scenarios describe completion support while editing OFT references in `Covers:` sections and coverage-tag targets.
+The following scenarios describe completion support while editing OFT references in `Covers:` sections and coverage-tag targets. Markdown declaration ID completion is described in the feature block below.
+
+### Markdown Specification Item ID Completion
+`feat~markdown-specification-item-id-completion~1`
+
+The plugin suggests existing OpenFastTrace specification item IDs while users edit the actual declaration ID field in supported Markdown specification documents. Users can complete declaration anchors from indexed declarations.
+
+Needs: req
+
+#### Complete Markdown Specification Item ID in Declaration ID Field
+`req~complete-markdown-specification-item-ids-in-declaration-id-field~1`
+
+The plugin suggests existing OpenFastTrace specification item IDs while users invoke completion in the actual specification item ID field of a Markdown declaration.
+
+Covers:
+- `feat~markdown-specification-item-id-completion~1`
+
+Needs: scn
+
+### Complete Markdown Specification Item ID in Declaration ID Field
+`scn~complete-markdown-specification-item-id-in-declaration-id-field~1`
+
+**Given** a project contains declared OpenFastTrace specification items and a user edits the actual ID field of a Markdown specification item declaration
+**When** the user types a partial specification item ID and invokes completion
+**Then** the IDE suggests existing declared specification item IDs from the project index and orders the suggestion list by full-ID prefix match, then name-prefix match, then name-substring match, and finally artifact-type prefix match
+
+Covers:
+- `req~complete-markdown-specification-item-ids-in-declaration-id-field~1`
+
+Needs: dsn
 
 ### Complete Specification Item ID in Covers Section
 `scn~complete-specification-item-id-in-covers-section~1`
@@ -1413,6 +1478,18 @@ Covers:
 
 Needs: dsn
 
+### Filter Run Configuration by Untagged Items
+`scn~filter-run-configuration-by-untagged-items~1`
+
+**Given** an IntelliJ project is open and an `OpenFastTrace` run configuration has the `Include untagged items` checkbox selected
+**When** a user runs that configuration
+**Then** the plugin passes the untagged-item filter to OpenFastTrace and the resulting trace output contains only specification items without tags.
+
+Covers:
+- `req~filter-trace-by-tags~1`
+
+Needs: dsn
+
 ### Test Runner as Default Run Configuration Result View
 `scn~test-runner-as-default-run-configuration-result-view~1`
 
@@ -1447,6 +1524,53 @@ Needs: dsn
 
 Covers:
 - `req~select-trace-result-view-in-run-configuration~2`
+
+Needs: dsn
+
+#### Filter Transitive Defects in Trace Result View
+`req~filter-transitive-defects-in-trace-result-view~1`
+
+The OpenFastTrace run configuration includes a `Show transitive defects` checkbox for the trace result view. When users leave the checkbox selected, the plugin shows transitive defects alongside direct defects in the configured result view. When users clear the checkbox, the plugin hides transitive defects so they can focus on the direct defects that still need fixing.
+
+Covers:
+- `feat~oft-run-configurations~2`
+- `feat~oft-test-runner-trace-results~1`
+
+Needs: scn
+
+#### Show Transitive Defects by Default in Run Configuration Templates
+`scn~show-transitive-defects-by-default-in-run-configuration-templates~1`
+
+**Given** an IntelliJ project is open and a user creates a new OpenFastTrace run configuration from one of the bundled templates
+**When** the configuration editor opens
+**Then** the `Show transitive defects` checkbox is selected by default
+
+Covers:
+- `req~filter-transitive-defects-in-trace-result-view~1`
+
+Needs: dsn
+
+#### Hide Transitive Defects in Test Runner UI
+`scn~hide-transitive-defects-in-test-runner-ui~1`
+
+**Given** an IntelliJ project is open, an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view, and the `Show transitive defects` checkbox is cleared
+**When** the user runs the configuration
+**Then** the test runner tree omits transitive defects while still showing direct defects and their trace links
+
+Covers:
+- `req~filter-transitive-defects-in-trace-result-view~1`
+
+Needs: dsn
+
+#### Hide Transitive Defects in Plain Text Output
+`scn~hide-transitive-defects-in-plain-text-output~1`
+
+**Given** an IntelliJ project is open, an `OpenFastTrace` run configuration uses the plain text result view, and the `Show transitive defects` checkbox is cleared
+**When** the user runs the configuration
+**Then** the plain text report omits transitive defects while still showing direct defects and their trace links
+
+Covers:
+- `req~filter-transitive-defects-in-trace-result-view~1`
 
 Needs: dsn
 
@@ -1487,26 +1611,26 @@ Covers:
 Needs: dsn
 
 ### Show Trace Source Files as Test Runner Suites
-`scn~show-trace-source-files-as-test-runner-suites~1`
+`scn~show-trace-source-files-as-test-runner-suites~2`
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains specification items from supported source files
 **When** the trace completes
-**Then** the test runner tree contains one suite per source file and labels source files below the opened project directory with project-local paths
+**Then** the test runner tree contains one suite per source file, labels source files below the opened project directory with project-local paths, and excludes those suites from the logical result total and completion progress.
 
 Covers:
-- `req~show-trace-source-files-as-test-runner-suites~1`
+- `req~show-trace-source-files-as-test-runner-suites~2`
 
 Needs: dsn
 
 ### Show Trace Specification Items as Test Runner Tests
-`scn~show-trace-specification-items-as-test-runner-tests~1`
+`scn~show-trace-specification-items-as-test-runner-tests~2`
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains specification items from supported source files
 **When** the trace completes
-**Then** the test runner tree contains one test entry per specification item below the suite for the source file that contains that item
+**Then** the test runner tree contains one test entry per specification item below the suite for the source file that contains that item and each visible item contributes one logical result.
 
 Covers:
-- `req~show-trace-specification-items-as-test-runner-tests~1`
+- `req~show-trace-specification-items-as-test-runner-tests~2`
 
 Needs: dsn
 
@@ -1515,7 +1639,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a specification item with a title
 **When** the trace completes
-**Then** the test runner tree shows the title as the visible specification-item name and omits the full specification item ID from the tree label
+**Then** the test runner tree shows the title as the visible specification-item name and omits the full specification item ID from the tree label.
 
 Covers:
 - `req~show-specification-item-title-in-test-runner-ui~2`
@@ -1547,14 +1671,14 @@ Covers:
 Needs: dsn
 
 ### Show Trace Links as Test Runner Sub-Tests
-`scn~show-trace-links-as-test-runner-sub-tests~1`
+`scn~show-trace-links-as-test-runner-sub-tests~2`
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and a traced specification item has incoming or outgoing trace links
 **When** the trace completes
-**Then** the test runner tree shows each incoming or outgoing trace link as a sub-test below that specification item
+**Then** the test runner tree shows each incoming or outgoing trace link as a detail child below that specification item without increasing the logical result total or completion progress.
 
 Covers:
-- `req~show-trace-links-as-test-runner-sub-tests~1`
+- `req~show-trace-links-as-test-runner-sub-tests~2`
 
 Needs: dsn
 
@@ -1575,7 +1699,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains an incoming or outgoing trace link
 **When** the trace completes
-**Then** the trace-link sub-test shows the link status in brackets only when the link status is not clean
+**Then** the trace-link sub-test shows the link status in brackets only when the link status is not clean.
 
 Covers:
 - `req~show-trace-link-status-in-test-runner-ui~2`
@@ -1587,7 +1711,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains specification items with incoming or outgoing trace links
 **When** the trace completes
-**Then** each trace-link sub-test shows whether the link is incoming or outgoing
+**Then** each trace-link sub-test shows whether the link is incoming or outgoing.
 
 Covers:
 - `req~show-trace-link-direction-in-test-runner-ui~1`
@@ -1599,7 +1723,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains incoming and outgoing trace links
 **When** the trace completes
-**Then** the trace-link sub-tests use Unicode arrows for the visible link direction
+**Then** the trace-link sub-tests use Unicode arrows for the visible link direction.
 
 Covers:
 - `req~show-unicode-trace-link-direction-in-test-runner-ui~1`
@@ -1607,14 +1731,40 @@ Covers:
 Needs: dsn
 
 ### Map Specification Item Trace Status to Test Runner Status
-`scn~map-specification-item-trace-status-to-test-runner-status~1`
+`scn~map-specification-item-trace-status-to-test-runner-status~2`
 
-**Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains clean and defective specification items
+**Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains clean and defective specification items, including an item with a defective visible trace link
 **When** the trace completes
-**Then** clean specification items are shown as passed tests and defective specification items are shown as failed tests
+**Then** each clean item with only clean visible links is shown as one passed logical result and each defective item or item with a defective visible link is shown as one failed logical result.
 
 Covers:
-- `req~map-specification-item-trace-status-to-test-runner-status~1`
+- `req~map-specification-item-trace-status-to-test-runner-status~2`
+
+Needs: dsn
+
+### Count Only Specification Items in Test Runner Results
+`scn~count-only-specification-items-in-test-runner-results~1`
+
+**Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and a clean trace result contains specification items in source-file suites with visible trace-link detail children
+**When** the trace completes
+**Then** the displayed result total equals the number of visible specification-item entries and the completion progress reaches 100%.
+
+Covers:
+- `req~count-only-specification-items-in-test-runner-results~1`
+
+Needs: dsn
+
+#### Mark Transitive Defects in Test Runner
+`scn~mark-transitive-defects-in-test-runner~1`
+
+**Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains defective specification items
+**When** the trace completes 
+**Then** the node name of specification items that are identified as transitive defects start with "↳"
+**And** the failure description calls the failure a transitive error
+**And** the failure description tells users to fix the specification items this one depends on. 
+
+Covers:
+- `req~map-specification-item-trace-status-to-test-runner-status~2`
 
 Needs: dsn
 
@@ -1623,7 +1773,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains clean and defective incoming or outgoing trace links
 **When** the trace completes
-**Then** clean trace links are shown as passed sub-tests and defective trace links are shown as failed sub-tests
+**Then** clean trace links are shown as passed sub-tests and defective trace links are shown as failed sub-tests.
 
 Covers:
 - `req~map-trace-link-status-to-test-runner-status~1`
@@ -1635,7 +1785,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and a source-file suite contains at least one failed specification item or trace-link sub-test
 **When** the trace completes
-**Then** the source-file suite is shown as failed
+**Then** the source-file suite is shown as failed.
 
 Covers:
 - `req~roll-up-source-file-suite-trace-status~1`
@@ -1647,7 +1797,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and at least one source-file suite contains a failed descendant
 **When** the trace completes
-**Then** the top-level trace suite is shown as failed
+**Then** the top-level trace suite is shown as failed.
 
 Covers:
 - `req~roll-up-top-level-trace-status~1`
@@ -1659,7 +1809,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a defective specification item
 **When** the user selects that specification item in the test runner tree
-**Then** the detail view explains why the specification item is defective
+**Then** the detail view explains why the specification item is defective.
 
 Covers:
 - `req~show-specification-item-defect-details-in-test-runner-ui~1`
@@ -1671,7 +1821,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a defective trace link
 **When** the user selects that trace link in the test runner tree
-**Then** the detail view explains why the trace link is defective
+**Then** the detail view explains why the trace link is defective.
 
 Covers:
 - `req~show-trace-link-defect-details-in-test-runner-ui~1`
@@ -1683,7 +1833,7 @@ Needs: dsn
 
 **Given** an `OpenFastTrace` run configuration uses the IntelliJ Test Runner UI result view and the trace result contains a trace link
 **When** the user selects that trace link in the test runner tree
-**Then** the detail view shows the owning specification item ID, linked specification item ID, link direction, and trace-link status
+**Then** the detail view shows the owning specification item ID, linked specification item ID, link direction, and trace-link status.
 
 Covers:
 - `req~show-trace-link-id-details-in-test-runner-ui~1`
@@ -1695,7 +1845,7 @@ Needs: dsn
 
 **Given** an IntelliJ project is open and the test runner tree shows an OpenFastTrace specification item entry from that project
 **When** a user activates source navigation for that specification item entry
-**Then** the IDE opens the corresponding specification item declaration in the editor
+**Then** the IDE opens the corresponding specification item declaration in the editor.
 
 Covers:
 - `req~navigate-from-test-runner-specification-items~1`
@@ -1707,7 +1857,7 @@ Needs: dsn
 
 **Given** an IntelliJ project is open and the test runner tree shows an OpenFastTrace trace-link entry from that project
 **When** a user activates source navigation for that trace-link entry
-**Then** the IDE opens the corresponding specification item declaration or source-side coverage tag in the editor
+**Then** the IDE opens the corresponding specification item declaration or source-side coverage tag in the editor.
 
 Covers:
 - `req~navigate-from-test-runner-trace-links~1`
@@ -1719,7 +1869,7 @@ Needs: dsn
 
 **Given** an IntelliJ project is open and the test runner tree shows an OpenFastTrace source-file suite entry from that project
 **When** a user activates source navigation for that source-file suite entry
-**Then** the IDE opens the corresponding source file in the editor
+**Then** the IDE opens the corresponding source file in the editor.
 
 Covers:
 - `req~navigate-from-test-runner-source-files~1`
