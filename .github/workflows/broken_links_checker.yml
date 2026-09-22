@@ -16,7 +16,7 @@ jobs:
   linkChecker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Configure broken links checker
         run: |
           mkdir -p ./target
@@ -28,7 +28,7 @@ jobs:
               }
             ]
           }' > ./target/broken_links_checker.json
-      - uses: tcort/github-action-markdown-link-check@v1
+      - uses: tcort/github-action-markdown-link-check@e047c5b37f24ab722bbef1a27b6fab7f96bc4068 # v1
         with:
           use-quiet-mode: "yes"
           use-verbose-mode: "yes"

@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 
 final class OpenFastTraceUserGuide {
     static final String TITLE = "OpenFastTrace User Guide";
-    static final String URL = "https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md";
+    static final String URL = "https://openfasttrace.itsallcode.org/user_guide/user_guide.html";
 
     private OpenFastTraceUserGuide() {
     }
