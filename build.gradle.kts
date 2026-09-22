@@ -21,7 +21,10 @@ plugins {
     id("io.github.ben-manes.versions") version "0.64.0"
     id("com.diffplug.spotless") version "8.10.2"
     id("org.itsallcode.openfasttrace") version "3.3.0"
-    id("org.jetbrains.intellij.platform") version "2.19.0"
+    // Pinned until newer plugin versions no longer break the navigation tests:
+    // https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/2189
+    // Remove this pin once a newer version passes `./gradlew test` here.
+    id("org.jetbrains.intellij.platform") version "2.17.0"
     id("org.sonarqube") version "7.5.0.8588"
 }
 
