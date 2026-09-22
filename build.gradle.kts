@@ -105,23 +105,24 @@ repositories {
     }
 }
 
+// Versions are pinned here intentionally.
 dependencies {
-    implementation("org.itsallcode.openfasttrace:openfasttrace:4.10.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace:4.10.0") // NOSONAR
 
     intellijPlatform {
-        intellijIdea("2026.1.3")
+        intellijIdea("2026.1.3") // NOSONAR
         bundledPlugin("com.intellij.java")
         testFramework(TestFrameworkType.Platform)
         pluginVerifier()
         zipSigner()
     }
 
-    testImplementation(platform("org.junit:junit-bom:6.1.3"))
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(platform("org.junit:junit-bom:6.1.3")) // NOSONAR
+    testImplementation("junit:junit:4.13.2") // NOSONAR
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.hamcrest:hamcrest:3.0")
-    testImplementation("org.opentest4j:opentest4j:1.3.0")
+    testImplementation("org.hamcrest:hamcrest:3.0") // NOSONAR
+    testImplementation("org.opentest4j:opentest4j:1.3.0") // NOSONAR
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
 }
 
