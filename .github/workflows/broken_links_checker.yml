@@ -28,7 +28,7 @@ jobs:
               }
             ]
           }' > ./target/broken_links_checker.json
-      - uses: tcort/github-action-markdown-link-check@v1
+      - uses: tcort/github-action-markdown-link-check@e047c5b37f24ab722bbef1a27b6fab7f96bc4068 # v1
         with:
           use-quiet-mode: "yes"
           use-verbose-mode: "yes"
