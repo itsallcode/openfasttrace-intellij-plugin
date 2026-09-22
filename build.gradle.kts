@@ -18,11 +18,11 @@ fun isNonStableVersion(version: String): Boolean {
 plugins {
     id("java")
     id("jacoco")
-    id("com.github.ben-manes.versions") version "0.54.0"
-    id("com.diffplug.spotless") version "8.6.0"
-    id("org.itsallcode.openfasttrace") version "3.1.2"
-    id("org.jetbrains.intellij.platform") version "2.16.0"
-    id("org.sonarqube") version "7.3.1.8318"
+    id("io.github.ben-manes.versions") version "0.64.0"
+    id("com.diffplug.spotless") version "8.10.2"
+    id("org.itsallcode.openfasttrace") version "3.3.0"
+    id("org.jetbrains.intellij.platform") version "2.19.0"
+    id("org.sonarqube") version "7.5.0.8588"
 }
 
 val pluginVersion = providers.gradleProperty("version")
@@ -64,7 +64,7 @@ java {
 }
 
 jacoco {
-    toolVersion = "0.8.13"
+    toolVersion = "0.8.15"
 }
 
 // [bld->dsn~gradle-dependency-maintenance-uses-locks-and-versions-plugin~1]
@@ -103,7 +103,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.itsallcode.openfasttrace:openfasttrace:4.9.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace:4.10.0")
 
     intellijPlatform {
         intellijIdea("2026.1.3")
@@ -113,7 +113,7 @@ dependencies {
         zipSigner()
     }
 
-    testImplementation(platform("org.junit:junit-bom:6.1.0"))
+    testImplementation(platform("org.junit:junit-bom:6.1.3"))
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.platform:junit-platform-launcher")
