@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Fail if not running on main branch
         if: ${{ github.ref != 'refs/heads/main' }}
@@ -27,7 +27,7 @@ jobs:
             core.setFailed('Not running on main branch, github.ref is ${{ github.ref }}. Please start this workflow only on main')
 
       - name: Set up Java 21
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
