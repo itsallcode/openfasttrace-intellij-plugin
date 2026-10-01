@@ -52,30 +52,58 @@ public final class OftRenamePsiElementProcessor extends RenamePsiElementProcesso
         }
         final int offset = editor.getCaretModel().getOffset();
         final CharSequence fileText = element.getContainingFile().getViewProvider().getContents();
-        for (OftSpecificationItemMatch match : OftSyntaxCore.findDefinitionSpecificationItems(fileText)) {
-            final int start = match.span().startOffset();
-            final int end = match.span().endOffset();
-            final int startBound = (start > 0 && fileText.charAt(start - 1) == '`') ? start - 1 : start;
-            final int endBound = (end < fileText.length() && fileText.charAt(end) == '`') ? end + 1 : end;
-            if (offset >= startBound && offset <= endBound) {
-                final PsiElement target = OftDeclarationResolver.findPsiElementAt(
-                        PsiManager.getInstance(element.getProject()),
-                        virtualFile,
-                        start
-                );
-                final OftIndexedSpecification spec = new OftIndexedSpecification(
-                        match.item().artifactType(),
-                        match.item().name(),
-                        match.item().revision(),
-                        start
-                );
-                return new OftDeclarationNavigationElement(
-                        target != null ? target : element,
-                        spec
-                );
-            }
+        final OftSpecificationItemMatch match = findMatchingSpecificationAtOffset(fileText, offset);
+        if (match != null) {
+            return createNavigationElement(element, virtualFile, match);
         }
         return element;
+    }
+
+    private static @Nullable OftSpecificationItemMatch findMatchingSpecificationAtOffset(
+            final CharSequence fileText,
+            final int offset
+    ) {
+        for (OftSpecificationItemMatch match : OftSyntaxCore.findDefinitionSpecificationItems(fileText)) {
+            if (isOffsetWithinBounds(fileText, match.span(), offset)) {
+                return match;
+            }
+        }
+        return null;
+    }
+
+    private static boolean isOffsetWithinBounds(
+            final CharSequence fileText,
+            final OftTextSpan span,
+            final int offset
+    ) {
+        final int start = span.startOffset();
+        final int end = span.endOffset();
+        final int startBound = (start > 0 && fileText.charAt(start - 1) == '`') ? start - 1 : start;
+        final int endBound = (end < fileText.length() && fileText.charAt(end) == '`') ? end + 1 : end;
+        return offset >= startBound && offset <= endBound;
+    }
+
+    private static OftDeclarationNavigationElement createNavigationElement(
+            final PsiElement element,
+            final VirtualFile virtualFile,
+            final OftSpecificationItemMatch match
+    ) {
+        final int start = match.span().startOffset();
+        final PsiElement target = OftDeclarationResolver.findPsiElementAt(
+                PsiManager.getInstance(element.getProject()),
+                virtualFile,
+                start
+        );
+        final OftIndexedSpecification spec = new OftIndexedSpecification(
+                match.item().artifactType(),
+                match.item().name(),
+                match.item().revision(),
+                start
+        );
+        return new OftDeclarationNavigationElement(
+                target != null ? target : element,
+                spec
+        );
     }
 
     @Override
