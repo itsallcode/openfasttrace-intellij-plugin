@@ -51,7 +51,7 @@ public final class OftRenameHandler implements RenameHandler {
             return false;
         }
         final VirtualFile virtualFile = file.getVirtualFile();
-        if (virtualFile == null || !OftSupportedFiles.isSpecificationFile(virtualFile)) {
+        if (!OftSupportedFiles.isSpecificationFile(virtualFile)) {
             return false;
         }
         final int offset = editor.getCaretModel().getOffset();
