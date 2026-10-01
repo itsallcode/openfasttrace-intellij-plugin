@@ -2,6 +2,7 @@ package org.itsallcode.openfasttrace.intellijplugin.navigation;
 
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -26,6 +27,18 @@ final class OftDeclarationNavigationElement extends FakePsiElement {
     OftDeclarationNavigationElement(final PsiElement delegate, final OftIndexedSpecification specification) {
         this.delegate = delegate;
         this.specification = specification;
+    }
+
+    OftIndexedSpecification getSpecification() {
+        return specification;
+    }
+
+    @Override
+    public TextRange getTextRange() {
+        if (specification != null) {
+            return new TextRange(specification.offset(), specification.offset() + specification.id().length());
+        }
+        return super.getTextRange();
     }
 
     @Override
@@ -80,6 +93,16 @@ final class OftDeclarationNavigationElement extends FakePsiElement {
     @Override
     public boolean isValid() {
         return delegate != null && delegate.isValid();
+    }
+
+    @Override
+    public boolean isWritable() {
+        return delegate != null && delegate.isWritable();
+    }
+
+    @Override
+    public boolean isPhysical() {
+        return delegate != null && delegate.isPhysical();
     }
 
     @Override

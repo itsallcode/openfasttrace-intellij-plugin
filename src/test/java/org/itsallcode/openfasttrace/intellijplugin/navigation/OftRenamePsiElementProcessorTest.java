@@ -25,13 +25,63 @@ import static org.hamcrest.Matchers.sameInstance;
 public class OftRenamePsiElementProcessorTest extends AbstractOftPlatformTestCase {
     private final OftRenamePsiElementProcessor processor = new OftRenamePsiElementProcessor();
 
-    public void testGivenSpecificationElementWhenCheckingCanProcessThenItReturnsTrue() {
+    public void testGivenSpecificationFileWhenCheckingCanProcessThenItReturnsFalse() {
         final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
                 req~test_item~1
                 Needs: dsn
                 """);
 
-        assertThat(processor.canProcessElement(specFile), is(true));
+        assertThat(processor.canProcessElement(specFile), is(false));
+    }
+
+    public void testGivenDirectoryWhenCheckingCanProcessThenItReturnsFalse() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                req~test_item~1
+                Needs: dsn
+                """);
+
+        assertThat(processor.canProcessElement(Objects.requireNonNull(specFile.getParent())), is(false));
+    }
+
+    public void testGivenSpecificationDeclarationElementWhenCheckingCanProcessThenItReturnsTrue() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                req~test_item~1
+                Needs: dsn
+                """);
+        final PsiElement declarationElement = Objects.requireNonNull(specFile.findElementAt(0));
+
+        assertThat(processor.canProcessElement(declarationElement), is(true));
+    }
+
+    public void testGivenDeclarationNavigationElementWhenCheckingCanProcessThenItReturnsTrue() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                req~test_item~1
+                Needs: dsn
+                """);
+        final PsiElement declarationElement = Objects.requireNonNull(specFile.findElementAt(0));
+        final OftDeclarationNavigationElement navigationElement = new OftDeclarationNavigationElement(
+                declarationElement,
+                new org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecification(
+                        "req",
+                        "test_item",
+                        1,
+                        0
+                )
+        );
+
+        assertThat(processor.canProcessElement(navigationElement), is(true));
+    }
+
+    public void testGivenNonDeclarationElementInSpecificationFileWhenCheckingCanProcessThenItReturnsFalse() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                Some leading documentation text.
+
+                req~test_item~1
+                Needs: dsn
+                """);
+        final PsiElement textElement = Objects.requireNonNull(specFile.findElementAt(5));
+
+        assertThat(processor.canProcessElement(textElement), is(false));
     }
 
     public void testGivenNonSpecificationElementWhenCheckingCanProcessThenItReturnsFalse() {
@@ -68,7 +118,7 @@ public class OftRenamePsiElementProcessorTest extends AbstractOftPlatformTestCas
 
         Assertions.assertAll(
                 () -> assertThat(substituted, notNullValue()),
-                () -> assertThat(processor.canProcessElement(substituted), is(true))
+                () -> assertThat(processor.canProcessElement(Objects.requireNonNull(substituted)), is(true))
         );
     }
 
@@ -109,10 +159,11 @@ public class OftRenamePsiElementProcessorTest extends AbstractOftPlatformTestCas
                 Needs: dsn
                 """);
         myFixture.configureFromExistingVirtualFile(specFile.getVirtualFile());
+        final PsiElement declarationElement = Objects.requireNonNull(specFile.findElementAt(0));
 
         final IncorrectOperationException exception = Assertions.assertThrows(
                 IncorrectOperationException.class,
-                () -> processor.renameElement(specFile, "invalid_specification_id", null, null)
+                () -> processor.renameElement(declarationElement, "invalid_specification_id", null, null)
         );
 
         assertThat(
@@ -137,6 +188,7 @@ public class OftRenamePsiElementProcessorTest extends AbstractOftPlatformTestCas
                         + "class Service {}\n"
         );
         myFixture.configureFromExistingVirtualFile(specFile.getVirtualFile());
+        final PsiElement declarationElement = Objects.requireNonNull(specFile.findElementAt(0));
 
         final OftSpecificationItem targetItem = new OftSpecificationItem("req", "rename_target", 1);
         final OftSpecificationIdReference reference = new OftSpecificationIdReference(
@@ -151,7 +203,7 @@ public class OftRenamePsiElementProcessorTest extends AbstractOftPlatformTestCas
         EdtTestUtil.runInEdtAndWait(() -> WriteCommandAction.runWriteCommandAction(
                 getProject(),
                 () -> processor.renameElement(
-                        specFile,
+                        declarationElement,
                         "req~renamed_item~1",
                         new UsageInfo[]{usageInfo},
                         null
@@ -163,6 +215,31 @@ public class OftRenamePsiElementProcessorTest extends AbstractOftPlatformTestCas
                 () -> assertThat(documentText(nestedSpec), containsString("req~renamed_item~1")),
                 () -> assertThat(documentText(javaFile), containsString("[" + "req~renamed_item~1->req~other~1]")),
                 () -> assertThat(documentText(javaFile), containsString("[" + "impl~service~1->req~renamed_item~1]"))
+        );
+    }
+
+    public void testGivenFileRenameForMarkdownJavaAndTextFilesThenProcessorDoesNotInterfere() {
+        final PsiFile markdownFile = myFixture.addFileToProject("doc/spec.md", """
+                req~rename_target~1
+                Needs: dsn
+                """);
+        final PsiFile javaFile = myFixture.addFileToProject("src/Main.java", "class Main {}");
+        final PsiFile textFile = myFixture.addFileToProject("doc/notes.txt", "Some plain notes.");
+
+        Assertions.assertAll(
+                () -> assertThat(processor.canProcessElement(markdownFile), is(false)),
+                () -> assertThat(processor.canProcessElement(javaFile), is(false)),
+                () -> assertThat(processor.canProcessElement(textFile), is(false))
+        );
+
+        myFixture.renameElement(markdownFile, "renamed-spec.md");
+        myFixture.renameElement(javaFile, "RenamedMain.java");
+        myFixture.renameElement(textFile, "renamed-notes.txt");
+
+        Assertions.assertAll(
+                () -> assertThat(markdownFile.getName(), is("renamed-spec.md")),
+                () -> assertThat(javaFile.getName(), is("RenamedMain.java")),
+                () -> assertThat(textFile.getName(), is("renamed-notes.txt"))
         );
     }
 

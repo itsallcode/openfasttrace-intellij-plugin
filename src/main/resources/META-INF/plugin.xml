@@ -129,6 +129,8 @@
                 language="TEXT"
                 implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftCoverageTagReferenceContributor"/>
         <renamePsiElementProcessor implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftRenamePsiElementProcessor"/>
+        <renameHandler implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftRenameHandler"/>
+        <renameInputValidator implementation="org.itsallcode.openfasttrace.intellijplugin.navigation.OftRenameInputValidator"/>
         <highlightingPassFactory implementation="org.itsallcode.openfasttrace.intellijplugin.highlighting.OftHighlightingPassRegistrar"/>
         <configurationType implementation="org.itsallcode.openfasttrace.intellijplugin.trace.runconfig.OftRunConfigurationType"/>
     </extensions>

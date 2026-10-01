@@ -296,7 +296,7 @@ Covers:
 - `scn~update-oft-references-after-rename~1`
 - `scn~show-renamed-oft-item-in-navigation~1`
 
-Needs: impl
+Needs: impl, itest
 
 ### User Guide Integration
 `dsn~user-guide-integration~1`

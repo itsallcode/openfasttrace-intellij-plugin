@@ -6,6 +6,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.search.SearchScope;
@@ -42,24 +43,39 @@ final class OftDeclarationResolver {
     }
 
     static Optional<OftSpecificationItem> findDeclaredItem(final PsiElement element) {
-        if (element == null || element.getContainingFile() == null) {
+        if (element == null || element instanceof PsiFileSystemItem) {
+            return Optional.empty();
+        }
+        if (element instanceof OftDeclarationNavigationElement navElement) {
+            final OftIndexedSpecification spec = navElement.getSpecification();
+            if (spec != null) {
+                return Optional.of(new OftSpecificationItem(spec.artifactType(), spec.name(), spec.revision()));
+            }
+            return Optional.empty();
+        }
+        if (element.getContainingFile() == null) {
             return Optional.empty();
         }
         final VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
-        if (virtualFile == null || !OftSupportedFiles.isSpecificationFile(virtualFile)) {
+        if (!OftSupportedFiles.isSpecificationFile(virtualFile)) {
             return Optional.empty();
         }
         final TextRange textRange = element.getTextRange();
         if (textRange == null) {
             return Optional.empty();
         }
-        final int offset = textRange.getStartOffset();
-        return OftSyntaxCore.findDefinitionSpecificationItems(
-                        element.getContainingFile().getViewProvider().getContents()
-                ).stream()
-                .filter(match -> contains(match.span(), offset))
+        final CharSequence fileText = element.getContainingFile().getViewProvider().getContents();
+        return OftSyntaxCore.findDefinitionSpecificationItems(fileText).stream()
+                .filter(match -> isElementMatchingDeclarationSpan(textRange, match.span()))
                 .map(OftSpecificationItemMatch::item)
                 .findFirst();
+    }
+
+    private static boolean isElementMatchingDeclarationSpan(final TextRange textRange, final OftTextSpan span) {
+        final int start = textRange.getStartOffset();
+        final int end = textRange.getEndOffset();
+        return (contains(span, start) || (start >= span.startOffset() - 2 && end <= span.endOffset() + 2))
+                && start >= span.startOffset() - 10;
     }
 
     private static Optional<OftSpecificationItem> findCoverageTagReferenceAt(
