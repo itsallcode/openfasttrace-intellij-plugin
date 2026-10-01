@@ -455,7 +455,7 @@ public class OftNavigationTest extends AbstractOftPlatformTestCase {
         EdtTestUtil.runInEdtAndWait(() -> WriteCommandAction.runWriteCommandAction(
                 getProject(),
                 () -> new OftRenamePsiElementProcessor().renameElement(
-                        myFixture.getFile(),
+                        declarationElementAtCaret(),
                         "req~new_name~1",
                         null,
                         null
