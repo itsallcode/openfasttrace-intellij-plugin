@@ -78,9 +78,9 @@ public final class OftRenamePsiElementProcessor extends RenamePsiElementProcesso
     ) {
         final int start = span.startOffset();
         final int end = span.endOffset();
-        final int startBound = (start > 0 && fileText.charAt(start - 1) == '`') ? start - 1 : start;
-        final int endBound = (end < fileText.length() && fileText.charAt(end) == '`') ? end + 1 : end;
-        return offset >= startBound && offset <= endBound;
+        final int startBound = ((start > 0) && (fileText.charAt(start - 1) == '`')) ? (start - 1) : start;
+        final int endBound = ((end < fileText.length()) && (fileText.charAt(end) == '`')) ? (end + 1) : end;
+        return (offset >= startBound) && (offset <= endBound);
     }
 
     private static OftDeclarationNavigationElement createNavigationElement(
@@ -113,13 +113,13 @@ public final class OftRenamePsiElementProcessor extends RenamePsiElementProcesso
             final UsageInfo @Nullable [] usages,
             final RefactoringElementListener listener
     ) throws IncorrectOperationException {
+        if (OftSyntaxCore.classifySpecificationItem(newName) != OftFragmentStatus.VALID) {
+            throw new IncorrectOperationException("Invalid OpenFastTrace specification item ID: " + newName);
+        }
         final OftSpecificationItem oldItem = OftDeclarationResolver.findDeclaredItem(element)
                 .orElseThrow(() -> new IncorrectOperationException(
                         "OpenFastTrace specification item declaration not found at rename target."
                 ));
-        if (OftSyntaxCore.classifySpecificationItem(newName) != OftFragmentStatus.VALID) {
-            throw new IncorrectOperationException("Invalid OpenFastTrace specification item ID: " + newName);
-        }
         final Project project = element.getProject();
         final PsiFile psiFile = element.getContainingFile();
         final String oldName = oldItem.id();
@@ -147,14 +147,12 @@ public final class OftRenamePsiElementProcessor extends RenamePsiElementProcesso
             return;
         }
         final CharSequence fileText = psiFile.getViewProvider().getContents();
-        final List<OftTextSpan> spans = new ArrayList<>();
-        for (OftSpecificationItemMatch match : OftSyntaxCore.findDefinitionSpecificationItems(fileText)) {
-            if (oldName.equals(match.item().id())) {
-                spans.add(match.span());
-            }
-        }
-        spans.sort(Comparator.comparingInt(OftTextSpan::startOffset).reversed());
-        for (OftTextSpan span : spans) {
+        final List<OftTextSpan> spans = OftSyntaxCore.findDefinitionSpecificationItems(fileText).stream()
+                .filter(match -> oldName.equals(match.item().id()))
+                .map(OftSpecificationItemMatch::span)
+                .sorted(Comparator.comparingInt(OftTextSpan::startOffset).reversed())
+                .toList();
+        for (final OftTextSpan span : spans) {
             replaceSpan(document, span, newText);
         }
         PsiDocumentManager.getInstance(project).commitDocument(document);
@@ -208,16 +206,14 @@ public final class OftRenamePsiElementProcessor extends RenamePsiElementProcesso
         if (document == null) {
             return;
         }
-        final List<OftTextSpan> spans = new ArrayList<>();
-        for (OftSpecificationItemMatch match : OftDeclarationResolver.findCoveredSpecificationItems(
+        final List<OftTextSpan> spans = OftDeclarationResolver.findCoveredSpecificationItems(
                 psiFile.getViewProvider().getContents()
-        )) {
-            if (oldName.equals(match.item().id())) {
-                spans.add(match.span());
-            }
-        }
-        spans.sort(Comparator.comparingInt(OftTextSpan::startOffset).reversed());
-        for (OftTextSpan span : spans) {
+        ).stream()
+                .filter(match -> oldName.equals(match.item().id()))
+                .map(OftSpecificationItemMatch::span)
+                .sorted(Comparator.comparingInt(OftTextSpan::startOffset).reversed())
+                .toList();
+        for (final OftTextSpan span : spans) {
             replaceSpan(document, span, newName);
         }
         PsiDocumentManager.getInstance(project).commitDocument(document);

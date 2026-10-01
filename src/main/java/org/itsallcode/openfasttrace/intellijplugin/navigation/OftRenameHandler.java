@@ -14,8 +14,10 @@ import com.intellij.refactoring.rename.RenameHandler;
 import com.intellij.refactoring.util.CommonRefactoringUtil;
 import org.itsallcode.openfasttrace.intellijplugin.OftSupportedFiles;
 import org.itsallcode.openfasttrace.intellijplugin.indexing.OftIndexedSpecification;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItem;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSpecificationItemMatch;
 import org.itsallcode.openfasttrace.intellijplugin.syntax.OftSyntaxCore;
+import org.itsallcode.openfasttrace.intellijplugin.syntax.OftTextSpan;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -26,29 +28,38 @@ public final class OftRenameHandler implements RenameHandler {
     @Override
     public boolean isAvailableOnDataContext(final @NonNull DataContext dataContext) {
         final Editor editor = CommonDataKeys.EDITOR.getData(dataContext);
+        if (editor != null && isAvailableInEditor(editor, dataContext)) {
+            return true;
+        }
+        final PsiElement element = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
+        if (hasDeclaredItem(element)) {
+            return true;
+        }
+        final PsiElement[] elements = CommonRefactoringUtil.getPsiElementArray(dataContext);
+        return elements.length == 1 && hasDeclaredItem(elements[0]);
+    }
+
+    private static boolean isAvailableInEditor(final Editor editor, final DataContext dataContext) {
         PsiFile file = CommonDataKeys.PSI_FILE.getData(dataContext);
-        if (file == null && editor != null) {
+        if (file == null) {
             final Project project = CommonDataKeys.PROJECT.getData(dataContext);
             if (project != null) {
                 file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
             }
         }
-        if (editor != null && file != null) {
-            final VirtualFile virtualFile = file.getVirtualFile();
-            if (virtualFile != null && OftSupportedFiles.isSpecificationFile(virtualFile)) {
-                final int offset = editor.getCaretModel().getOffset();
-                if (findDeclarationAt(file, offset).isPresent()) {
-                    return true;
-                }
-            }
+        if (file == null) {
+            return false;
         }
-        final PsiElement element = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
-        if (element != null && OftDeclarationResolver.findDeclaredItem(element).isPresent()) {
-            return true;
+        final VirtualFile virtualFile = file.getVirtualFile();
+        if (virtualFile == null || !OftSupportedFiles.isSpecificationFile(virtualFile)) {
+            return false;
         }
-        final PsiElement[] elements = CommonRefactoringUtil.getPsiElementArray(dataContext);
-        return elements.length == 1 && elements[0] != null
-                && OftDeclarationResolver.findDeclaredItem(elements[0]).isPresent();
+        final int offset = editor.getCaretModel().getOffset();
+        return findDeclarationAt(file, offset).isPresent();
+    }
+
+    private static boolean hasDeclaredItem(final @Nullable PsiElement element) {
+        return element != null && OftDeclarationResolver.findDeclaredItem(element).isPresent();
     }
 
     @Override
@@ -123,46 +134,69 @@ public final class OftRenameHandler implements RenameHandler {
             final @Nullable PsiFile file,
             final int offset
     ) {
-        if (file == null || file.getVirtualFile() == null || !OftSupportedFiles.isSpecificationFile(file.getVirtualFile())) {
+        if (file == null || file.getVirtualFile() == null
+                || !OftSupportedFiles.isSpecificationFile(file.getVirtualFile())) {
             return Optional.empty();
         }
         final CharSequence text = file.getViewProvider().getContents();
-        for (OftSpecificationItemMatch match : OftSyntaxCore.findDefinitionSpecificationItems(text)) {
-            final int start = match.span().startOffset();
-            final int end = match.span().endOffset();
-            final int startBound = (start > 0 && text.charAt(start - 1) == '`') ? start - 1 : start;
-            final int endBound = (end < text.length() && text.charAt(end) == '`') ? end + 1 : end;
-            if (offset >= startBound && offset <= endBound) {
-                final PsiElement psiElement = file.findElementAt(start);
-                final OftIndexedSpecification spec = new OftIndexedSpecification(
-                        match.item().artifactType(),
-                        match.item().name(),
-                        match.item().revision(),
-                        start
-                );
-                return Optional.of(new OftDeclarationNavigationElement(
-                        psiElement != null ? psiElement : file,
-                        spec
-                ));
+        for (final OftSpecificationItemMatch match : OftSyntaxCore.findDefinitionSpecificationItems(text)) {
+            if (isOffsetWithinBounds(text, match.span(), offset)) {
+                return Optional.of(createDeclarationElement(file, match));
             }
         }
         return Optional.empty();
+    }
+
+    private static boolean isOffsetWithinBounds(
+            final CharSequence text,
+            final OftTextSpan span,
+            final int offset
+    ) {
+        final int start = span.startOffset();
+        final int end = span.endOffset();
+        final int startBound = ((start > 0) && (text.charAt(start - 1) == '`')) ? (start - 1) : start;
+        final int endBound = ((end < text.length()) && (text.charAt(end) == '`')) ? (end + 1) : end;
+        return (offset >= startBound) && (offset <= endBound);
+    }
+
+    private static OftDeclarationNavigationElement createDeclarationElement(
+            final PsiFile file,
+            final OftSpecificationItemMatch match
+    ) {
+        final int start = match.span().startOffset();
+        final PsiElement psiElement = file.findElementAt(start);
+        final OftIndexedSpecification spec = new OftIndexedSpecification(
+                match.item().artifactType(),
+                match.item().name(),
+                match.item().revision(),
+                start
+        );
+        return new OftDeclarationNavigationElement(
+                psiElement != null ? psiElement : file,
+                spec
+        );
     }
 
     private static Optional<PsiElement> resolveDeclarationTarget(final PsiElement element) {
         if (element instanceof OftDeclarationNavigationElement) {
             return Optional.of(element);
         }
-        return OftDeclarationResolver.findDeclaredItem(element).map(declaredItem -> {
-            final TextRange range = element.getTextRange();
-            final int offset = range != null ? range.getStartOffset() : element.getTextOffset();
-            final OftIndexedSpecification spec = new OftIndexedSpecification(
-                    declaredItem.artifactType(),
-                    declaredItem.name(),
-                    declaredItem.revision(),
-                    offset
-            );
-            return new OftDeclarationNavigationElement(element, spec);
-        });
+        return OftDeclarationResolver.findDeclaredItem(element)
+                .map(declaredItem -> createDeclarationNavigationElement(element, declaredItem));
+    }
+
+    private static OftDeclarationNavigationElement createDeclarationNavigationElement(
+            final PsiElement element,
+            final OftSpecificationItem declaredItem
+    ) {
+        final TextRange range = element.getTextRange();
+        final int offset = range != null ? range.getStartOffset() : element.getTextOffset();
+        final OftIndexedSpecification spec = new OftIndexedSpecification(
+                declaredItem.artifactType(),
+                declaredItem.name(),
+                declaredItem.revision(),
+                offset
+        );
+        return new OftDeclarationNavigationElement(element, spec);
     }
 }

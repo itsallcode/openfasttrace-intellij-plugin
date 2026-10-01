@@ -36,7 +36,10 @@ public final class OftRenameInputValidator implements RenameInputValidatorEx {
     }
 
     @Override
-    public @DialogMessage @Nullable String getErrorMessage(final @NotNull String newName, final @NotNull Project project) {
+    public @DialogMessage @Nullable String getErrorMessage(
+            final @NotNull String newName,
+            final @NotNull Project project
+    ) {
         if (OftSyntaxCore.classifySpecificationItem(newName) == OftFragmentStatus.VALID) {
             return null;
         }

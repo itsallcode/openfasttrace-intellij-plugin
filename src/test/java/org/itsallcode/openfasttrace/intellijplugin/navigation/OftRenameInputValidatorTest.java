@@ -91,4 +91,34 @@ public class OftRenameInputValidatorTest extends AbstractOftPlatformTestCase {
 
         assertThat(validator.getPattern().accepts(headerElement, context), is(false));
     }
+
+    public void testGivenNonMatchingPsiElementsWhenTestingPatternAcceptanceThenReturnsFalse() {
+        final PsiFile javaFile = myFixture.addFileToProject("src/Main.java", "class Main {}");
+        final ProcessingContext context = new ProcessingContext();
+
+        assertAll(
+                () -> assertThat(validator.getPattern().accepts(javaFile, context), is(false)),
+                () -> assertThat(
+                        validator.getPattern().accepts(Objects.requireNonNull(javaFile.findElementAt(0)), context),
+                        is(false)
+                )
+        );
+    }
+
+    public void testGivenVariousMalformedSpecificationItemIdsWhenCheckingIsValidThenReturnsFalse() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                req~test-item.name_1~1
+                Needs: dsn
+                """);
+        final PsiElement declarationElement = Objects.requireNonNull(specFile.findElementAt(0));
+        final ProcessingContext context = new ProcessingContext();
+
+        assertAll(
+                () -> assertThat(validator.isInputValid("req~~1", declarationElement, context), is(false)),
+                () -> assertThat(validator.isInputValid("req~name~", declarationElement, context), is(false)),
+                () -> assertThat(validator.isInputValid("req~name~-1", declarationElement, context), is(false)),
+                () -> assertThat(validator.isInputValid("unknown_type~name~1", declarationElement, context), is(false)),
+                () -> assertThat(validator.isInputValid("   ", declarationElement, context), is(false))
+        );
+    }
 }

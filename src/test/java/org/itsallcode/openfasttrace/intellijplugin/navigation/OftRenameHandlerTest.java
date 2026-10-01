@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 // [itest->dsn~specification-item-rename~1]
 public class OftRenameHandlerTest extends AbstractOftPlatformTestCase {
@@ -161,10 +162,11 @@ public class OftRenameHandlerTest extends AbstractOftPlatformTestCase {
                 Covers:
                 - req~test_item~1
                 """);
-        final PsiFile javaFile = myFixture.addFileToProject("src/Main.java",
-                "// [" + "impl->req~test_item~1]\n"
-                        + "class Main {}\n"
-        );
+        final String coverageTag = "[impl" + "->req~test_item~1]";
+        final PsiFile javaFile = myFixture.addFileToProject("src/Main.java", """
+                // %s
+                class Main {}
+                """.formatted(coverageTag));
 
         myFixture.configureFromExistingVirtualFile(specFile.getVirtualFile());
         myFixture.getEditor().getCaretModel().moveToOffset(4);
@@ -237,6 +239,220 @@ public class OftRenameHandlerTest extends AbstractOftPlatformTestCase {
         assertAll(
                 () -> assertThat(specFile.getText(), containsString("req~renamed_item~2")),
                 () -> assertThat(designFile.getText(), containsString("req~renamed_item~2"))
+        );
+    }
+
+    public void testGivenEditorWithoutPsiFileInContextWhenCheckingIsAvailableThenResolvesFileFromDocument() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                req~test_item~1
+                Needs: dsn
+                """);
+        myFixture.configureFromExistingVirtualFile(specFile.getVirtualFile());
+        myFixture.getEditor().getCaretModel().moveToOffset(5);
+
+        final DataContext dataContext = SimpleDataContext.builder()
+                .add(CommonDataKeys.EDITOR, myFixture.getEditor())
+                .add(CommonDataKeys.PROJECT, getProject())
+                .build();
+
+        assertThat(handler.isAvailableOnDataContext(dataContext), is(true));
+    }
+
+    public void testGivenEditorWithNullProjectAndNoDeclarationInDataContextWhenCheckingIsAvailableThenReturnsFalse() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                # Header
+                req~test_item~1
+                """);
+        myFixture.configureFromExistingVirtualFile(specFile.getVirtualFile());
+        myFixture.getEditor().getCaretModel().moveToOffset(2);
+
+        final DataContext dataContext = SimpleDataContext.builder()
+                .add(CommonDataKeys.EDITOR, myFixture.getEditor())
+                .build();
+
+        assertThat(handler.isAvailableOnDataContext(dataContext), is(false));
+    }
+
+    public void testGivenNoDefaultNameInDataContextWhenInvokingRenameThenRenameWithoutDefaultNameIsCalled() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                req~test_item~1
+                Needs: dsn
+                """);
+        final PsiElement declarationElement = Objects.requireNonNull(specFile.findElementAt(0));
+
+        final DataContext dataContext = SimpleDataContext.builder()
+                .add(CommonDataKeys.PSI_ELEMENT, declarationElement)
+                .add(CommonDataKeys.PROJECT, getProject())
+                .build();
+
+        assertDoesNotThrow(() -> EdtTestUtil.runInEdtAndWait(() ->
+                handler.invoke(getProject(), null, null, dataContext)));
+    }
+
+    public void testGivenNoEditorAndPsiElementInContextWhenInvokingRenameThenPerformsRename() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                req~test_item~1
+                Needs: dsn
+                """);
+        final PsiFile designFile = myFixture.addFileToProject("doc/design.md", """
+                dsn~design_item~1
+                Covers:
+                - req~test_item~1
+                """);
+        final PsiElement declarationElement = Objects.requireNonNull(specFile.findElementAt(0));
+        final OftDeclarationNavigationElement navElement = new OftDeclarationNavigationElement(
+                declarationElement,
+                new OftIndexedSpecification("req", "test_item", 1, 0)
+        );
+
+        final DataContext dataContext = SimpleDataContext.builder()
+                .add(CommonDataKeys.PSI_ELEMENT, navElement)
+                .add(CommonDataKeys.PROJECT, getProject())
+                .add(PsiElementRenameHandler.DEFAULT_NAME, "req~renamed_item~2")
+                .build();
+
+        EdtTestUtil.runInEdtAndWait(() ->
+                handler.invoke(getProject(), null, null, dataContext)
+        );
+
+        assertAll(
+                () -> assertThat(specFile.getText(), containsString("req~renamed_item~2")),
+                () -> assertThat(designFile.getText(), containsString("req~renamed_item~2"))
+        );
+    }
+
+    public void testGivenNoEditorAndRawPsiElementWithDeclaredItemWhenInvokingRenameThenPerformsRename() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                req~test_item~1
+                Needs: dsn
+                """);
+        final PsiElement declarationElement = Objects.requireNonNull(specFile.findElementAt(0));
+
+        final DataContext dataContext = SimpleDataContext.builder()
+                .add(CommonDataKeys.PSI_ELEMENT, declarationElement)
+                .add(CommonDataKeys.PROJECT, getProject())
+                .add(PsiElementRenameHandler.DEFAULT_NAME, "req~renamed_item~2")
+                .build();
+
+        EdtTestUtil.runInEdtAndWait(() ->
+                handler.invoke(getProject(), null, null, dataContext)
+        );
+
+        assertThat(specFile.getText(), containsString("req~renamed_item~2"));
+    }
+
+    public void testGivenNoEditorAndPsiElementArrayInContextWhenInvokingRenameThenPerformsRename() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                req~test_item~1
+                Needs: dsn
+                """);
+        final PsiElement declarationElement = Objects.requireNonNull(specFile.findElementAt(0));
+
+        final DataContext dataContext = SimpleDataContext.builder()
+                .add(PlatformCoreDataKeys.PSI_ELEMENT_ARRAY, new PsiElement[]{declarationElement})
+                .add(CommonDataKeys.PROJECT, getProject())
+                .add(PsiElementRenameHandler.DEFAULT_NAME, "req~renamed_item~2")
+                .build();
+
+        EdtTestUtil.runInEdtAndWait(() ->
+                handler.invoke(getProject(), null, null, dataContext)
+        );
+
+        assertThat(specFile.getText(), containsString("req~renamed_item~2"));
+    }
+
+    public void testGivenEditorAndNullFileWhenInvokingRenameThenResolvesFileFromEditor() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                req~test_item~1
+                Needs: dsn
+                """);
+        myFixture.configureFromExistingVirtualFile(specFile.getVirtualFile());
+        myFixture.getEditor().getCaretModel().moveToOffset(4);
+
+        final DataContext dataContext = SimpleDataContext.builder()
+                .add(CommonDataKeys.EDITOR, myFixture.getEditor())
+                .add(CommonDataKeys.PROJECT, getProject())
+                .add(PsiElementRenameHandler.DEFAULT_NAME, "req~renamed_item~2")
+                .build();
+
+        EdtTestUtil.runInEdtAndWait(() ->
+                handler.invoke(getProject(), myFixture.getEditor(), null, dataContext)
+        );
+
+        assertThat(specFile.getText(), containsString("req~renamed_item~2"));
+    }
+
+    public void testGivenCaretNotOnDeclarationAndNoPsiElementInContextWhenInvokingRenameThenDoesNothing() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                # Header
+                req~test_item~1
+                Needs: dsn
+                """);
+        myFixture.configureFromExistingVirtualFile(specFile.getVirtualFile());
+        myFixture.getEditor().getCaretModel().moveToOffset(2);
+
+        final DataContext dataContext = SimpleDataContext.builder()
+                .add(CommonDataKeys.EDITOR, myFixture.getEditor())
+                .add(CommonDataKeys.PSI_FILE, myFixture.getFile())
+                .add(CommonDataKeys.PROJECT, getProject())
+                .add(PsiElementRenameHandler.DEFAULT_NAME, "req~renamed_item~2")
+                .build();
+
+        EdtTestUtil.runInEdtAndWait(() ->
+                handler.invoke(getProject(), myFixture.getEditor(), myFixture.getFile(), dataContext)
+        );
+
+        assertThat(specFile.getText(), containsString("req~test_item~1"));
+    }
+
+    public void testGivenElementsArrayWithMultipleElementsWhenInvokingRenameThenFallsBackToDataContext() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                req~test_item~1
+                Needs: dsn
+                """);
+        final PsiElement declarationElement = Objects.requireNonNull(specFile.findElementAt(0));
+
+        final DataContext dataContext = SimpleDataContext.builder()
+                .add(CommonDataKeys.PSI_ELEMENT, declarationElement)
+                .add(CommonDataKeys.PROJECT, getProject())
+                .add(PsiElementRenameHandler.DEFAULT_NAME, "req~renamed_item~2")
+                .build();
+
+        EdtTestUtil.runInEdtAndWait(() ->
+                handler.invoke(getProject(), new PsiElement[0], dataContext)
+        );
+
+        assertThat(specFile.getText(), containsString("req~renamed_item~2"));
+    }
+
+    public void testGivenElementsArrayWithNavigationElementWhenInvokingRenameThenPerformsRename() {
+        final PsiFile specFile = myFixture.addFileToProject("doc/spec.md", """
+                req~test_item~1
+                Needs: dsn
+                """);
+        final PsiElement declarationElement = Objects.requireNonNull(specFile.findElementAt(0));
+        final OftDeclarationNavigationElement navElement = new OftDeclarationNavigationElement(
+                declarationElement,
+                new OftIndexedSpecification("req", "test_item", 1, 0)
+        );
+
+        final DataContext dataContext = SimpleDataContext.builder()
+                .add(CommonDataKeys.PROJECT, getProject())
+                .add(PsiElementRenameHandler.DEFAULT_NAME, "req~renamed_item~2")
+                .build();
+
+        EdtTestUtil.runInEdtAndWait(() ->
+                handler.invoke(getProject(), new PsiElement[]{navElement}, dataContext)
+        );
+
+        assertThat(specFile.getText(), containsString("req~renamed_item~2"));
+    }
+
+    public void testFindDeclarationAtGivenNullOrNonSpecificationFileThenReturnsEmpty() {
+        final PsiFile javaFile = myFixture.addFileToProject("src/Main.java", "class Main {}");
+        assertAll(
+                () -> assertThat(OftRenameHandler.findDeclarationAt(null, 0).isEmpty(), is(true)),
+                () -> assertThat(OftRenameHandler.findDeclarationAt(javaFile, 0).isEmpty(), is(true))
         );
     }
 }
